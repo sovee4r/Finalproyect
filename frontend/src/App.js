@@ -26,143 +26,174 @@ const Home = () => {
   // Vista del juego en pantalla completa
   if (isPlaying) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-8" data-testid="game-fullscreen">
-        <div className="text-center space-y-6">
-          <h1 className="text-6xl font-bold text-white mb-8">🎮 Juego en Progreso</h1>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-12 border-2 border-purple-500/30 min-h-[500px] flex items-center justify-center">
-            <p className="text-2xl text-purple-300">Aquí va tu juego...</p>
+      <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center p-8" data-testid="game-fullscreen">
+        {/* Efecto scanlines retro */}
+        <div className="absolute inset-0 pointer-events-none opacity-10" style={{
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, #00ff00 2px, #00ff00 4px)'
+        }}></div>
+        
+        <div className="text-center space-y-6 relative z-10">
+          <h1 className="text-6xl font-bold text-cyan-400 mb-8 tracking-wider" style={{textShadow: '4px 4px 0px #ff00ff, 8px 8px 0px rgba(255,0,255,0.3)'}}>
+            █ JUEGO EN PROGRESO █
+          </h1>
+          <div className="bg-black border-8 border-cyan-400 p-12 min-h-[500px] flex items-center justify-center" style={{boxShadow: '0 0 20px #00ffff, inset 0 0 20px rgba(0,255,255,0.1)'}}>
+            <p className="text-3xl text-lime-400 font-bold tracking-widest animate-pulse">▓▓▓ GAME AREA ▓▓▓</p>
           </div>
           <button
             onClick={() => setIsPlaying(false)}
-            className="px-8 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold rounded-full shadow-lg transform transition hover:scale-105"
+            className="px-10 py-4 bg-magenta-600 hover:bg-magenta-500 text-yellow-300 text-xl font-bold border-4 border-yellow-300 tracking-widest transition-all"
+            style={{boxShadow: '6px 6px 0px #ffff00'}}
             data-testid="exit-game-button"
           >
-            Salir del Juego
+            [[ SALIR ]]
           </button>
         </div>
       </div>
     );
   }
 
-  // Vista del lobby principal
+  // Vista del lobby principal - ESTILO RETRO
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-6">
-      {/* Icono de casa en esquina superior izquierda */}
-      <div className="absolute top-6 left-6">
+    <div className="min-h-screen bg-black relative overflow-hidden p-6">
+      {/* Efecto scanlines retro sutil */}
+      <div className="absolute inset-0 pointer-events-none opacity-5" style={{
+        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, #00ff00 2px, #00ff00 4px)'
+      }}></div>
+
+      {/* Grid retro de fondo */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
+        backgroundImage: 'linear-gradient(#00ffff 1px, transparent 1px), linear-gradient(90deg, #00ffff 1px, transparent 1px)',
+        backgroundSize: '50px 50px'
+      }}></div>
+
+      {/* Icono de casa en esquina superior izquierda - RETRO */}
+      <div className="absolute top-6 left-6 z-20">
         <button 
-          className="p-3 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors"
+          className="p-3 bg-cyan-500 hover:bg-cyan-400 border-4 border-yellow-300 transition-colors"
+          style={{boxShadow: '4px 4px 0px #ffff00'}}
           data-testid="home-button"
         >
-          <svg className="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
+          <span className="text-2xl">🏠</span>
         </button>
       </div>
 
       {/* Contenedor principal con dos secciones */}
-      <div className="max-w-7xl mx-auto pt-20">
+      <div className="max-w-7xl mx-auto pt-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
           
-          {/* Sección Principal (Izquierda - Juego) */}
-          <div className="lg:col-span-2 bg-slate-800/30 backdrop-blur-sm rounded-3xl border-2 border-purple-500/20 p-8 shadow-2xl" data-testid="main-game-area">
+          {/* Sección Principal (Izquierda - Juego) - RETRO */}
+          <div className="lg:col-span-2 bg-black border-8 border-cyan-400 p-8" style={{boxShadow: '0 0 30px #00ffff, inset 0 0 20px rgba(0,255,255,0.1)'}} data-testid="main-game-area">
             
-            {/* Logo/título con colores */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="flex gap-1">
-                <div className="w-2 h-8 bg-purple-500 rounded-full transform -rotate-12"></div>
-                <div className="w-2 h-8 bg-pink-500 rounded-full"></div>
-                <div className="w-2 h-8 bg-fuchsia-500 rounded-full transform rotate-12"></div>
+            {/* Logo/título con colores RETRO */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="flex gap-2">
+                <div className="w-4 h-12 bg-magenta-500" style={{boxShadow: '0 0 10px #ff00ff'}}></div>
+                <div className="w-4 h-12 bg-cyan-400" style={{boxShadow: '0 0 10px #00ffff'}}></div>
+                <div className="w-4 h-12 bg-yellow-400" style={{boxShadow: '0 0 10px #ffff00'}}></div>
               </div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-fuchsia-400 bg-clip-text text-transparent">
-                LOGO
+              <h2 className="text-4xl font-bold text-yellow-300 tracking-widest" style={{textShadow: '3px 3px 0px #ff00ff'}}>
+                ▓▓ LOGO ▓▓
               </h2>
             </div>
 
-            {/* Área del personaje */}
+            {/* Área del personaje - RETRO */}
             <div className="flex flex-col items-center justify-center space-y-8 py-12">
               <div className="relative">
-                {/* Círculo grande del personaje */}
-                <div className="w-64 h-64 bg-gradient-to-br from-purple-900/40 to-pink-900/40 rounded-full flex items-center justify-center border-4 border-purple-500/30 shadow-2xl" data-testid="character-circle">
+                {/* Círculo grande del personaje con estilo retro */}
+                <div className="w-64 h-64 bg-black border-8 border-magenta-500 flex items-center justify-center relative" 
+                     style={{
+                       boxShadow: '0 0 30px #ff00ff, inset 0 0 30px rgba(255,0,255,0.2)',
+                       clipPath: 'circle(50%)'
+                     }} 
+                     data-testid="character-circle">
                   {/* Círculo pequeño interno con ícono */}
-                  <div className="w-20 h-20 bg-slate-700/50 rounded-full flex items-center justify-center border-2 border-purple-400/50">
-                    <span className="text-4xl">👤</span>
+                  <div className="w-24 h-24 bg-cyan-500 border-4 border-yellow-300 flex items-center justify-center" style={{clipPath: 'circle(50%)', boxShadow: '0 0 20px #00ffff'}}>
+                    <span className="text-5xl">👾</span>
                   </div>
                 </div>
                 
-                {/* Botón de editar personaje (lápiz) */}
+                {/* Botón de editar personaje (lápiz) - RETRO */}
                 <button
                   onClick={() => setIsEditingCharacter(!isEditingCharacter)}
-                  className="absolute bottom-4 right-4 p-3 bg-purple-600 hover:bg-purple-700 rounded-full shadow-lg transition-all transform hover:scale-110"
+                  className="absolute bottom-4 right-4 p-3 bg-yellow-400 hover:bg-yellow-300 border-4 border-magenta-500 transition-all"
+                  style={{boxShadow: '4px 4px 0px #ff00ff'}}
                   data-testid="edit-character-button"
                 >
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
+                  <span className="text-2xl">✏️</span>
                 </button>
               </div>
 
-              <p className="text-purple-300 text-xl font-medium">Personaje</p>
+              <p className="text-cyan-400 text-2xl font-bold tracking-widest" style={{textShadow: '2px 2px 0px #ff00ff'}}>
+                ▒▒ PERSONAJE ▒▒
+              </p>
 
-              {/* Botón de inicio */}
+              {/* Botón de inicio - RETRO */}
               <button
                 onClick={() => setIsPlaying(true)}
-                className="px-12 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-700 hover:via-pink-700 hover:to-fuchsia-700 text-white text-lg font-bold rounded-full shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl"
+                className="px-16 py-5 bg-magenta-600 hover:bg-magenta-500 text-yellow-300 text-2xl font-bold border-8 border-cyan-400 tracking-widest transition-all transform hover:scale-105"
+                style={{boxShadow: '8px 8px 0px #00ffff, 0 0 30px #ff00ff'}}
                 data-testid="start-button"
               >
-                Inicio
+                ► INICIO ◄
               </button>
             </div>
           </div>
 
-          {/* Sección Derecha (Lista de amigos) */}
-          <div className="bg-slate-800/30 backdrop-blur-sm rounded-3xl border-2 border-purple-500/20 p-6 shadow-2xl flex flex-col" data-testid="friends-sidebar">
+          {/* Sección Derecha (Lista de amigos) - RETRO */}
+          <div className="bg-black border-8 border-lime-400 p-6 flex flex-col" style={{boxShadow: '0 0 30px #00ff00, inset 0 0 20px rgba(0,255,0,0.1)'}} data-testid="friends-sidebar">
             
-            {/* Título de la lista */}
-            <div className="bg-slate-700/50 rounded-xl p-3 mb-4 text-center border border-purple-500/30">
-              <h3 className="text-lg font-semibold text-purple-300">Lista de amigos</h3>
+            {/* Título de la lista - RETRO */}
+            <div className="bg-lime-400 border-4 border-cyan-400 p-4 mb-6 text-center" style={{boxShadow: '4px 4px 0px #00ffff'}}>
+              <h3 className="text-xl font-bold text-black tracking-widest">LISTA DE AMIGOS</h3>
             </div>
 
-            {/* Lista de amigos */}
-            <div className="space-y-3 flex-1">
+            {/* Lista de amigos - RETRO */}
+            <div className="space-y-4 flex-1">
               {/* Tu usuario */}
-              <div className="bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-full px-5 py-3 text-center border border-purple-400/40" data-testid="your-user">
-                <p className="text-white font-medium">"tu usuario"</p>
+              <div className="bg-magenta-600 border-4 border-yellow-300 px-5 py-4 text-center" style={{boxShadow: '4px 4px 0px #ffff00'}} data-testid="your-user">
+                <p className="text-yellow-300 font-bold text-lg tracking-wide">★ TU USUARIO ★</p>
               </div>
 
               {/* Amigo 1 */}
-              <div className="bg-slate-700/40 hover:bg-slate-700/60 rounded-full px-5 py-3 text-center border border-slate-600 transition-colors cursor-pointer" data-testid="friend-1">
-                <p className="text-purple-200">"amigo"</p>
+              <div className="bg-cyan-700 hover:bg-cyan-600 border-4 border-lime-400 px-5 py-4 text-center transition-colors cursor-pointer" style={{boxShadow: '3px 3px 0px #00ff00'}} data-testid="friend-1">
+                <p className="text-lime-300 font-bold tracking-wide">▸ AMIGO</p>
               </div>
 
               {/* Amigo 2 */}
-              <div className="bg-slate-700/40 hover:bg-slate-700/60 rounded-full px-5 py-3 text-center border border-slate-600 transition-colors cursor-pointer" data-testid="friend-2">
-                <p className="text-purple-200">"amigo"</p>
+              <div className="bg-cyan-700 hover:bg-cyan-600 border-4 border-lime-400 px-5 py-4 text-center transition-colors cursor-pointer" style={{boxShadow: '3px 3px 0px #00ff00'}} data-testid="friend-2">
+                <p className="text-lime-300 font-bold tracking-wide">▸ AMIGO</p>
               </div>
             </div>
 
-            {/* Botón agregar amigo */}
+            {/* Botón agregar amigo - RETRO */}
             <button
-              className="mt-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 rounded-full px-5 py-3 text-white font-semibold transition-all transform hover:scale-105 shadow-lg"
+              className="mt-6 bg-yellow-400 hover:bg-yellow-300 border-4 border-magenta-500 px-5 py-4 text-black font-bold text-lg tracking-widest transition-all transform hover:scale-105"
+              style={{boxShadow: '4px 4px 0px #ff00ff'}}
               data-testid="add-friend-button"
             >
-              Agregar amigo
+              + AGREGAR AMIGO +
             </button>
           </div>
 
         </div>
       </div>
 
-      {/* Modal de edición de personaje */}
+      {/* Modal de edición de personaje - RETRO */}
       {isEditingCharacter && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setIsEditingCharacter(false)}>
-          <div className="bg-slate-800 rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl max-w-md" onClick={(e) => e.stopPropagation()} data-testid="edit-character-modal">
-            <h3 className="text-2xl font-bold text-purple-300 mb-4">Editar Personaje</h3>
-            <p className="text-slate-300 mb-6">Aquí podrás personalizar tu personaje...</p>
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={() => setIsEditingCharacter(false)}>
+          <div className="bg-black border-8 border-cyan-400 p-10 max-w-md" style={{boxShadow: '0 0 50px #00ffff'}} onClick={(e) => e.stopPropagation()} data-testid="edit-character-modal">
+            <h3 className="text-3xl font-bold text-yellow-300 mb-6 tracking-widest text-center" style={{textShadow: '3px 3px 0px #ff00ff'}}>
+              ▓ EDITAR PERSONAJE ▓
+            </h3>
+            <p className="text-cyan-400 mb-8 text-center text-lg tracking-wide">
+              Personaliza tu avatar retro...
+            </p>
             <button
               onClick={() => setIsEditingCharacter(false)}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all"
+              className="w-full px-6 py-4 bg-magenta-600 hover:bg-magenta-500 text-yellow-300 font-bold text-xl border-4 border-yellow-300 tracking-widest transition-all"
+              style={{boxShadow: '6px 6px 0px #ffff00'}}
             >
-              Cerrar
+              [[ CERRAR ]]
             </button>
           </div>
         </div>
