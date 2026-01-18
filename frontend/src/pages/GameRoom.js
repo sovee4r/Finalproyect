@@ -177,6 +177,30 @@ function GameRoom() {
       setCurrentQuestion(response.data);
       setSelectedAnswer(null);
       setAnswerResult(null);
+      
+      // Start timer
+      setTimeLeft(room?.time_per_question || 30);
+      
+      // Clear previous timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      
+      // Start countdown
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            // Auto-submit with no answer if time runs out
+            if (selectedAnswer === null) {
+              handleAnswerSelect(-1); // -1 means no answer (time out)
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
     } catch (error) {
       console.error('Error loading question:', error);
     }
