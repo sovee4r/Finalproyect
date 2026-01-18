@@ -72,6 +72,7 @@ function Login() {
               id="email-input"
               name="email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-900 border-4 border-purple-400 px-4 py-3 text-white focus:outline-none focus:border-pink-400"
@@ -86,6 +87,7 @@ function Login() {
               id="password-input"
               name="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-900 border-4 border-purple-400 px-4 py-3 text-white focus:outline-none focus:border-pink-400"
