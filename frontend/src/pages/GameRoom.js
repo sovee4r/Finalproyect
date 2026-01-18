@@ -118,6 +118,9 @@ function GameRoom() {
 
     return () => {
       websocket.close();
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
   }, [user, roomId]);
 
