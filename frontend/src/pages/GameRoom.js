@@ -43,6 +43,12 @@ function GameRoom() {
         });
         setUser(userResponse.data);
 
+        const roomResponse = await axios.get(`${API}/rooms/${roomId}`, {
+          headers: getAuthHeaders(),
+          withCredentials: true
+        });
+        setRoom(roomResponse.data);
+
         const messagesResponse = await axios.get(`${API}/rooms/${roomId}/messages`, {
           headers: getAuthHeaders(),
           withCredentials: true
