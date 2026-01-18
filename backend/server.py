@@ -566,6 +566,240 @@ async def leave_room(room_id: str, user: dict = Depends(get_current_user)):
     
     return {"message": "Left room successfully"}
 
+# ============ GAME QUESTIONS & SESSION ROUTES ============
+
+@api_router.post("/rooms/{room_id}/start")
+async def start_game_session(room_id: str, user: dict = Depends(get_current_user)):
+    """Start a game session and generate questions"""
+    room_doc = await db.game_rooms.find_one({"room_id": room_id}, {"_id": 0})
+    if not room_doc:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    if room_doc["host_user_id"] != user["user_id"]:
+        raise HTTPException(status_code=403, detail="Only host can start game")
+    
+    # Get questions for this subject and grade
+    questions = await db.questions.find({
+        "subject": room_doc["subject"],
+        "grade_level": room_doc["grade_level"]
+    }, {"_id": 0}).to_list(10)
+    
+    if not questions:
+        # If no questions exist, create some default ones
+        questions = await create_default_questions(room_doc["subject"], room_doc["grade_level"])
+    
+    # Limit to 10 questions and shuffle
+    import random
+    random.shuffle(questions)
+    questions = questions[:10]
+    
+    # Create game session
+    session_id = f"session_{uuid.uuid4().hex[:12]}"
+    question_ids = [q["question_id"] for q in questions]
+    
+    # Initialize player scores
+    player_scores = {player_id: 0 for player_id in room_doc["players"]}
+    player_answers = {player_id: [] for player_id in room_doc["players"]}
+    
+    session_doc = {
+        "session_id": session_id,
+        "room_id": room_id,
+        "current_question": 0,
+        "questions": question_ids,
+        "player_scores": player_scores,
+        "player_answers": player_answers,
+        "started_at": datetime.now(timezone.utc),
+        "status": "active"
+    }
+    
+    await db.game_sessions.insert_one(session_doc)
+    
+    # Update room status
+    await db.game_rooms.update_one(
+        {"room_id": room_id},
+        {"$set": {"status": "playing"}}
+    )
+    
+    return {
+        "session_id": session_id,
+        "questions": questions,
+        "total_questions": len(questions)
+    }
+
+@api_router.get("/sessions/{session_id}/question/{question_num}")
+async def get_question(session_id: str, question_num: int, user: dict = Depends(get_current_user)):
+    """Get specific question for the game"""
+    session_doc = await db.game_sessions.find_one({"session_id": session_id}, {"_id": 0})
+    if not session_doc:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    if question_num >= len(session_doc["questions"]):
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    question_id = session_doc["questions"][question_num]
+    question_doc = await db.questions.find_one({"question_id": question_id}, {"_id": 0})
+    
+    if not question_doc:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    # Don't send correct answer to frontend
+    question_response = question_doc.copy()
+    question_response.pop("correct_answer", None)
+    question_response["question_number"] = question_num + 1
+    question_response["total_questions"] = len(session_doc["questions"])
+    
+    return question_response
+
+@api_router.post("/sessions/{session_id}/answer")
+async def submit_answer(
+    session_id: str,
+    question_num: int,
+    answer: int,
+    user: dict = Depends(get_current_user)
+):
+    """Submit answer for a question"""
+    session_doc = await db.game_sessions.find_one({"session_id": session_id}, {"_id": 0})
+    if not session_doc:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    # Get the question
+    question_id = session_doc["questions"][question_num]
+    question_doc = await db.questions.find_one({"question_id": question_id}, {"_id": 0})
+    
+    # Check if answer is correct
+    is_correct = answer == question_doc["correct_answer"]
+    
+    # Update player score
+    if is_correct:
+        await db.game_sessions.update_one(
+            {"session_id": session_id},
+            {"$inc": {f"player_scores.{user['user_id']}": 1}}
+        )
+    
+    # Record answer
+    await db.game_sessions.update_one(
+        {"session_id": session_id},
+        {"$push": {f"player_answers.{user['user_id']}": answer}}
+    )
+    
+    return {
+        "is_correct": is_correct,
+        "correct_answer": question_doc["correct_answer"],
+        "explanation": f"La respuesta correcta es: {question_doc['options'][question_doc['correct_answer']]}"
+    }
+
+@api_router.get("/sessions/{session_id}/results")
+async def get_game_results(session_id: str, user: dict = Depends(get_current_user)):
+    """Get final game results"""
+    session_doc = await db.game_sessions.find_one({"session_id": session_id}, {"_id": 0})
+    if not session_doc:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    # Get player usernames
+    player_ids = list(session_doc["player_scores"].keys())
+    players = await db.users.find(
+        {"user_id": {"$in": player_ids}},
+        {"_id": 0, "user_id": 1, "username": 1, "user_tag": 1}
+    ).to_list(100)
+    
+    # Build results
+    results = []
+    for player in players:
+        score = session_doc["player_scores"].get(player["user_id"], 0)
+        results.append({
+            "user_id": player["user_id"],
+            "username": f"{player['username']}#{player.get('user_tag', '0000')}",
+            "score": score,
+            "total_questions": len(session_doc["questions"])
+        })
+    
+    # Sort by score
+    results.sort(key=lambda x: x["score"], reverse=True)
+    
+    return {
+        "session_id": session_id,
+        "results": results,
+        "winner": results[0] if results else None
+    }
+
+async def create_default_questions(subject: str, grade_level: str):
+    """Create default questions if none exist"""
+    default_questions = {
+        "matematicas": {
+            "10": [
+                {
+                    "question_text": "¿Cuál es el resultado de 2³ + 4²?",
+                    "options": ["24", "20", "16", "18"],
+                    "correct_answer": 0
+                },
+                {
+                    "question_text": "La ecuación x² - 5x + 6 = 0 tiene como soluciones:",
+                    "options": ["x = 2, x = 3", "x = 1, x = 6", "x = -2, x = -3", "x = 2, x = -3"],
+                    "correct_answer": 0
+                }
+            ],
+            "11": [
+                {
+                    "question_text": "¿Cuál es la derivada de f(x) = x³?",
+                    "options": ["3x²", "x²", "3x", "x³"],
+                    "correct_answer": 0
+                }
+            ],
+            "12": [
+                {
+                    "question_text": "La integral de 2x dx es:",
+                    "options": ["x² + C", "2x² + C", "x²/2 + C", "2x + C"],
+                    "correct_answer": 0
+                }
+            ]
+        },
+        "lengua": {
+            "10": [
+                {
+                    "question_text": "¿Qué figura literaria se usa en 'Sus ojos eran dos luceros'?",
+                    "options": ["Metáfora", "Símil", "Hipérbole", "Personificación"],
+                    "correct_answer": 0
+                }
+            ]
+        },
+        "ciencias": {
+            "10": [
+                {
+                    "question_text": "¿Cuál es la fórmula química del agua?",
+                    "options": ["H₂O", "CO₂", "O₂", "H₂O₂"],
+                    "correct_answer": 0
+                }
+            ]
+        },
+        "sociales": {
+            "10": [
+                {
+                    "question_text": "¿En qué año comenzó la Segunda Guerra Mundial?",
+                    "options": ["1939", "1914", "1945", "1940"],
+                    "correct_answer": 0
+                }
+            ]
+        }
+    }
+    
+    questions = []
+    if subject in default_questions and grade_level in default_questions[subject]:
+        for q_data in default_questions[subject][grade_level]:
+            question_id = f"q_{uuid.uuid4().hex[:12]}"
+            question_doc = {
+                "question_id": question_id,
+                "subject": subject,
+                "grade_level": grade_level,
+                "question_text": q_data["question_text"],
+                "options": q_data["options"],
+                "correct_answer": q_data["correct_answer"],
+                "difficulty": "medium"
+            }
+            await db.questions.insert_one(question_doc)
+            questions.append(question_doc)
+    
+    return questions
+
 # ============ WEBSOCKET ROUTE ============
 
 @app.websocket("/ws/{room_id}")
