@@ -22,7 +22,9 @@ function GameRoom() {
   const [showResults, setShowResults] = useState(false);
   const [answerResult, setAnswerResult] = useState(null);
   const [finalResults, setFinalResults] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
   const messagesEndRef = useRef(null);
+  const timerRef = useRef(null);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('access_token');
