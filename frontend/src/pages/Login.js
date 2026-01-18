@@ -23,17 +23,19 @@ function Login() {
         password
       });
 
-      console.log('[Login] Login successful:', response.data.user);
+      console.log('[Login] Login successful');
 
       // Store token
       localStorage.setItem('access_token', response.data.access_token);
-      console.log('[Login] Token stored in localStorage');
       
-      // Navigate to debug page first to verify token works
-      navigate('/debug-auth');
+      // Small delay to ensure localStorage is written
+      setTimeout(() => {
+        // Navigate directly to dashboard with replace
+        window.location.href = '/dashboard';
+      }, 100);
+      
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
-    } finally {
       setLoading(false);
     }
   };
