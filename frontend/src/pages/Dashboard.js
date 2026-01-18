@@ -116,7 +116,7 @@ function Dashboard() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${API}/friends/add?friend_email=${encodeURIComponent(friendEmail)}`,
+        `${API}/friends/add?friend_identifier=${encodeURIComponent(friendEmail)}`,
         {},
         {
           headers: getAuthHeaders(),
