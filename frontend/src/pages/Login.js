@@ -67,8 +67,10 @@ function Login() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="pixel-font text-xs text-purple-300 block mb-2">EMAIL</label>
+            <label htmlFor="email-input" className="pixel-font text-xs text-purple-300 block mb-2">EMAIL</label>
             <input
+              id="email-input"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -79,8 +81,10 @@ function Login() {
           </div>
 
           <div>
-            <label className="pixel-font text-xs text-purple-300 block mb-2">CONTRASEÑA</label>
+            <label htmlFor="password-input" className="pixel-font text-xs text-purple-300 block mb-2">CONTRASEÑA</label>
             <input
+              id="password-input"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
