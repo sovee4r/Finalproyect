@@ -322,25 +322,122 @@ function Dashboard() {
 
       {/* Create Room Modal */}
       {showCreateRoom && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setShowCreateRoom(false)}>
-          <div className="bg-slate-900 border-8 border-purple-500 p-8 max-w-md" style={{ boxShadow: '12px 12px 0 0 #a855f7' }} onClick={(e) => e.stopPropagation()}>
-            <h3 className="pixel-font text-xl text-purple-400 mb-4 text-center">CREAR SALA</h3>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 overflow-y-auto p-4" onClick={() => setShowCreateRoom(false)}>
+          <div className="bg-slate-900 border-8 border-purple-500 p-8 max-w-2xl w-full my-8" style={{ boxShadow: '12px 12px 0 0 #a855f7' }} onClick={(e) => e.stopPropagation()}>
+            <h3 className="pixel-font text-xl text-purple-400 mb-6 text-center">CREAR SALA</h3>
             <form onSubmit={handleCreateRoom} className="space-y-4">
-              <input
-                type="text"
-                value={roomName}
-                onChange={(e) => setRoomName(e.target.value)}
-                placeholder="Nombre de la sala"
-                className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
-                required
-                data-testid="room-name-input"
-              />
+              {/* Nombre de la sala */}
+              <div>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">NOMBRE DE LA SALA</label>
+                <input
+                  type="text"
+                  value={roomName}
+                  onChange={(e) => setRoomName(e.target.value)}
+                  placeholder="Mi Sala Épica"
+                  className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
+                  required
+                  data-testid="room-name-input"
+                />
+              </div>
+
+              {/* Cantidad de jugadores */}
+              <div>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">JUGADORES MAXIMOS</label>
+                <select
+                  value={roomConfig.maxPlayers}
+                  onChange={(e) => setRoomConfig({...roomConfig, maxPlayers: parseInt(e.target.value)})}
+                  className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
+                >
+                  <option value="2">2 Jugadores</option>
+                  <option value="3">3 Jugadores</option>
+                  <option value="4">4 Jugadores</option>
+                  <option value="6">6 Jugadores</option>
+                  <option value="8">8 Jugadores</option>
+                </select>
+              </div>
+
+              {/* Modo de juego */}
+              <div>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">MODO DE JUEGO</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setRoomConfig({...roomConfig, gameMode: 'normal'})}
+                    className={`pixel-font px-4 py-3 border-4 text-xs ${
+                      roomConfig.gameMode === 'normal' 
+                        ? 'bg-purple-600 border-pink-500 text-white' 
+                        : 'bg-slate-800 border-purple-400 text-purple-300'
+                    }`}
+                  >
+                    NORMAL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRoomConfig({...roomConfig, gameMode: 'competencia'})}
+                    className={`pixel-font px-4 py-3 border-4 text-xs ${
+                      roomConfig.gameMode === 'competencia' 
+                        ? 'bg-purple-600 border-pink-500 text-white' 
+                        : 'bg-slate-800 border-purple-400 text-purple-300'
+                    }`}
+                  >
+                    COMPETENCIA
+                  </button>
+                </div>
+              </div>
+
+              {/* Materia */}
+              <div>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">MATERIA</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    {value: 'matematicas', label: '➕ MATEMATICAS', emoji: '📐'},
+                    {value: 'lengua', label: '📖 LENGUA', emoji: '📚'},
+                    {value: 'ciencias', label: '🔬 CIENCIAS', emoji: '⚗️'},
+                    {value: 'sociales', label: '🌍 SOCIALES', emoji: '🗺️'}
+                  ].map(subject => (
+                    <button
+                      key={subject.value}
+                      type="button"
+                      onClick={() => setRoomConfig({...roomConfig, subject: subject.value})}
+                      className={`pixel-font px-4 py-3 border-4 text-xs ${
+                        roomConfig.subject === subject.value 
+                          ? 'bg-purple-600 border-pink-500 text-white' 
+                          : 'bg-slate-800 border-purple-400 text-purple-300'
+                      }`}
+                    >
+                      {subject.emoji} {subject.value.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Grado */}
+              <div>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">GRADO (SECUNDARIA)</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {['10', '11', '12'].map(grade => (
+                    <button
+                      key={grade}
+                      type="button"
+                      onClick={() => setRoomConfig({...roomConfig, gradeLevel: grade})}
+                      className={`pixel-font px-4 py-3 border-4 text-xs ${
+                        roomConfig.gradeLevel === grade 
+                          ? 'bg-purple-600 border-pink-500 text-white' 
+                          : 'bg-slate-800 border-purple-400 text-purple-300'
+                      }`}
+                    >
+                      GRADO {grade}°
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <button
                 type="submit"
-                className="pixel-font w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white border-4 border-pink-500 text-xs"
+                className="pixel-font w-full px-6 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-700 hover:via-pink-700 hover:to-fuchsia-700 text-white border-4 border-pink-500 text-xs mt-4"
                 style={{ boxShadow: '6px 6px 0 0 #ec4899' }}
               >
-                CREAR
+                &gt; CREAR SALA &lt;
               </button>
             </form>
           </div>
