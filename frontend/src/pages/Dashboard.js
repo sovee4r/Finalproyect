@@ -104,7 +104,7 @@ function Dashboard() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${API}/rooms?room_name=${encodeURIComponent(roomName)}&max_players=${roomConfig.maxPlayers}&game_mode=${roomConfig.gameMode}&subject=${roomConfig.subject}&grade_level=${roomConfig.gradeLevel}`,
+        `${API}/rooms?room_name=${encodeURIComponent(roomName)}&max_players=${roomConfig.maxPlayers}&game_mode=${roomConfig.gameMode}&subject=${roomConfig.subject}&grade_level=${roomConfig.gradeLevel}&time_per_question=${roomConfig.timePerQuestion}&total_questions=${roomConfig.totalQuestions}`,
         {},
         {
           headers: getAuthHeaders(),
@@ -118,7 +118,9 @@ function Dashboard() {
         maxPlayers: 4,
         gameMode: 'normal',
         subject: 'matematicas',
-        gradeLevel: '10'
+        gradeLevel: '10',
+        timePerQuestion: 30,
+        totalQuestions: 10
       });
       navigate(`/room/${response.data.room_id}`);
     } catch (error) {
