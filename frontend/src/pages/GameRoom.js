@@ -357,14 +357,23 @@ function GameRoom() {
             {/* Question Screen */}
             {isPlaying && !showResults && currentQuestion && (
               <div className="space-y-6">
-                {/* Progress */}
+                {/* Progress and Timer */}
                 <div className="flex justify-between items-center mb-4">
                   <span className="pixel-font text-xs text-purple-300">
                     PREGUNTA {currentQuestion.question_number}/{currentQuestion.total_questions}
                   </span>
-                  <span className="pixel-font text-xs text-pink-400">
-                    {getMateriaEmoji(currentQuestion.subject)} {currentQuestion.subject.toUpperCase()}
-                  </span>
+                  
+                  {/* Timer */}
+                  <div className="flex items-center gap-2">
+                    <span className="pixel-font text-xs text-pink-400">
+                      {getMateriaEmoji(currentQuestion.subject)} {currentQuestion.subject.toUpperCase()}
+                    </span>
+                    <div className={`pixel-font text-lg px-3 py-1 border-4 ${
+                      timeLeft <= 5 ? 'bg-red-600 border-red-400 animate-pulse' : 'bg-slate-700 border-purple-500'
+                    }`}>
+                      ⏱️ {timeLeft}s
+                    </div>
+                  </div>
                 </div>
 
                 {/* Question */}
