@@ -43,25 +43,34 @@ function Dashboard() {
     
     const fetchData = async () => {
       try {
+        console.log('[Dashboard] Starting fetchData...');
+        
         // Check if we have a token
         const token = localStorage.getItem('access_token');
+        console.log('[Dashboard] Token exists:', !!token);
+        
         if (!token) {
-          console.log('No token found, redirecting to login');
+          console.log('[Dashboard] No token found, redirecting to login');
           navigate('/login', { replace: true });
           return;
         }
 
         // Fetch user if not already set
         let currentUser = user;
+        console.log('[Dashboard] Current user:', currentUser);
+        
         if (!currentUser) {
+          console.log('[Dashboard] Fetching user from API...');
           const userResponse = await axios.get(`${API}/auth/me`, {
             headers: getAuthHeaders(),
             withCredentials: true
           });
           currentUser = userResponse.data;
+          console.log('[Dashboard] User fetched:', currentUser);
           setUser(currentUser);
         }
 
+        console.log('[Dashboard] Fetching character, friends, rooms...');
         // Fetch other data
         const [characterRes, friendsRes, roomsRes] = await Promise.all([
           axios.get(`${API}/users/me/character`, {
@@ -78,14 +87,17 @@ function Dashboard() {
           })
         ]);
 
+        console.log('[Dashboard] Data fetched successfully');
         setCharacter(characterRes.data);
         setCharacterCustomization(characterRes.data.customization);
         setFriends(friendsRes.data);
         setRooms(roomsRes.data);
         setIsLoading(false);
         setHasInitialized(true);
+        console.log('[Dashboard] Initialization complete');
       } catch (error) {
-        console.error('Error loading dashboard:', error);
+        console.error('[Dashboard] Error loading dashboard:', error);
+        console.error('[Dashboard] Error details:', error.response?.data);
         localStorage.removeItem('access_token');
         navigate('/login', { replace: true });
       }
