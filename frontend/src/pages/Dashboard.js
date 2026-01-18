@@ -97,6 +97,8 @@ function Dashboard() {
       } catch (error) {
         console.error('[Dashboard] Error:', error);
         localStorage.removeItem('access_token');
+        sessionStorage.removeItem('access_token');
+        alert('Error al cargar dashboard. Inicia sesión nuevamente.');
         window.location.href = '/login';
       }
     };
