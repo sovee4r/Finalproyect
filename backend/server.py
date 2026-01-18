@@ -282,12 +282,24 @@ async def process_google_session(request: Request, response: Response):
     
     if user_doc:
         user_id = user_doc["user_id"]
+        # Update user tag if doesn't exist (for existing users)
+        if "user_tag" not in user_doc:
+            import random
+            user_tag = f"{random.randint(1000, 9999)}"
+            await db.users.update_one(
+                {"user_id": user_id},
+                {"$set": {"user_tag": user_tag}}
+            )
+            user_doc["user_tag"] = user_tag
     else:
         # Create new user
+        import random
+        user_tag = f"{random.randint(1000, 9999)}"
         user_id = f"user_{uuid.uuid4().hex[:12]}"
         user_doc = {
             "user_id": user_id,
             "username": user_data["name"],
+            "user_tag": user_tag,
             "email": user_data["email"],
             "picture": user_data.get("picture"),
             "created_at": datetime.now(timezone.utc)
