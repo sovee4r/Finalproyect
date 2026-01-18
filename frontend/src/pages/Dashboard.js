@@ -272,10 +272,12 @@ function Dashboard() {
                       <p className="pixel-font text-sm text-white">{room.name}</p>
                       <span className="text-xs px-2 py-1 bg-purple-600 text-white">{room.game_mode.toUpperCase()}</span>
                     </div>
-                    <div className="flex justify-between items-center text-xs text-purple-300 mb-2">
+                    <div className="grid grid-cols-2 gap-2 text-xs text-purple-300 mb-2">
                       <span>👥 {room.players.length}/{room.max_players}</span>
                       <span>📚 {room.subject}</span>
                       <span>🎓 Grado {room.grade_level}</span>
+                      <span>⏱️ {room.time_per_question}s</span>
+                      <span className="col-span-2">❓ {room.total_questions} preguntas</span>
                     </div>
                     <button
                       onClick={() => handleJoinRoom(room.room_id)}
