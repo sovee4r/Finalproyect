@@ -24,7 +24,7 @@ function AppRouter() {
       <Route path="/debug-auth" element={<DebugAuth />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/room/:roomId" element={<GameRoom />} />
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
