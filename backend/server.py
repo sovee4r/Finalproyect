@@ -415,7 +415,7 @@ async def get_friends(user: dict = Depends(get_current_user)):
     
     friends = await db.users.find(
         {"user_id": {"$in": friend_ids}},
-        {"_id": 0, "user_id": 1, "username": 1, "picture": 1}
+        {"_id": 0, "user_id": 1, "username": 1, "user_tag": 1, "picture": 1}
     ).to_list(100)
     
     return friends
