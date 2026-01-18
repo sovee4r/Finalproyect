@@ -107,8 +107,30 @@ class GameRoom(BaseModel):
     host_user_id: str
     players: List[str] = []
     max_players: int = 4
+    game_mode: str = "normal"  # "normal" o "competencia"
+    subject: str = "matematicas"  # materias: matematicas, lengua, ciencias, sociales
+    grade_level: str = "10"  # 10, 11, 12 (últimos 3 años de secundaria)
     status: str = "waiting"  # "waiting", "playing", "finished"
     created_at: datetime
+
+class Question(BaseModel):
+    question_id: str
+    subject: str  # matematicas, lengua, ciencias, sociales
+    grade_level: str  # 10, 11, 12
+    question_text: str
+    options: List[str]  # 4 opciones
+    correct_answer: int  # índice de la respuesta correcta (0-3)
+    difficulty: str = "medium"  # easy, medium, hard
+
+class GameSession(BaseModel):
+    session_id: str
+    room_id: str
+    current_question: int = 0
+    questions: List[str] = []  # IDs de preguntas
+    player_scores: Dict[str, int] = {}
+    player_answers: Dict[str, List[int]] = {}  # user_id: [respuestas]
+    started_at: datetime
+    status: str = "active"  # active, finished
 
 class ChatMessage(BaseModel):
     message_id: str
