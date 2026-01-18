@@ -110,6 +110,8 @@ class GameRoom(BaseModel):
     game_mode: str = "normal"  # "normal" o "competencia"
     subject: str = "matematicas"  # materias: matematicas, lengua, ciencias, sociales
     grade_level: str = "10"  # 10, 11, 12 (últimos 3 años de secundaria)
+    time_per_question: int = 30  # segundos por pregunta
+    total_questions: int = 10  # cantidad de preguntas
     status: str = "waiting"  # "waiting", "playing", "finished"
     created_at: datetime
 
