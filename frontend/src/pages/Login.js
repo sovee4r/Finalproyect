@@ -25,7 +25,11 @@ function Login() {
 
       // Store token
       localStorage.setItem('access_token', response.data.access_token);
-      navigate('/dashboard');
+      
+      // Navigate with user data to avoid re-fetching
+      navigate('/dashboard', {
+        state: { user: response.data.user }
+      });
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
     } finally {
