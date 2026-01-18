@@ -184,8 +184,15 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-900 pixel-bg p-6">
+      {/* DEV MODE Banner */}
+      <div className="fixed top-0 left-0 right-0 bg-yellow-600 text-black text-center py-2 z-50">
+        <p className="pixel-font text-xs">
+          🛠️ MODO DESARROLLO - Autenticación desactivada temporalmente
+        </p>
+      </div>
+
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
+      <div className="max-w-7xl mx-auto mb-8 mt-12">
         <div className="bg-slate-800/90 border-4 border-purple-500 p-4 flex justify-between items-center" style={{
           boxShadow: '6px 6px 0 0 #a855f7',
           imageRendering: 'pixelated'
