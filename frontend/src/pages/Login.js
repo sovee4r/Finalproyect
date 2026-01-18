@@ -23,13 +23,14 @@ function Login() {
         password
       });
 
+      console.log('[Login] Login successful:', response.data.user);
+
       // Store token
       localStorage.setItem('access_token', response.data.access_token);
+      console.log('[Login] Token stored in localStorage');
       
-      // Navigate with user data to avoid re-fetching
-      navigate('/dashboard', {
-        state: { user: response.data.user }
-      });
+      // Navigate to debug page first to verify token works
+      navigate('/debug-auth');
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
     } finally {
