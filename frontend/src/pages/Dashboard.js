@@ -48,6 +48,12 @@ function Dashboard() {
           return;
         }
 
+        // If we already have user from navigation state, skip fetching
+        if (user && character && friends.length >= 0 && rooms.length >= 0) {
+          setIsLoading(false);
+          return;
+        }
+
         if (!user) {
           const userResponse = await axios.get(`${API}/auth/me`, {
             headers: getAuthHeaders(),
@@ -84,7 +90,7 @@ function Dashboard() {
     };
 
     fetchData();
-  }, [navigate, user]);
+  }, []);
 
   const handleLogout = async () => {
     try {
