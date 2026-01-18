@@ -884,6 +884,14 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, token: str):
 
 # ============ CHAT ROUTES ============
 
+@api_router.get("/rooms/{room_id}")
+async def get_room(room_id: str, user: dict = Depends(get_current_user)):
+    """Get room details"""
+    room_doc = await db.game_rooms.find_one({"room_id": room_id}, {"_id": 0})
+    if not room_doc:
+        raise HTTPException(status_code=404, detail="Room not found")
+    return room_doc
+
 @api_router.get("/rooms/{room_id}/messages")
 async def get_room_messages(room_id: str, user: dict = Depends(get_current_user)):
     """Get chat messages for a room"""
