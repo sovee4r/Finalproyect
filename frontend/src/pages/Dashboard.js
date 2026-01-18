@@ -95,30 +95,35 @@ function Dashboard() {
 
   const handleCreateRoom = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${API}/rooms?room_name=${encodeURIComponent(roomName)}&max_players=${roomConfig.maxPlayers}&game_mode=${roomConfig.gameMode}&subject=${roomConfig.subject}&grade_level=${roomConfig.gradeLevel}&time_per_question=${roomConfig.timePerQuestion}&total_questions=${roomConfig.totalQuestions}`,
-        {},
-        {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        }
-      );
-      setRooms([...rooms, response.data]);
-      setShowCreateRoom(false);
-      setRoomName('');
-      setRoomConfig({
-        maxPlayers: 4,
-        gameMode: 'normal',
-        subject: 'matematicas',
-        gradeLevel: '10',
-        timePerQuestion: 30,
-        totalQuestions: 10
-      });
-      navigate(`/room/${response.data.room_id}`);
-    } catch (error) {
-      console.error('Error creating room:', error);
-    }
+    
+    // Crear sala mock en dev mode
+    const newRoom = {
+      room_id: `room_${Date.now()}`,
+      name: roomName,
+      host_user_id: user.user_id,
+      players: [user.user_id],
+      max_players: roomConfig.maxPlayers,
+      game_mode: roomConfig.gameMode,
+      subject: roomConfig.subject,
+      grade_level: roomConfig.gradeLevel,
+      time_per_question: roomConfig.timePerQuestion,
+      total_questions: roomConfig.totalQuestions,
+      status: 'waiting',
+      created_at: new Date()
+    };
+    
+    setRooms([...rooms, newRoom]);
+    setShowCreateRoom(false);
+    setRoomName('');
+    setRoomConfig({
+      maxPlayers: 4,
+      gameMode: 'normal',
+      subject: 'matematicas',
+      gradeLevel: '10',
+      timePerQuestion: 30,
+      totalQuestions: 10
+    });
+    navigate(`/room/${newRoom.room_id}`);
   };
 
   const handleAddFriend = async (e) => {
