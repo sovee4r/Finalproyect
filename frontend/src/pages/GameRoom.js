@@ -13,9 +13,15 @@ function GameRoom() {
   const [room, setRoom] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [players, setPlayers] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [ws, setWs] = useState(null);
+  const [gameSession, setGameSession] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [questionNumber, setQuestionNumber] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+  const [answerResult, setAnswerResult] = useState(null);
+  const [finalResults, setFinalResults] = useState(null);
   const messagesEndRef = useRef(null);
 
   const getAuthHeaders = () => {
@@ -89,9 +95,6 @@ function GameRoom() {
           message: `${data.username} salió de la sala`,
           timestamp: new Date().toISOString()
         }]);
-      } else if (data.type === 'game_action') {
-        // Handle game actions
-        console.log('Game action:', data);
       }
     };
 
@@ -139,13 +142,82 @@ function GameRoom() {
     }
   };
 
-  const handleStartGame = () => {
-    setIsPlaying(true);
-    if (ws) {
-      ws.send(JSON.stringify({
-        type: 'game_action',
-        action: 'start_game'
-      }));
+  const handleStartGame = async () => {
+    try {
+      const response = await axios.post(`${API}/rooms/${roomId}/start`, {}, {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      });
+      
+      setGameSession(response.data);
+      setIsPlaying(true);
+      setQuestionNumber(0);
+      
+      // Load first question
+      loadQuestion(response.data.session_id, 0);
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error al iniciar el juego');
+    }
+  };
+
+  const loadQuestion = async (sessionId, qNum) => {
+    try {
+      const response = await axios.get(`${API}/sessions/${sessionId}/question/${qNum}`, {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      });
+      setCurrentQuestion(response.data);
+      setSelectedAnswer(null);
+      setAnswerResult(null);
+    } catch (error) {
+      console.error('Error loading question:', error);
+    }
+  };
+
+  const handleAnswerSelect = async (answerIndex) => {
+    if (selectedAnswer !== null) return; // Already answered
+    
+    setSelectedAnswer(answerIndex);
+    
+    try {
+      const response = await axios.post(
+        `${API}/sessions/${gameSession.session_id}/answer?question_num=${questionNumber}&answer=${answerIndex}`,
+        {},
+        {
+          headers: getAuthHeaders(),
+          withCredentials: true
+        }
+      );
+      
+      setAnswerResult(response.data);
+      
+      // Wait 3 seconds before next question
+      setTimeout(() => {
+        const nextQuestion = questionNumber + 1;
+        if (nextQuestion < gameSession.total_questions) {
+          setQuestionNumber(nextQuestion);
+          loadQuestion(gameSession.session_id, nextQuestion);
+        } else {
+          // Game finished, show results
+          loadFinalResults();
+        }
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error submitting answer:', error);
+    }
+  };
+
+  const loadFinalResults = async () => {
+    try {
+      const response = await axios.get(`${API}/sessions/${gameSession.session_id}/results`, {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      });
+      setFinalResults(response.data);
+      setShowResults(true);
+    } catch (error) {
+      console.error('Error loading results:', error);
     }
   };
 
@@ -157,6 +229,16 @@ function GameRoom() {
     );
   }
 
+  const getMateriaEmoji = (subject) => {
+    const emojis = {
+      'matematicas': '📐',
+      'lengua': '📚',
+      'ciencias': '⚗️',
+      'sociales': '🗺️'
+    };
+    return emojis[subject] || '📖';
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 pixel-bg p-6">
       {/* Header */}
@@ -165,7 +247,14 @@ function GameRoom() {
           boxShadow: '6px 6px 0 0 #a855f7',
           imageRendering: 'pixelated'
         }}>
-          <h1 className="pixel-font text-lg text-purple-400">SALA: {roomId}</h1>
+          <div>
+            <h1 className="pixel-font text-lg text-purple-400">SALA: {room?.name || roomId}</h1>
+            {room && (
+              <p className="text-xs text-purple-300 mt-1">
+                {getMateriaEmoji(room.subject)} {room.subject} - Grado {room.grade_level}° - {room.game_mode}
+              </p>
+            )}
+          </div>
           <button
             onClick={handleLeaveRoom}
             className="pixel-font px-4 py-2 bg-red-600 hover:bg-red-700 text-white border-4 border-red-400 text-xs"
@@ -184,9 +273,11 @@ function GameRoom() {
             boxShadow: '8px 8px 0 0 #a855f7, 16px 16px 0 0 #ec4899',
             imageRendering: 'pixelated'
           }} data-testid="game-area">
-            {!isPlaying ? (
+            
+            {/* Waiting Screen */}
+            {!isPlaying && !showResults && (
               <div className="flex flex-col items-center justify-center h-full space-y-8">
-                <h2 className="pixel-font text-3xl text-purple-400 leading-loose" style={{
+                <h2 className="pixel-font text-3xl text-purple-400 leading-loose text-center" style={{
                   textShadow: '3px 3px 0 #ec4899'
                 }}>
                   ESPERANDO<br/>JUGADORES
@@ -204,19 +295,130 @@ function GameRoom() {
                   &gt; INICIAR JUEGO &lt;
                 </button>
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full space-y-6">
-                <h2 className="pixel-font text-2xl text-purple-400">JUEGO ACTIVO</h2>
-                <div className="w-full max-w-md bg-slate-900 border-4 border-fuchsia-500 p-6 text-center">
-                  <p className="text-purple-300 mb-4">Área de juego multijugador</p>
-                  <p className="pixel-font text-xs text-pink-400">Implementa tu lógica de juego aquí</p>
+            )}
+
+            {/* Question Screen */}
+            {isPlaying && !showResults && currentQuestion && (
+              <div className="space-y-6">
+                {/* Progress */}
+                <div className="flex justify-between items-center mb-4">
+                  <span className="pixel-font text-xs text-purple-300">
+                    PREGUNTA {currentQuestion.question_number}/{currentQuestion.total_questions}
+                  </span>
+                  <span className="pixel-font text-xs text-pink-400">
+                    {getMateriaEmoji(currentQuestion.subject)} {currentQuestion.subject.toUpperCase()}
+                  </span>
                 </div>
+
+                {/* Question */}
+                <div className="bg-slate-900/50 border-4 border-fuchsia-500 p-6 mb-6">
+                  <p className="text-white text-lg leading-relaxed">
+                    {currentQuestion.question_text}
+                  </p>
+                </div>
+
+                {/* Options */}
+                <div className="space-y-3">
+                  {currentQuestion.options.map((option, index) => {
+                    let buttonClass = "bg-slate-700 border-purple-500 text-white hover:bg-slate-600";
+                    
+                    if (selectedAnswer !== null) {
+                      if (index === answerResult?.correct_answer) {
+                        buttonClass = "bg-green-600 border-green-400 text-white";
+                      } else if (index === selectedAnswer && !answerResult?.is_correct) {
+                        buttonClass = "bg-red-600 border-red-400 text-white";
+                      } else {
+                        buttonClass = "bg-slate-800 border-slate-600 text-slate-400";
+                      }
+                    } else if (selectedAnswer === index) {
+                      buttonClass = "bg-purple-600 border-pink-500 text-white";
+                    }
+
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswerSelect(index)}
+                        disabled={selectedAnswer !== null}
+                        className={`w-full text-left px-6 py-4 border-4 transition-all ${buttonClass}`}
+                        style={{ boxShadow: '4px 4px 0 0 rgba(0,0,0,0.3)' }}
+                        data-testid={`option-${index}`}
+                      >
+                        <span className="pixel-font text-xs mr-3">
+                          {String.fromCharCode(65 + index)}.
+                        </span>
+                        <span>{option}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Answer feedback */}
+                {answerResult && (
+                  <div className={`p-4 border-4 text-center ${
+                    answerResult.is_correct 
+                      ? 'bg-green-900/50 border-green-500' 
+                      : 'bg-red-900/50 border-red-500'
+                  }`}>
+                    <p className="pixel-font text-sm text-white mb-2">
+                      {answerResult.is_correct ? '✓ CORRECTO!' : '✗ INCORRECTO'}
+                    </p>
+                    <p className="text-sm text-white">{answerResult.explanation}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Results Screen */}
+            {showResults && finalResults && (
+              <div className="space-y-6">
+                <h2 className="pixel-font text-3xl text-center text-purple-400 mb-6" style={{
+                  textShadow: '3px 3px 0 #ec4899'
+                }}>
+                  RESULTADOS FINALES
+                </h2>
+
+                {/* Winner */}
+                {finalResults.winner && (
+                  <div className="bg-gradient-to-r from-yellow-600 to-yellow-500 border-4 border-yellow-400 p-6 text-center mb-6">
+                    <p className="pixel-font text-2xl text-white mb-2">🏆 GANADOR 🏆</p>
+                    <p className="pixel-font text-xl text-white">{finalResults.winner.username}</p>
+                    <p className="text-white text-lg mt-2">
+                      {finalResults.winner.score}/{finalResults.winner.total_questions} correctas
+                    </p>
+                  </div>
+                )}
+
+                {/* All results */}
+                <div className="space-y-3">
+                  {finalResults.results.map((result, index) => (
+                    <div 
+                      key={result.user_id}
+                      className={`border-4 p-4 flex justify-between items-center ${
+                        index === 0 
+                          ? 'bg-yellow-900/30 border-yellow-500' 
+                          : 'bg-slate-700 border-purple-500'
+                      }`}
+                      style={{ boxShadow: '3px 3px 0 0 rgba(0,0,0,0.3)' }}
+                    >
+                      <div>
+                        <span className="pixel-font text-lg mr-3">
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`}
+                        </span>
+                        <span className="text-white">{result.username}</span>
+                      </div>
+                      <span className="pixel-font text-xl text-white">
+                        {result.score}/{result.total_questions}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
                 <button
-                  onClick={() => setIsPlaying(false)}
-                  className="pixel-font px-8 py-3 bg-pink-600 hover:bg-pink-700 text-white border-4 border-purple-500 text-xs"
-                  style={{ boxShadow: '4px 4px 0 0 #a855f7' }}
+                  onClick={() => navigate('/dashboard')}
+                  className="pixel-font w-full px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white border-4 border-pink-500 text-sm mt-6"
+                  style={{ boxShadow: '6px 6px 0 0 #ec4899' }}
                 >
-                  DETENER JUEGO
+                  VOLVER AL LOBBY
                 </button>
               </div>
             )}
