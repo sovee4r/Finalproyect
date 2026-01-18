@@ -78,6 +78,7 @@ class UserLogin(BaseModel):
 class User(BaseModel):
     user_id: str
     username: str
+    user_tag: Optional[str] = None
     email: str
     picture: Optional[str] = None
     created_at: datetime
