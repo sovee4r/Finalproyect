@@ -293,7 +293,9 @@ function Dashboard() {
             ) : (
               friends.map(friend => (
                 <div key={friend.user_id} className="bg-slate-700 border-4 border-purple-500 px-3 py-2" style={{ boxShadow: '2px 2px 0 0 #a855f7' }}>
-                  <p className="pixel-font text-xs text-purple-300">{friend.username}</p>
+                  <p className="pixel-font text-xs text-purple-300">
+                    {friend.username}#{friend.user_tag}
+                  </p>
                 </div>
               ))
             )}
