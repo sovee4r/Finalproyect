@@ -61,8 +61,10 @@ function Register() {
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label className="pixel-font text-xs text-purple-300 block mb-2">USUARIO</label>
+            <label htmlFor="username-input" className="pixel-font text-xs text-purple-300 block mb-2">USUARIO</label>
             <input
+              id="username-input"
+              name="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -73,8 +75,10 @@ function Register() {
           </div>
 
           <div>
-            <label className="pixel-font text-xs text-purple-300 block mb-2">EMAIL</label>
+            <label htmlFor="email-input-register" className="pixel-font text-xs text-purple-300 block mb-2">EMAIL</label>
             <input
+              id="email-input-register"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -85,8 +89,10 @@ function Register() {
           </div>
 
           <div>
-            <label className="pixel-font text-xs text-purple-300 block mb-2">CONTRASEÑA</label>
+            <label htmlFor="password-input-register" className="pixel-font text-xs text-purple-300 block mb-2">CONTRASEÑA</label>
             <input
+              id="password-input-register"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
