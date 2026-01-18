@@ -209,7 +209,32 @@ function GameRoom() {
   const handleAnswerSelect = async (answerIndex) => {
     if (selectedAnswer !== null) return; // Already answered
     
+    // Clear timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
     setSelectedAnswer(answerIndex);
+    
+    // If time ran out (answerIndex === -1), just move to next question
+    if (answerIndex === -1) {
+      setAnswerResult({
+        is_correct: false,
+        correct_answer: currentQuestion.correct_answer || 0,
+        explanation: "⏰ Se acabó el tiempo!"
+      });
+      
+      setTimeout(() => {
+        const nextQuestion = questionNumber + 1;
+        if (nextQuestion < gameSession.total_questions) {
+          setQuestionNumber(nextQuestion);
+          loadQuestion(gameSession.session_id, nextQuestion);
+        } else {
+          loadFinalResults();
+        }
+      }, 3000);
+      return;
+    }
     
     try {
       const response = await axios.post(
