@@ -66,6 +66,7 @@ function Register() {
               id="username-input"
               name="username"
               type="text"
+              autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full bg-slate-900 border-4 border-purple-400 px-4 py-3 text-white focus:outline-none focus:border-pink-400"
@@ -80,6 +81,7 @@ function Register() {
               id="email-input-register"
               name="email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-900 border-4 border-purple-400 px-4 py-3 text-white focus:outline-none focus:border-pink-400"
@@ -94,6 +96,7 @@ function Register() {
               id="password-input-register"
               name="password"
               type="password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-900 border-4 border-purple-400 px-4 py-3 text-white focus:outline-none focus:border-pink-400"
