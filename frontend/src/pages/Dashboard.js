@@ -436,6 +436,39 @@ function Dashboard() {
                 </div>
               </div>
 
+              {/* Tiempo por pregunta */}
+              <div>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">TIEMPO POR PREGUNTA</label>
+                <select
+                  value={roomConfig.timePerQuestion}
+                  onChange={(e) => setRoomConfig({...roomConfig, timePerQuestion: parseInt(e.target.value)})}
+                  className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
+                >
+                  <option value="15">15 segundos</option>
+                  <option value="20">20 segundos</option>
+                  <option value="30">30 segundos</option>
+                  <option value="45">45 segundos</option>
+                  <option value="60">60 segundos</option>
+                  <option value="90">90 segundos</option>
+                </select>
+              </div>
+
+              {/* Cantidad de preguntas */}
+              <div>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">CANTIDAD DE PREGUNTAS</label>
+                <select
+                  value={roomConfig.totalQuestions}
+                  onChange={(e) => setRoomConfig({...roomConfig, totalQuestions: parseInt(e.target.value)})}
+                  className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
+                >
+                  <option value="5">5 preguntas</option>
+                  <option value="10">10 preguntas</option>
+                  <option value="15">15 preguntas</option>
+                  <option value="20">20 preguntas</option>
+                  <option value="25">25 preguntas</option>
+                </select>
+              </div>
+
               <button
                 type="submit"
                 className="pixel-font w-full px-6 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-700 hover:via-pink-700 hover:to-fuchsia-700 text-white border-4 border-pink-500 text-xs mt-4"
