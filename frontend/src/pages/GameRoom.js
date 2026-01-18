@@ -311,7 +311,7 @@ function GameRoom() {
             <h1 className="pixel-font text-lg text-purple-400">SALA: {room?.name || roomId}</h1>
             {room && (
               <p className="text-xs text-purple-300 mt-1">
-                {getMateriaEmoji(room.subject)} {room.subject} - Grado {room.grade_level}° - {room.game_mode}
+                {getMateriaEmoji(room.subject)} {room.subject} - Grado {room.grade_level}° - {room.game_mode} - ⏱️ {room.time_per_question}s - ❓ {room.total_questions}p
               </p>
             )}
           </div>
