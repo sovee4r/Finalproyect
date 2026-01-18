@@ -21,6 +21,7 @@ function AppRouter() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/debug-auth" element={<DebugAuth />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/room/:roomId" element={<GameRoom />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
