@@ -25,16 +25,37 @@ function Register() {
         password
       });
 
-      console.log('[Register] Registration successful');
+      console.log('[Register] Response received');
+      const token = response.data.access_token;
 
-      localStorage.setItem('access_token', response.data.access_token);
-      
-      // Small delay and use window.location for clean navigation
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 100);
+      // Try both storage methods
+      try {
+        localStorage.setItem('access_token', token);
+        sessionStorage.setItem('access_token', token);
+        console.log('[Register] Token saved');
+        
+        // Verify it was saved
+        const verify = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+        console.log('[Register] Token verified:', !!verify);
+        
+        if (!verify) {
+          throw new Error('Could not save token');
+        }
+        
+        // Wait and redirect
+        setTimeout(() => {
+          console.log('[Register] Redirecting...');
+          window.location.href = '/dashboard';
+        }, 200);
+        
+      } catch (storageError) {
+        console.error('[Register] Storage error:', storageError);
+        setError('Error: Tu navegador está bloqueando el almacenamiento. Usa modo normal (no incógnito).');
+        setLoading(false);
+      }
       
     } catch (err) {
+      console.error('[Register] Register error:', err);
       setError(err.response?.data?.detail || 'Error al registrarse');
       setLoading(false);
     }
