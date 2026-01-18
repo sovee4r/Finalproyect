@@ -43,34 +43,33 @@ function Dashboard() {
     
     const fetchData = async () => {
       try {
-        console.log('[Dashboard] Starting fetchData...');
+        console.log('[Dashboard] Starting...');
         
         // Check if we have a token
         const token = localStorage.getItem('access_token');
         console.log('[Dashboard] Token exists:', !!token);
         
         if (!token) {
-          console.log('[Dashboard] No token found, redirecting to login');
-          navigate('/login', { replace: true });
+          console.log('[Dashboard] No token, redirecting');
+          window.location.href = '/login';
           return;
         }
 
         // Fetch user if not already set
         let currentUser = user;
-        console.log('[Dashboard] Current user:', currentUser);
         
         if (!currentUser) {
-          console.log('[Dashboard] Fetching user from API...');
+          console.log('[Dashboard] Fetching user...');
           const userResponse = await axios.get(`${API}/auth/me`, {
             headers: getAuthHeaders(),
             withCredentials: true
           });
           currentUser = userResponse.data;
-          console.log('[Dashboard] User fetched:', currentUser);
+          console.log('[Dashboard] User:', currentUser.username);
           setUser(currentUser);
         }
 
-        console.log('[Dashboard] Fetching character, friends, rooms...');
+        console.log('[Dashboard] Fetching data...');
         // Fetch other data
         const [characterRes, friendsRes, roomsRes] = await Promise.all([
           axios.get(`${API}/users/me/character`, {
@@ -87,24 +86,22 @@ function Dashboard() {
           })
         ]);
 
-        console.log('[Dashboard] Data fetched successfully');
+        console.log('[Dashboard] Data loaded successfully');
         setCharacter(characterRes.data);
         setCharacterCustomization(characterRes.data.customization);
         setFriends(friendsRes.data);
         setRooms(roomsRes.data);
         setIsLoading(false);
         setHasInitialized(true);
-        console.log('[Dashboard] Initialization complete');
       } catch (error) {
-        console.error('[Dashboard] Error loading dashboard:', error);
-        console.error('[Dashboard] Error details:', error.response?.data);
+        console.error('[Dashboard] Error:', error);
         localStorage.removeItem('access_token');
-        navigate('/login', { replace: true });
+        window.location.href = '/login';
       }
     };
 
     fetchData();
-  }, [hasInitialized, navigate, user]);
+  }, [hasInitialized]);
 
   const handleLogout = async () => {
     try {
