@@ -187,6 +187,23 @@ async def register(user_data: UserRegister):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Generate unique user tag (4 digits)
+    import random
+    user_tag = None
+    max_attempts = 10
+    for _ in range(max_attempts):
+        user_tag = f"{random.randint(1000, 9999)}"
+        # Check if username#tag combination exists
+        existing_tag = await db.users.find_one({
+            "username": user_data.username,
+            "user_tag": user_tag
+        })
+        if not existing_tag:
+            break
+    
+    if not user_tag:
+        raise HTTPException(status_code=500, detail="Could not generate unique user tag")
+    
     # Create user
     user_id = f"user_{uuid.uuid4().hex[:12]}"
     hashed_password = hash_password(user_data.password)
@@ -194,6 +211,7 @@ async def register(user_data: UserRegister):
     user_doc = {
         "user_id": user_id,
         "username": user_data.username,
+        "user_tag": user_tag,
         "email": user_data.email,
         "password_hash": hashed_password,
         "picture": None,
@@ -219,7 +237,10 @@ async def register(user_data: UserRegister):
     # Create token
     token = create_access_token(user_id)
     
-    return {"access_token": token, "token_type": "bearer", "user": User(**user_doc)}
+    user_doc.pop("password_hash", None)
+    user_doc.pop("_id", None)
+    
+    return {"access_token": token, "token_type": "bearer", "user": user_doc}
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin):
