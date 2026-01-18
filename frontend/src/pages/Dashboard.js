@@ -184,7 +184,9 @@ function Dashboard() {
           <div className="flex items-center gap-4">
             <span className="text-4xl">{character?.customization.avatar}</span>
             <div>
-              <h2 className="pixel-font text-lg text-purple-400">{user?.username}</h2>
+              <h2 className="pixel-font text-lg text-purple-400">
+                {user?.username}#{user?.user_tag}
+              </h2>
               <p className="text-sm text-purple-300">Score: {character?.score || 0}</p>
             </div>
           </div>
