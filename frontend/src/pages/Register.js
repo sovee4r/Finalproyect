@@ -26,7 +26,11 @@ function Register() {
       });
 
       localStorage.setItem('access_token', response.data.access_token);
-      navigate('/dashboard');
+      
+      // Navigate with user data
+      navigate('/dashboard', {
+        state: { user: response.data.user }
+      });
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al registrarse');
     } finally {
