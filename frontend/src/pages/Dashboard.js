@@ -48,6 +48,7 @@ function Dashboard() {
         // Check both storage methods
         const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
         console.log('[Dashboard] Token exists:', !!token);
+        console.log('[Dashboard] Token preview:', token?.substring(0, 50));
         
         if (!token) {
           console.log('[Dashboard] No token, redirecting');
@@ -61,41 +62,59 @@ function Dashboard() {
         
         if (!currentUser) {
           console.log('[Dashboard] Fetching user...');
-          const userResponse = await axios.get(`${API}/auth/me`, {
-            headers: getAuthHeaders(),
-            withCredentials: true
-          });
-          currentUser = userResponse.data;
-          console.log('[Dashboard] User:', currentUser.username);
-          setUser(currentUser);
+          console.log('[Dashboard] API URL:', API);
+          
+          try {
+            const userResponse = await axios.get(`${API}/auth/me`, {
+              headers: getAuthHeaders(),
+              withCredentials: true
+            });
+            currentUser = userResponse.data;
+            console.log('[Dashboard] User fetched:', currentUser.username);
+            setUser(currentUser);
+          } catch (userError) {
+            console.error('[Dashboard] Error fetching user:', userError);
+            console.error('[Dashboard] Error response:', userError.response?.data);
+            console.error('[Dashboard] Error status:', userError.response?.status);
+            throw userError;
+          }
         }
 
         console.log('[Dashboard] Fetching data...');
         // Fetch other data
-        const [characterRes, friendsRes, roomsRes] = await Promise.all([
-          axios.get(`${API}/users/me/character`, {
-            headers: getAuthHeaders(),
-            withCredentials: true
-          }),
-          axios.get(`${API}/friends`, {
-            headers: getAuthHeaders(),
-            withCredentials: true
-          }),
-          axios.get(`${API}/rooms`, {
-            headers: getAuthHeaders(),
-            withCredentials: true
-          })
-        ]);
+        try {
+          const [characterRes, friendsRes, roomsRes] = await Promise.all([
+            axios.get(`${API}/users/me/character`, {
+              headers: getAuthHeaders(),
+              withCredentials: true
+            }),
+            axios.get(`${API}/friends`, {
+              headers: getAuthHeaders(),
+              withCredentials: true
+            }),
+            axios.get(`${API}/rooms`, {
+              headers: getAuthHeaders(),
+              withCredentials: true
+            })
+          ]);
 
-        console.log('[Dashboard] Data loaded successfully');
-        setCharacter(characterRes.data);
-        setCharacterCustomization(characterRes.data.customization);
-        setFriends(friendsRes.data);
-        setRooms(roomsRes.data);
-        setIsLoading(false);
-        setHasInitialized(true);
+          console.log('[Dashboard] Data loaded successfully');
+          setCharacter(characterRes.data);
+          setCharacterCustomization(characterRes.data.customization);
+          setFriends(friendsRes.data);
+          setRooms(roomsRes.data);
+          setIsLoading(false);
+          setHasInitialized(true);
+          console.log('[Dashboard] Initialization complete!');
+        } catch (dataError) {
+          console.error('[Dashboard] Error fetching data:', dataError);
+          console.error('[Dashboard] Data error response:', dataError.response?.data);
+          throw dataError;
+        }
+        
       } catch (error) {
-        console.error('[Dashboard] Error:', error);
+        console.error('[Dashboard] Fatal error:', error);
+        console.error('[Dashboard] Error message:', error.message);
         localStorage.removeItem('access_token');
         sessionStorage.removeItem('access_token');
         alert('Error al cargar dashboard. Inicia sesión nuevamente.');
