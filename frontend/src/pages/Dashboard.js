@@ -34,7 +34,7 @@ function Dashboard() {
   const [hasInitialized, setHasInitialized] = useState(false);
 
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -45,12 +45,13 @@ function Dashboard() {
       try {
         console.log('[Dashboard] Starting...');
         
-        // Check if we have a token
-        const token = localStorage.getItem('access_token');
+        // Check both storage methods
+        const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
         console.log('[Dashboard] Token exists:', !!token);
         
         if (!token) {
           console.log('[Dashboard] No token, redirecting');
+          alert('No se encontró sesión. Por favor inicia sesión nuevamente.');
           window.location.href = '/login';
           return;
         }
