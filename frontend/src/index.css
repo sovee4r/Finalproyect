@@ -17,6 +17,50 @@ body {
 .pixel-font {
     font-family: 'Press Start 2P', cursive;
     image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* Patrón de píxeles para fondos */
+.pixel-bg {
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(168, 85, 247, 0.03) 2px,
+            rgba(168, 85, 247, 0.03) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(168, 85, 247, 0.03) 2px,
+            rgba(168, 85, 247, 0.03) 4px
+        );
+}
+
+/* Efecto dithering/tramado pixelado */
+.pixel-dither {
+    background-image: 
+        repeating-conic-gradient(
+            rgba(168, 85, 247, 0.1) 0% 25%,
+            transparent 0% 50%
+        );
+    background-size: 4px 4px;
+}
+
+/* Borde pixelado */
+.pixel-border {
+    box-shadow: 
+        0 -4px 0 0 currentColor,
+        4px -4px 0 0 currentColor,
+        4px 0 0 0 currentColor,
+        4px 4px 0 0 currentColor,
+        0 4px 0 0 currentColor,
+        -4px 4px 0 0 currentColor,
+        -4px 0 0 0 currentColor,
+        -4px -4px 0 0 currentColor;
 }
 
 code {
