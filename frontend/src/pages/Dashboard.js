@@ -88,17 +88,9 @@ function Dashboard() {
   }, [hasInitialized]);
 
   const handleLogout = async () => {
-    try {
-      await axios.post(`${API}/auth/logout`, {}, {
-        headers: getAuthHeaders(),
-        withCredentials: true
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-    localStorage.removeItem('access_token');
-    sessionStorage.removeItem('access_token');
-    window.location.href = '/login';
+    // DEV MODE - Solo recarga la página
+    console.log('[Dashboard] Logout (dev mode)');
+    window.location.href = '/dashboard';
   };
 
   const handleCreateRoom = async (e) => {
