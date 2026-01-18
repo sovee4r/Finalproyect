@@ -21,7 +21,9 @@ function Dashboard() {
     maxPlayers: 4,
     gameMode: 'normal',
     subject: 'matematicas',
-    gradeLevel: '10'
+    gradeLevel: '10',
+    timePerQuestion: 30,
+    totalQuestions: 10
   });
   const [friendEmail, setFriendEmail] = useState('');
   const [characterCustomization, setCharacterCustomization] = useState({
