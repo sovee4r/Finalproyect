@@ -147,20 +147,15 @@ function Dashboard() {
 
   const handleUpdateCharacter = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.put(
-        `${API}/users/me/character`,
-        characterCustomization,
-        {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        }
-      );
-      setCharacter(response.data);
-      setShowEditCharacter(false);
-    } catch (error) {
-      console.error('Error updating character:', error);
-    }
+    
+    // Update mock character
+    const updatedCharacter = {
+      ...character,
+      customization: characterCustomization
+    };
+    
+    setCharacter(updatedCharacter);
+    setShowEditCharacter(false);
   };
 
   const handleJoinRoom = async (roomId) => {
