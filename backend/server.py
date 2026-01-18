@@ -409,14 +409,29 @@ async def get_friends(user: dict = Depends(get_current_user)):
     return friends
 
 @api_router.post("/friends/add")
-async def add_friend(friend_email: str, user: dict = Depends(get_current_user)):
-    """Send friend request"""
-    friend_doc = await db.users.find_one({"email": friend_email}, {"_id": 0})
+async def add_friend(friend_identifier: str, user: dict = Depends(get_current_user)):
+    """Send friend request using username#tag format"""
+    # Parse username#tag
+    if '#' not in friend_identifier:
+        raise HTTPException(status_code=400, detail="Use format: username#1234")
+    
+    parts = friend_identifier.split('#')
+    if len(parts) != 2:
+        raise HTTPException(status_code=400, detail="Invalid format. Use: username#1234")
+    
+    friend_username, friend_tag = parts
+    
+    # Find friend by username and tag
+    friend_doc = await db.users.find_one({
+        "username": friend_username,
+        "user_tag": friend_tag
+    }, {"_id": 0})
+    
     if not friend_doc:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
     if friend_doc["user_id"] == user["user_id"]:
-        raise HTTPException(status_code=400, detail="Cannot add yourself as friend")
+        raise HTTPException(status_code=400, detail="No puedes agregarte a ti mismo")
     
     # Check if already friends
     existing = await db.friendships.find_one({
@@ -427,7 +442,7 @@ async def add_friend(friend_email: str, user: dict = Depends(get_current_user)):
     })
     
     if existing:
-        raise HTTPException(status_code=400, detail="Already friends")
+        raise HTTPException(status_code=400, detail="Ya son amigos")
     
     friendship_doc = {
         "friendship_id": f"friend_{uuid.uuid4().hex[:12]}",
@@ -439,7 +454,7 @@ async def add_friend(friend_email: str, user: dict = Depends(get_current_user)):
     
     await db.friendships.insert_one(friendship_doc)
     
-    return {"message": "Friend added successfully", "friend": friend_doc}
+    return {"message": "Amigo agregado exitosamente", "friend": friend_doc}
 
 # ============ GAME ROOMS ROUTES ============
 
