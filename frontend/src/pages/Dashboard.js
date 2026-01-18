@@ -17,6 +17,12 @@ function Dashboard() {
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [showEditCharacter, setShowEditCharacter] = useState(false);
   const [roomName, setRoomName] = useState('');
+  const [roomConfig, setRoomConfig] = useState({
+    maxPlayers: 4,
+    gameMode: 'normal',
+    subject: 'matematicas',
+    gradeLevel: '10'
+  });
   const [friendEmail, setFriendEmail] = useState('');
   const [characterCustomization, setCharacterCustomization] = useState({
     avatar: '👤',
