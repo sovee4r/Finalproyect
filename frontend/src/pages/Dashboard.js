@@ -12,7 +12,7 @@ function Dashboard() {
   const [character, setCharacter] = useState(null);
   const [friends, setFriends] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [isLoading, setIsLoading] = useState(!location.state?.user);
+  const [isLoading, setIsLoading] = useState(true);
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [showEditCharacter, setShowEditCharacter] = useState(false);
@@ -31,6 +31,7 @@ function Dashboard() {
     color: '#a855f7',
     accessories: []
   });
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('access_token');
@@ -38,30 +39,30 @@ function Dashboard() {
   };
 
   useEffect(() => {
+    if (hasInitialized) return;
+    
     const fetchData = async () => {
       try {
         // Check if we have a token
         const token = localStorage.getItem('access_token');
-        if (!token && !user) {
+        if (!token) {
           console.log('No token found, redirecting to login');
-          navigate('/login');
+          navigate('/login', { replace: true });
           return;
         }
 
-        // If we already have user from navigation state, skip fetching
-        if (user && character && friends.length >= 0 && rooms.length >= 0) {
-          setIsLoading(false);
-          return;
-        }
-
-        if (!user) {
+        // Fetch user if not already set
+        let currentUser = user;
+        if (!currentUser) {
           const userResponse = await axios.get(`${API}/auth/me`, {
             headers: getAuthHeaders(),
             withCredentials: true
           });
-          setUser(userResponse.data);
+          currentUser = userResponse.data;
+          setUser(currentUser);
         }
 
+        // Fetch other data
         const [characterRes, friendsRes, roomsRes] = await Promise.all([
           axios.get(`${API}/users/me/character`, {
             headers: getAuthHeaders(),
@@ -82,15 +83,16 @@ function Dashboard() {
         setFriends(friendsRes.data);
         setRooms(roomsRes.data);
         setIsLoading(false);
+        setHasInitialized(true);
       } catch (error) {
         console.error('Error loading dashboard:', error);
         localStorage.removeItem('access_token');
-        navigate('/login');
+        navigate('/login', { replace: true });
       }
     };
 
     fetchData();
-  }, []);
+  }, [hasInitialized, navigate, user]);
 
   const handleLogout = async () => {
     try {
