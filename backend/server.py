@@ -594,10 +594,10 @@ async def start_game_session(room_id: str, user: dict = Depends(get_current_user
         # If no questions exist, create some default ones
         questions = await create_default_questions(room_doc["subject"], room_doc["grade_level"])
     
-    # Limit to 10 questions and shuffle
+    # Limit to configured number of questions and shuffle
     import random
     random.shuffle(questions)
-    questions = questions[:10]
+    questions = questions[:room_doc["total_questions"]]
     
     # Create game session
     session_id = f"session_{uuid.uuid4().hex[:12]}"
