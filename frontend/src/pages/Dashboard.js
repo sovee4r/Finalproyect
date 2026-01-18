@@ -102,7 +102,7 @@ function Dashboard() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${API}/rooms?room_name=${encodeURIComponent(roomName)}&max_players=4`,
+        `${API}/rooms?room_name=${encodeURIComponent(roomName)}&max_players=${roomConfig.maxPlayers}&game_mode=${roomConfig.gameMode}&subject=${roomConfig.subject}&grade_level=${roomConfig.gradeLevel}`,
         {},
         {
           headers: getAuthHeaders(),
@@ -112,6 +112,12 @@ function Dashboard() {
       setRooms([...rooms, response.data]);
       setShowCreateRoom(false);
       setRoomName('');
+      setRoomConfig({
+        maxPlayers: 4,
+        gameMode: 'normal',
+        subject: 'matematicas',
+        gradeLevel: '10'
+      });
       navigate(`/room/${response.data.room_id}`);
     } catch (error) {
       console.error('Error creating room:', error);
