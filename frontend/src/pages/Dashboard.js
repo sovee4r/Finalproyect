@@ -333,14 +333,19 @@ function Dashboard() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setShowAddFriend(false)}>
           <div className="bg-slate-900 border-8 border-purple-500 p-8 max-w-md" style={{ boxShadow: '12px 12px 0 0 #a855f7' }} onClick={(e) => e.stopPropagation()}>
             <h3 className="pixel-font text-xl text-purple-400 mb-4 text-center">AGREGAR AMIGO</h3>
+            <p className="text-purple-300 text-sm mb-4 text-center">
+              Usa el formato: usuario#1234
+            </p>
             <form onSubmit={handleAddFriend} className="space-y-4">
               <input
-                type="email"
+                type="text"
                 value={friendEmail}
                 onChange={(e) => setFriendEmail(e.target.value)}
-                placeholder="Email del amigo"
+                placeholder="Ej: JugadorPro#1234"
                 className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
                 required
+                pattern="^[a-zA-Z0-9_]+#[0-9]{4}$"
+                title="Formato: usuario#1234"
                 data-testid="friend-email-input"
               />
               <button
