@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AuthCallback from './pages/AuthCallback';
 import GameRoom from './pages/GameRoom';
+import DebugAuth from './pages/DebugAuth';
 import { useLocation } from 'react-router-dom';
 
 function AppRouter() {
