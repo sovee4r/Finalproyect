@@ -116,6 +116,7 @@ function Dashboard() {
       console.error('Logout error:', error);
     }
     localStorage.removeItem('access_token');
+    sessionStorage.removeItem('access_token');
     window.location.href = '/login';
   };
 
