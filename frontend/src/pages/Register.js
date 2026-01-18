@@ -25,16 +25,17 @@ function Register() {
         password
       });
 
-      console.log('[Register] Registration successful:', response.data.user);
+      console.log('[Register] Registration successful');
 
       localStorage.setItem('access_token', response.data.access_token);
-      console.log('[Register] Token stored in localStorage');
       
-      // Navigate to debug page
-      navigate('/debug-auth');
+      // Small delay and use window.location for clean navigation
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 100);
+      
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al registrarse');
-    } finally {
       setLoading(false);
     }
   };
