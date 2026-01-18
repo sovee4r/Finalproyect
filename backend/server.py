@@ -502,16 +502,26 @@ async def get_rooms(user: dict = Depends(get_current_user)):
     return rooms
 
 @api_router.post("/rooms")
-async def create_room(room_name: str, max_players: int = 4, user: dict = Depends(get_current_user)):
-    """Create a new game room"""
+async def create_room(
+    room_name: str,
+    max_players: int = 4,
+    game_mode: str = "normal",
+    subject: str = "matematicas",
+    grade_level: str = "10",
+    user: dict = Depends(get_current_user)
+):
+    """Create a new game room with configuration"""
     room_id = f"room_{uuid.uuid4().hex[:8]}"
     
     room_doc = {
         "room_id": room_id,
         "name": room_name,
         "host_user_id": user["user_id"],
-        "players": [user["user_id"]],
+        "players": [user["user_id"]],  # Host se une automáticamente
         "max_players": max_players,
+        "game_mode": game_mode,
+        "subject": subject,
+        "grade_level": grade_level,
         "status": "waiting",
         "created_at": datetime.now(timezone.utc)
     }
