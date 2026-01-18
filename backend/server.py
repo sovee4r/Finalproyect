@@ -510,6 +510,8 @@ async def create_room(
     game_mode: str = "normal",
     subject: str = "matematicas",
     grade_level: str = "10",
+    time_per_question: int = 30,
+    total_questions: int = 10,
     user: dict = Depends(get_current_user)
 ):
     """Create a new game room with configuration"""
@@ -524,6 +526,8 @@ async def create_room(
         "game_mode": game_mode,
         "subject": subject,
         "grade_level": grade_level,
+        "time_per_question": time_per_question,
+        "total_questions": total_questions,
         "status": "waiting",
         "created_at": datetime.now(timezone.utc)
     }
