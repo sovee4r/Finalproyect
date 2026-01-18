@@ -23,18 +23,37 @@ function Login() {
         password
       });
 
-      console.log('[Login] Login successful');
-
-      // Store token
-      localStorage.setItem('access_token', response.data.access_token);
+      console.log('[Login] Response received');
+      const token = response.data.access_token;
       
-      // Small delay to ensure localStorage is written
-      setTimeout(() => {
-        // Navigate directly to dashboard with replace
-        window.location.href = '/dashboard';
-      }, 100);
+      // Try both storage methods
+      try {
+        localStorage.setItem('access_token', token);
+        sessionStorage.setItem('access_token', token);
+        console.log('[Login] Token saved');
+        
+        // Verify it was saved
+        const verify = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+        console.log('[Login] Token verified:', !!verify);
+        
+        if (!verify) {
+          throw new Error('Could not save token');
+        }
+        
+        // Wait a bit and redirect
+        setTimeout(() => {
+          console.log('[Login] Redirecting...');
+          window.location.href = '/dashboard';
+        }, 200);
+        
+      } catch (storageError) {
+        console.error('[Login] Storage error:', storageError);
+        setError('Error: Tu navegador está bloqueando el almacenamiento. Usa modo normal (no incógnito).');
+        setLoading(false);
+      }
       
     } catch (err) {
+      console.error('[Login] Login error:', err);
       setError(err.response?.data?.detail || 'Error al iniciar sesión');
       setLoading(false);
     }
