@@ -34,7 +34,8 @@ function Dashboard() {
   const [hasInitialized, setHasInitialized] = useState(false);
 
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    // Usar token mock para desarrollo
+    const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || 'dev-token';
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -43,82 +44,43 @@ function Dashboard() {
     
     const fetchData = async () => {
       try {
-        console.log('[Dashboard] Starting...');
+        console.log('[Dashboard] DEV MODE - Auth disabled');
         
-        // Check both storage methods
-        const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-        console.log('[Dashboard] Token exists:', !!token);
-        console.log('[Dashboard] Token preview:', token?.substring(0, 50));
+        // Usuario mock para desarrollo
+        const mockUser = {
+          user_id: 'dev_user_123',
+          username: 'DevUser',
+          user_tag: '0000',
+          email: 'dev@test.com',
+          picture: null
+        };
         
-        if (!token) {
-          console.log('[Dashboard] No token, redirecting');
-          alert('No se encontró sesión. Por favor inicia sesión nuevamente.');
-          window.location.href = '/login';
-          return;
-        }
-
-        // Fetch user if not already set
-        let currentUser = user;
+        setUser(mockUser);
         
-        if (!currentUser) {
-          console.log('[Dashboard] Fetching user...');
-          console.log('[Dashboard] API URL:', API);
-          
-          try {
-            const userResponse = await axios.get(`${API}/auth/me`, {
-              headers: getAuthHeaders(),
-              withCredentials: true
-            });
-            currentUser = userResponse.data;
-            console.log('[Dashboard] User fetched:', currentUser.username);
-            setUser(currentUser);
-          } catch (userError) {
-            console.error('[Dashboard] Error fetching user:', userError);
-            console.error('[Dashboard] Error response:', userError.response?.data);
-            console.error('[Dashboard] Error status:', userError.response?.status);
-            throw userError;
-          }
-        }
-
-        console.log('[Dashboard] Fetching data...');
-        // Fetch other data
-        try {
-          const [characterRes, friendsRes, roomsRes] = await Promise.all([
-            axios.get(`${API}/users/me/character`, {
-              headers: getAuthHeaders(),
-              withCredentials: true
-            }),
-            axios.get(`${API}/friends`, {
-              headers: getAuthHeaders(),
-              withCredentials: true
-            }),
-            axios.get(`${API}/rooms`, {
-              headers: getAuthHeaders(),
-              withCredentials: true
-            })
-          ]);
-
-          console.log('[Dashboard] Data loaded successfully');
-          setCharacter(characterRes.data);
-          setCharacterCustomization(characterRes.data.customization);
-          setFriends(friendsRes.data);
-          setRooms(roomsRes.data);
-          setIsLoading(false);
-          setHasInitialized(true);
-          console.log('[Dashboard] Initialization complete!');
-        } catch (dataError) {
-          console.error('[Dashboard] Error fetching data:', dataError);
-          console.error('[Dashboard] Data error response:', dataError.response?.data);
-          throw dataError;
-        }
+        // Character mock
+        const mockCharacter = {
+          character_id: 'dev_char_123',
+          user_id: 'dev_user_123',
+          customization: {
+            avatar: '👤',
+            color: '#a855f7',
+            accessories: []
+          },
+          inventory: [],
+          score: 0
+        };
+        
+        setCharacter(mockCharacter);
+        setCharacterCustomization(mockCharacter.customization);
+        setFriends([]);
+        setRooms([]);
+        setIsLoading(false);
+        setHasInitialized(true);
+        
+        console.log('[Dashboard] DEV MODE - Ready to work!');
         
       } catch (error) {
-        console.error('[Dashboard] Fatal error:', error);
-        console.error('[Dashboard] Error message:', error.message);
-        localStorage.removeItem('access_token');
-        sessionStorage.removeItem('access_token');
-        alert('Error al cargar dashboard. Inicia sesión nuevamente.');
-        window.location.href = '/login';
+        console.error('[Dashboard] Error:', error);
       }
     };
 
