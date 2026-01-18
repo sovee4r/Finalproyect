@@ -320,9 +320,9 @@ async def process_google_session(request: Request, response: Response):
         }
         await db.characters.insert_one(character_doc)
     
-    # Store session
+    # Store session with 90 days expiry
     session_token = user_data["session_token"]
-    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    expires_at = datetime.now(timezone.utc) + timedelta(days=90)
     
     await db.user_sessions.insert_one({
         "user_id": user_id,
