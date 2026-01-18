@@ -32,6 +32,14 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Check if we have a token
+        const token = localStorage.getItem('access_token');
+        if (!token && !user) {
+          console.log('No token found, redirecting to login');
+          navigate('/login');
+          return;
+        }
+
         if (!user) {
           const userResponse = await axios.get(`${API}/auth/me`, {
             headers: getAuthHeaders(),
@@ -62,6 +70,7 @@ function Dashboard() {
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading dashboard:', error);
+        localStorage.removeItem('access_token');
         navigate('/login');
       }
     };
