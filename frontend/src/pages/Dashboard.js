@@ -109,12 +109,11 @@ function Dashboard() {
         headers: getAuthHeaders(),
         withCredentials: true
       });
-      localStorage.removeItem('access_token');
-      navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
-      navigate('/login');
     }
+    localStorage.removeItem('access_token');
+    window.location.href = '/login';
   };
 
   const handleCreateRoom = async (e) => {
