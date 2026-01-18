@@ -263,14 +263,19 @@ function Dashboard() {
                 <p className="text-purple-300 text-center py-4">No hay salas disponibles</p>
               ) : (
                 rooms.map(room => (
-                  <div key={room.room_id} className="bg-slate-700 border-4 border-purple-400 p-3 flex justify-between items-center" style={{ boxShadow: '3px 3px 0 0 #a855f7' }}>
-                    <div>
+                  <div key={room.room_id} className="bg-slate-700 border-4 border-purple-400 p-3" style={{ boxShadow: '3px 3px 0 0 #a855f7' }}>
+                    <div className="flex justify-between items-center mb-2">
                       <p className="pixel-font text-sm text-white">{room.name}</p>
-                      <p className="text-xs text-purple-300">{room.players.length}/{room.max_players} jugadores</p>
+                      <span className="text-xs px-2 py-1 bg-purple-600 text-white">{room.game_mode.toUpperCase()}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs text-purple-300 mb-2">
+                      <span>👥 {room.players.length}/{room.max_players}</span>
+                      <span>📚 {room.subject}</span>
+                      <span>🎓 Grado {room.grade_level}</span>
                     </div>
                     <button
                       onClick={() => handleJoinRoom(room.room_id)}
-                      className="pixel-font px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white border-4 border-pink-500 text-xs"
+                      className="pixel-font w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white border-4 border-pink-500 text-xs mt-2"
                       style={{ boxShadow: '2px 2px 0 0 #ec4899' }}
                       data-testid={`join-room-${room.room_id}`}
                     >
