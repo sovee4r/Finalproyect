@@ -128,21 +128,46 @@ function Dashboard() {
 
   const handleAddFriend = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${API}/friends/add?friend_identifier=${encodeURIComponent(friendEmail)}`,
-        {},
-        {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        }
-      );
-      setFriends([...friends, response.data.friend]);
-      setShowAddFriend(false);
-      setFriendEmail('');
-    } catch (error) {
-      alert(error.response?.data?.detail || 'Error al agregar amigo');
+    
+    // Validar formato username#tag
+    if (!friendEmail.includes('#')) {
+      alert('Por favor usa el formato: usuario#1234');
+      return;
     }
+    
+    const [username, tag] = friendEmail.split('#');
+    
+    if (!tag || tag.length !== 4) {
+      alert('El código debe tener 4 dígitos. Ejemplo: usuario#1234');
+      return;
+    }
+    
+    // Crear amigo mock en dev mode
+    const newFriend = {
+      user_id: `friend_${Date.now()}`,
+      username: username,
+      user_tag: tag,
+      picture: null
+    };
+    
+    // Verificar que no sea el mismo usuario
+    if (username === user.username && tag === user.user_tag) {
+      alert('No puedes agregarte a ti mismo');
+      return;
+    }
+    
+    // Verificar que no esté ya agregado
+    const alreadyFriend = friends.find(f => f.username === username && f.user_tag === tag);
+    if (alreadyFriend) {
+      alert('Ya son amigos');
+      return;
+    }
+    
+    setFriends([...friends, newFriend]);
+    setShowAddFriend(false);
+    setFriendEmail('');
+    
+    alert(`✓ Amigo agregado: ${username}#${tag}`);
   };
 
   const handleUpdateCharacter = async (e) => {
