@@ -1,16 +1,52 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 const WS_URL = BACKEND_URL.replace('http', 'ws').replace('https', 'wss');
 
+// DEV MODE - Preguntas de ejemplo para todas las materias
+const DEV_QUESTIONS = {
+  matematicas: [
+    { question_id: 'q1', question_text: '¿Cuál es el resultado de 2³ + 4²?', options: ['24', '20', '16', '18'], correct_answer: 0 },
+    { question_id: 'q2', question_text: 'La ecuación x² - 5x + 6 = 0 tiene como soluciones:', options: ['x = 2, x = 3', 'x = 1, x = 6', 'x = -2, x = -3', 'x = 2, x = -3'], correct_answer: 0 },
+    { question_id: 'q3', question_text: '¿Cuál es la raíz cuadrada de 144?', options: ['12', '14', '11', '13'], correct_answer: 0 },
+    { question_id: 'q4', question_text: 'Si 3x + 7 = 22, entonces x =', options: ['5', '7', '4', '6'], correct_answer: 0 },
+    { question_id: 'q5', question_text: '¿Cuánto es 15% de 200?', options: ['30', '25', '35', '20'], correct_answer: 0 },
+  ],
+  lengua: [
+    { question_id: 'l1', question_text: '¿Qué figura literaria se usa en "Sus ojos eran dos luceros"?', options: ['Metáfora', 'Símil', 'Hipérbole', 'Personificación'], correct_answer: 0 },
+    { question_id: 'l2', question_text: '¿Cuál es el sinónimo de "efímero"?', options: ['Pasajero', 'Eterno', 'Importante', 'Grande'], correct_answer: 0 },
+    { question_id: 'l3', question_text: '¿Qué tipo de palabra es "rápidamente"?', options: ['Adverbio', 'Adjetivo', 'Sustantivo', 'Verbo'], correct_answer: 0 },
+    { question_id: 'l4', question_text: '¿Quién escribió "Don Quijote de la Mancha"?', options: ['Miguel de Cervantes', 'Gabriel García Márquez', 'Pablo Neruda', 'Jorge Luis Borges'], correct_answer: 0 },
+    { question_id: 'l5', question_text: '¿Qué es una onomatopeya?', options: ['Palabra que imita sonidos', 'Palabra que exagera', 'Palabra que compara', 'Palabra que describe'], correct_answer: 0 },
+  ],
+  ciencias: [
+    { question_id: 'c1', question_text: '¿Cuál es la fórmula química del agua?', options: ['H₂O', 'CO₂', 'O₂', 'H₂O₂'], correct_answer: 0 },
+    { question_id: 'c2', question_text: '¿Cuántos planetas hay en el sistema solar?', options: ['8', '9', '7', '10'], correct_answer: 0 },
+    { question_id: 'c3', question_text: '¿Qué órgano bombea la sangre?', options: ['Corazón', 'Pulmón', 'Hígado', 'Riñón'], correct_answer: 0 },
+    { question_id: 'c4', question_text: '¿Cuál es el elemento más abundante en la atmósfera?', options: ['Nitrógeno', 'Oxígeno', 'Carbono', 'Hidrógeno'], correct_answer: 0 },
+    { question_id: 'c5', question_text: '¿Qué tipo de energía tiene un objeto en movimiento?', options: ['Cinética', 'Potencial', 'Térmica', 'Química'], correct_answer: 0 },
+  ],
+  sociales: [
+    { question_id: 's1', question_text: '¿En qué año comenzó la Segunda Guerra Mundial?', options: ['1939', '1914', '1945', '1940'], correct_answer: 0 },
+    { question_id: 's2', question_text: '¿Cuál es la capital de Francia?', options: ['París', 'Londres', 'Madrid', 'Roma'], correct_answer: 0 },
+    { question_id: 's3', question_text: '¿Quién pintó la Mona Lisa?', options: ['Leonardo da Vinci', 'Pablo Picasso', 'Vincent van Gogh', 'Miguel Ángel'], correct_answer: 0 },
+    { question_id: 's4', question_text: '¿En qué continente está Egipto?', options: ['África', 'Asia', 'Europa', 'Oceanía'], correct_answer: 0 },
+    { question_id: 's5', question_text: '¿Quién fue el primer presidente de Estados Unidos?', options: ['George Washington', 'Abraham Lincoln', 'Thomas Jefferson', 'John Adams'], correct_answer: 0 },
+  ]
+};
+
 function GameRoom() {
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // DEV MODE - Obtener datos de la sala desde navigation state
+  const roomFromNav = location.state?.room || null;
+  
   const [user, setUser] = useState(null);
-  const [room, setRoom] = useState(null);
+  const [room, setRoom] = useState(roomFromNav);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -23,48 +59,50 @@ function GameRoom() {
   const [answerResult, setAnswerResult] = useState(null);
   const [finalResults, setFinalResults] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [devQuestions, setDevQuestions] = useState([]);
+  const [playerScore, setPlayerScore] = useState(0);
   const messagesEndRef = useRef(null);
   const timerRef = useRef(null);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('access_token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
-  const getToken = () => {
-    const token = localStorage.getItem('access_token');
-    return token || '';
-  };
-
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userResponse = await axios.get(`${API}/auth/me`, {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        });
-        setUser(userResponse.data);
-
-        const roomResponse = await axios.get(`${API}/rooms/${roomId}`, {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        });
-        setRoom(roomResponse.data);
-
-        const messagesResponse = await axios.get(`${API}/rooms/${roomId}/messages`, {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        });
-        setMessages(messagesResponse.data);
-
-      } catch (error) {
-        console.error('Error loading room:', error);
-        navigate('/dashboard');
-      }
+    // DEV MODE - Usar datos mockeados
+    console.log('[GameRoom] DEV MODE - Initializing with mock data');
+    
+    const mockUser = {
+      user_id: 'dev_user_123',
+      username: 'DevUser',
+      user_tag: '0000'
     };
-
-    fetchData();
-  }, [roomId, navigate]);
+    setUser(mockUser);
+    
+    // Si no hay sala en navigation state, crear una mock
+    if (!room) {
+      const mockRoom = {
+        room_id: roomId,
+        name: 'Sala de Prueba',
+        host_user_id: 'dev_user_123',
+        players: ['dev_user_123'],
+        max_players: 4,
+        game_mode: 'normal',
+        subject: 'matematicas',
+        grade_level: '10',
+        time_per_question: 30,
+        total_questions: 5,
+        status: 'waiting'
+      };
+      setRoom(mockRoom);
+    }
+    
+    // Mensaje de bienvenida
+    setMessages([{
+      message_id: 'sys_welcome',
+      user_id: 'system',
+      username: 'Sistema',
+      message: '🛠️ MODO DESARROLLO - Chat simulado',
+      timestamp: new Date().toISOString()
+    }]);
+    
+  }, [roomId, room]);
 
   useEffect(() => {
     if (!user) return;
