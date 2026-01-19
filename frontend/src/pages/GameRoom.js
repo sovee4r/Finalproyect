@@ -119,155 +119,142 @@ function GameRoom() {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !ws) return;
+    if (!newMessage.trim()) return;
 
-    ws.send(JSON.stringify({
-      type: 'chat',
-      message: newMessage
-    }));
-
+    // DEV MODE - Agregar mensaje localmente
+    const newMsg = {
+      message_id: `msg_${Date.now()}`,
+      user_id: user.user_id,
+      username: user.username,
+      message: newMessage,
+      timestamp: new Date().toISOString()
+    };
+    
+    setMessages(prev => [...prev, newMsg]);
     setNewMessage('');
   };
 
-  const handleLeaveRoom = async () => {
-    try {
-      await axios.post(`${API}/rooms/${roomId}/leave`, {}, {
-        headers: getAuthHeaders(),
-        withCredentials: true
-      });
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Error leaving room:', error);
-      navigate('/dashboard');
-    }
+  const handleLeaveRoom = () => {
+    // DEV MODE - Solo navegar de vuelta
+    navigate('/dashboard');
   };
 
-  const handleStartGame = async () => {
-    try {
-      const response = await axios.post(`${API}/rooms/${roomId}/start`, {}, {
-        headers: getAuthHeaders(),
-        withCredentials: true
-      });
-      
-      setGameSession(response.data);
-      setIsPlaying(true);
-      setQuestionNumber(0);
-      
-      // Load first question
-      loadQuestion(response.data.session_id, 0);
-    } catch (error) {
-      alert(error.response?.data?.detail || 'Error al iniciar el juego');
-    }
-  };
-
-  const loadQuestion = async (sessionId, qNum) => {
-    try {
-      const response = await axios.get(`${API}/sessions/${sessionId}/question/${qNum}`, {
-        headers: getAuthHeaders(),
-        withCredentials: true
-      });
-      setCurrentQuestion(response.data);
-      setSelectedAnswer(null);
-      setAnswerResult(null);
-      
-      // Start timer
-      setTimeLeft(room?.time_per_question || 30);
-      
-      // Clear previous timer
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      
-      // Start countdown
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            // Auto-submit with no answer if time runs out
-            if (selectedAnswer === null) {
-              handleAnswerSelect(-1); // -1 means no answer (time out)
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      
-    } catch (error) {
-      console.error('Error loading question:', error);
-    }
-  };
-
-  const handleAnswerSelect = async (answerIndex) => {
-    if (selectedAnswer !== null) return; // Already answered
+  const handleStartGame = () => {
+    // DEV MODE - Iniciar juego con preguntas locales
+    const subject = room?.subject || 'matematicas';
+    const questions = DEV_QUESTIONS[subject] || DEV_QUESTIONS.matematicas;
+    const totalQ = Math.min(room?.total_questions || 5, questions.length);
     
-    // Clear timer
+    // Barajar preguntas
+    const shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, totalQ);
+    setDevQuestions(shuffled);
+    
+    const session = {
+      session_id: `dev_session_${Date.now()}`,
+      room_id: roomId,
+      total_questions: totalQ
+    };
+    
+    setGameSession(session);
+    setIsPlaying(true);
+    setQuestionNumber(0);
+    setPlayerScore(0);
+    
+    // Cargar primera pregunta
+    loadDevQuestion(shuffled, 0);
+  };
+
+  const loadDevQuestion = (questions, qNum) => {
+    const question = questions[qNum];
+    if (!question) return;
+    
+    setCurrentQuestion({
+      ...question,
+      question_number: qNum + 1,
+      total_questions: questions.length,
+      subject: room?.subject || 'matematicas'
+    });
+    setSelectedAnswer(null);
+    setAnswerResult(null);
+    
+    // Iniciar timer
+    const timePerQ = room?.time_per_question || 30;
+    setTimeLeft(timePerQ);
+    
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          handleAnswerSelect(-1); // Tiempo agotado
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleAnswerSelect = (answerIndex) => {
+    if (selectedAnswer !== null) return;
+    
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
     
     setSelectedAnswer(answerIndex);
     
-    // If time ran out (answerIndex === -1), just move to next question
+    const isCorrect = answerIndex === currentQuestion.correct_answer;
+    
     if (answerIndex === -1) {
       setAnswerResult({
         is_correct: false,
-        correct_answer: currentQuestion.correct_answer || 0,
-        explanation: "⏰ Se acabó el tiempo!"
+        correct_answer: currentQuestion.correct_answer,
+        explanation: "⏰ ¡Se acabó el tiempo!"
       });
+    } else {
+      if (isCorrect) {
+        setPlayerScore(prev => prev + 1);
+      }
       
-      setTimeout(() => {
-        const nextQuestion = questionNumber + 1;
-        if (nextQuestion < gameSession.total_questions) {
-          setQuestionNumber(nextQuestion);
-          loadQuestion(gameSession.session_id, nextQuestion);
-        } else {
-          loadFinalResults();
-        }
-      }, 3000);
-      return;
+      setAnswerResult({
+        is_correct: isCorrect,
+        correct_answer: currentQuestion.correct_answer,
+        explanation: `La respuesta correcta es: ${currentQuestion.options[currentQuestion.correct_answer]}`
+      });
     }
     
-    try {
-      const response = await axios.post(
-        `${API}/sessions/${gameSession.session_id}/answer?question_num=${questionNumber}&answer=${answerIndex}`,
-        {},
-        {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        }
-      );
-      
-      setAnswerResult(response.data);
-      
-      // Wait 3 seconds before next question
-      setTimeout(() => {
-        const nextQuestion = questionNumber + 1;
-        if (nextQuestion < gameSession.total_questions) {
-          setQuestionNumber(nextQuestion);
-          loadQuestion(gameSession.session_id, nextQuestion);
-        } else {
-          // Game finished, show results
-          loadFinalResults();
-        }
-      }, 3000);
-      
-    } catch (error) {
-      console.error('Error submitting answer:', error);
-    }
+    // Siguiente pregunta después de 2 segundos
+    setTimeout(() => {
+      const nextQ = questionNumber + 1;
+      if (nextQ < devQuestions.length) {
+        setQuestionNumber(nextQ);
+        loadDevQuestion(devQuestions, nextQ);
+      } else {
+        // Mostrar resultados finales
+        showFinalResults();
+      }
+    }, 2000);
   };
 
-  const loadFinalResults = async () => {
-    try {
-      const response = await axios.get(`${API}/sessions/${gameSession.session_id}/results`, {
-        headers: getAuthHeaders(),
-        withCredentials: true
-      });
-      setFinalResults(response.data);
-      setShowResults(true);
-    } catch (error) {
-      console.error('Error loading results:', error);
-    }
+  const showFinalResults = () => {
+    setFinalResults({
+      session_id: gameSession?.session_id,
+      results: [{
+        user_id: user.user_id,
+        username: `${user.username}#${user.user_tag}`,
+        score: playerScore + (answerResult?.is_correct ? 1 : 0),
+        total_questions: devQuestions.length
+      }],
+      winner: {
+        username: `${user.username}#${user.user_tag}`,
+        score: playerScore + (answerResult?.is_correct ? 1 : 0),
+        total_questions: devQuestions.length
+      }
+    });
+    setShowResults(true);
   };
 
   if (!user) {
