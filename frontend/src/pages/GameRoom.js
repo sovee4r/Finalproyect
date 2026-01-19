@@ -104,63 +104,14 @@ function GameRoom() {
     
   }, [roomId, room]);
 
+  // DEV MODE - No WebSocket needed, cleanup timer on unmount
   useEffect(() => {
-    if (!user) return;
-
-    const token = getToken();
-    const websocket = new WebSocket(`${WS_URL}/ws/${roomId}?token=${token}`);
-
-    websocket.onopen = () => {
-      console.log('WebSocket connected');
-    };
-
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      if (data.type === 'chat') {
-        setMessages(prev => [...prev, {
-          message_id: data.message_id || `msg_${Date.now()}`,
-          user_id: data.user_id,
-          username: data.username,
-          message: data.message,
-          timestamp: data.timestamp
-        }]);
-      } else if (data.type === 'user_joined') {
-        setMessages(prev => [...prev, {
-          message_id: `sys_${Date.now()}`,
-          user_id: 'system',
-          username: 'Sistema',
-          message: `${data.username} se unió a la sala`,
-          timestamp: new Date().toISOString()
-        }]);
-      } else if (data.type === 'user_left') {
-        setMessages(prev => [...prev, {
-          message_id: `sys_${Date.now()}`,
-          user_id: 'system',
-          username: 'Sistema',
-          message: `${data.username} salió de la sala`,
-          timestamp: new Date().toISOString()
-        }]);
-      }
-    };
-
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    websocket.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
-
-    setWs(websocket);
-
     return () => {
-      websocket.close();
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [user, roomId]);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
