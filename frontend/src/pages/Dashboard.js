@@ -123,7 +123,8 @@ function Dashboard() {
       timePerQuestion: 30,
       totalQuestions: 10
     });
-    navigate(`/room/${newRoom.room_id}`);
+    // Pasar datos de la sala al navegar
+    navigate(`/room/${newRoom.room_id}`, { state: { room: newRoom } });
   };
 
   const handleAddFriend = async (e) => {
