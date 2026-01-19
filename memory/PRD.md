@@ -264,4 +264,9 @@ La autenticación está temporalmente deshabilitada para permitir trabajar en la
 - Implementado modo desarrollo completo en Dashboard.js y GameRoom.js
 - Juego de trivia funcionando con preguntas locales para 4 materias
 - Sistema de amigos mock funcionando
+- **NUEVO**: Rediseño completo del GameRoom basado en mockup del usuario:
+  - Panel izquierdo: Ranking de jugadores en tiempo real (Top 3 ganan)
+  - Centro: Mesa pixel-art con jugadores + preguntas 2x2
+  - Panel derecho: Espacio para anuncio + info del juego
+  - Pantalla de resultados con podio Top 3
 - Documentación actualizada
