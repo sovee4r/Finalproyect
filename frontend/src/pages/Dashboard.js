@@ -184,20 +184,10 @@ function Dashboard() {
     setShowEditCharacter(false);
   };
 
-  const handleJoinRoom = async (roomId) => {
-    try {
-      await axios.post(
-        `${API}/rooms/${roomId}/join`,
-        {},
-        {
-          headers: getAuthHeaders(),
-          withCredentials: true
-        }
-      );
-      navigate(`/room/${roomId}`);
-    } catch (error) {
-      alert(error.response?.data?.detail || 'Error al unirse a la sala');
-    }
+  const handleJoinRoom = (roomId) => {
+    // DEV MODE - Buscar la sala en la lista local y navegar
+    const roomToJoin = rooms.find(r => r.room_id === roomId);
+    navigate(`/room/${roomId}`, { state: { room: roomToJoin } });
   };
 
   if (isLoading) {
