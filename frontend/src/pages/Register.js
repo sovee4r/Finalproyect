@@ -63,6 +63,16 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-slate-900 pixel-bg flex items-center justify-center p-6">
+      {/* Home button */}
+      <Link
+        to="/"
+        className="fixed top-4 left-4 w-12 h-12 bg-slate-800 hover:bg-slate-700 border-4 border-purple-500 flex items-center justify-center text-2xl z-50"
+        style={{ boxShadow: '3px 3px 0 0 #a855f7' }}
+        title="Ir al inicio"
+      >
+        🏠
+      </Link>
+
       <div className="bg-slate-800/90 border-8 border-purple-500 p-8 max-w-md w-full pixel-dither" style={{
         boxShadow: '8px 8px 0 0 #a855f7, 16px 16px 0 0 #ec4899',
         imageRendering: 'pixelated'
