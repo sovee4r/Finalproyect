@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -7,8 +7,7 @@ const API = `${BACKEND_URL}/api`;
 
 function Dashboard() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [user, setUser] = useState(location.state?.user || null);
+  const [user, setUser] = useState(null);
   const [character, setCharacter] = useState(null);
   const [friends, setFriends] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -25,169 +24,171 @@ function Dashboard() {
     timePerQuestion: 30,
     totalQuestions: 10
   });
-  const [friendEmail, setFriendEmail] = useState('');
+  const [friendIdentifier, setFriendIdentifier] = useState('');
   const [characterCustomization, setCharacterCustomization] = useState({
     avatar: '👤',
     color: '#a855f7',
     accessories: []
   });
-  const [hasInitialized, setHasInitialized] = useState(false);
+  const [error, setError] = useState('');
 
   const getAuthHeaders = () => {
-    // Usar token mock para desarrollo
-    const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || 'dev-token';
+    const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
   useEffect(() => {
-    if (hasInitialized) return;
-    
     const fetchData = async () => {
       try {
-        console.log('[Dashboard] DEV MODE - Auth disabled');
-        
-        // Usuario mock para desarrollo
-        const mockUser = {
-          user_id: 'dev_user_123',
-          username: 'DevUser',
-          user_tag: '0000',
-          email: 'dev@test.com',
-          picture: null
-        };
-        
-        setUser(mockUser);
-        
-        // Character mock
-        const mockCharacter = {
-          character_id: 'dev_char_123',
-          user_id: 'dev_user_123',
-          customization: {
+        // Get current user
+        const userResponse = await axios.get(`${API}/auth/me`, {
+          headers: getAuthHeaders(),
+          withCredentials: true
+        });
+        setUser(userResponse.data);
+
+        // Get character
+        try {
+          const charResponse = await axios.get(`${API}/users/me/character`, {
+            headers: getAuthHeaders(),
+            withCredentials: true
+          });
+          setCharacter(charResponse.data);
+          setCharacterCustomization(charResponse.data.customization || {
             avatar: '👤',
             color: '#a855f7',
             accessories: []
-          },
-          inventory: [],
-          score: 0
-        };
-        
-        setCharacter(mockCharacter);
-        setCharacterCustomization(mockCharacter.customization);
-        setFriends([]);
-        setRooms([]);
+          });
+        } catch (e) {
+          console.log('No character found');
+        }
+
+        // Get friends
+        try {
+          const friendsResponse = await axios.get(`${API}/friends`, {
+            headers: getAuthHeaders(),
+            withCredentials: true
+          });
+          setFriends(friendsResponse.data);
+        } catch (e) {
+          console.log('No friends found');
+        }
+
+        // Get rooms
+        try {
+          const roomsResponse = await axios.get(`${API}/rooms`, {
+            headers: getAuthHeaders(),
+            withCredentials: true
+          });
+          setRooms(roomsResponse.data);
+        } catch (e) {
+          console.log('No rooms found');
+        }
+
         setIsLoading(false);
-        setHasInitialized(true);
-        
-        console.log('[Dashboard] DEV MODE - Ready to work!');
-        
       } catch (error) {
         console.error('[Dashboard] Error:', error);
+        // If auth fails, redirect to login
+        localStorage.removeItem('access_token');
+        sessionStorage.removeItem('access_token');
+        navigate('/login');
       }
     };
 
     fetchData();
-  }, [hasInitialized]);
+  }, [navigate]);
 
-  const handleLogout = async () => {
-    // DEV MODE - Solo recarga la página
-    console.log('[Dashboard] Logout (dev mode)');
-    window.location.href = '/dashboard';
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    sessionStorage.removeItem('access_token');
+    navigate('/');
   };
 
   const handleCreateRoom = async (e) => {
     e.preventDefault();
+    setError('');
     
-    // Crear sala mock en dev mode
-    const newRoom = {
-      room_id: `room_${Date.now()}`,
-      name: roomName,
-      host_user_id: user.user_id,
-      players: [user.user_id],
-      max_players: roomConfig.maxPlayers,
-      game_mode: roomConfig.gameMode,
-      subject: roomConfig.subject,
-      grade_level: roomConfig.gradeLevel,
-      time_per_question: roomConfig.timePerQuestion,
-      total_questions: roomConfig.totalQuestions,
-      status: 'waiting',
-      created_at: new Date()
-    };
-    
-    setRooms([...rooms, newRoom]);
-    setShowCreateRoom(false);
-    setRoomName('');
-    setRoomConfig({
-      maxPlayers: 4,
-      gameMode: 'normal',
-      subject: 'matematicas',
-      gradeLevel: '10',
-      timePerQuestion: 30,
-      totalQuestions: 10
-    });
-    // Pasar datos de la sala al navegar
-    navigate(`/room/${newRoom.room_id}`, { state: { room: newRoom } });
+    try {
+      const params = new URLSearchParams({
+        room_name: roomName,
+        max_players: roomConfig.maxPlayers,
+        game_mode: roomConfig.gameMode,
+        subject: roomConfig.subject,
+        grade_level: roomConfig.gradeLevel,
+        time_per_question: roomConfig.timePerQuestion,
+        total_questions: roomConfig.totalQuestions
+      });
+
+      const response = await axios.post(`${API}/rooms?${params.toString()}`, {}, {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      });
+
+      setShowCreateRoom(false);
+      setRoomName('');
+      navigate(`/room/${response.data.room_id}`);
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Error al crear la sala');
+    }
   };
 
   const handleAddFriend = async (e) => {
     e.preventDefault();
+    setError('');
     
-    // Validar formato username#tag
-    if (!friendEmail.includes('#')) {
-      alert('Por favor usa el formato: usuario#1234');
+    if (!friendIdentifier.includes('#')) {
+      setError('Por favor usa el formato: usuario#1234');
       return;
     }
-    
-    const [username, tag] = friendEmail.split('#');
-    
-    if (!tag || tag.length !== 4) {
-      alert('El código debe tener 4 dígitos. Ejemplo: usuario#1234');
-      return;
+
+    try {
+      const params = new URLSearchParams({ friend_identifier: friendIdentifier });
+      await axios.post(`${API}/friends/add?${params.toString()}`, {}, {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      });
+
+      // Refresh friends list
+      const friendsResponse = await axios.get(`${API}/friends`, {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      });
+      setFriends(friendsResponse.data);
+      
+      setShowAddFriend(false);
+      setFriendIdentifier('');
+      alert('✓ Amigo agregado exitosamente');
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Error al agregar amigo');
     }
-    
-    // Crear amigo mock en dev mode
-    const newFriend = {
-      user_id: `friend_${Date.now()}`,
-      username: username,
-      user_tag: tag,
-      picture: null
-    };
-    
-    // Verificar que no sea el mismo usuario
-    if (username === user.username && tag === user.user_tag) {
-      alert('No puedes agregarte a ti mismo');
-      return;
-    }
-    
-    // Verificar que no esté ya agregado
-    const alreadyFriend = friends.find(f => f.username === username && f.user_tag === tag);
-    if (alreadyFriend) {
-      alert('Ya son amigos');
-      return;
-    }
-    
-    setFriends([...friends, newFriend]);
-    setShowAddFriend(false);
-    setFriendEmail('');
-    
-    alert(`✓ Amigo agregado: ${username}#${tag}`);
   };
 
   const handleUpdateCharacter = async (e) => {
     e.preventDefault();
     
-    // Update mock character
-    const updatedCharacter = {
-      ...character,
-      customization: characterCustomization
-    };
-    
-    setCharacter(updatedCharacter);
-    setShowEditCharacter(false);
+    try {
+      const response = await axios.put(`${API}/users/me/character`, characterCustomization, {
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        withCredentials: true
+      });
+      
+      setCharacter(response.data);
+      setShowEditCharacter(false);
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Error al actualizar personaje');
+    }
   };
 
-  const handleJoinRoom = (roomId) => {
-    // DEV MODE - Buscar la sala en la lista local y navegar
-    const roomToJoin = rooms.find(r => r.room_id === roomId);
-    navigate(`/room/${roomId}`, { state: { room: roomToJoin } });
+  const handleJoinRoom = async (roomId) => {
+    try {
+      await axios.post(`${API}/rooms/${roomId}/join`, {}, {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      });
+      navigate(`/room/${roomId}`);
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error al unirse a la sala');
+    }
   };
 
   if (isLoading) {
@@ -200,21 +201,22 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-900 pixel-bg p-6">
-      {/* DEV MODE Banner */}
-      <div className="fixed top-0 left-0 right-0 bg-yellow-600 text-black text-center py-2 z-50">
-        <p className="pixel-font text-xs">
-          🛠️ MODO DESARROLLO - Autenticación desactivada temporalmente
-        </p>
-      </div>
-
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8 mt-12">
+      <div className="max-w-7xl mx-auto mb-8">
         <div className="bg-slate-800/90 border-4 border-purple-500 p-4 flex justify-between items-center" style={{
-          boxShadow: '6px 6px 0 0 #a855f7',
-          imageRendering: 'pixelated'
+          boxShadow: '6px 6px 0 0 #a855f7'
         }}>
           <div className="flex items-center gap-4">
-            <span className="text-4xl">{character?.customization.avatar}</span>
+            {/* Home button */}
+            <Link
+              to="/"
+              className="w-10 h-10 bg-slate-700 hover:bg-slate-600 border-4 border-purple-400 flex items-center justify-center text-xl"
+              style={{ boxShadow: '2px 2px 0 0 #a855f7' }}
+              title="Ir al inicio"
+            >
+              🏠
+            </Link>
+            <span className="text-4xl">{character?.customization?.avatar || '👤'}</span>
             <div>
               <h2 className="pixel-font text-lg text-purple-400">
                 {user?.username}#{user?.user_tag}
@@ -238,8 +240,7 @@ function Dashboard() {
         <div className="lg:col-span-2 space-y-6">
           {/* Character Section */}
           <div className="bg-slate-800/90 border-4 border-purple-500 p-6" style={{
-            boxShadow: '6px 6px 0 0 #a855f7',
-            imageRendering: 'pixelated'
+            boxShadow: '6px 6px 0 0 #a855f7'
           }}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="pixel-font text-base text-purple-400">TU PERSONAJE</h3>
@@ -253,19 +254,18 @@ function Dashboard() {
               </button>
             </div>
             <div className="flex items-center justify-center py-8">
-              <div className="w-32 h-32 flex items-center justify-center border-4 border-fuchsia-500 bg-slate-900" style={{
+              <div className="w-32 h-32 flex items-center justify-center border-4 border-fuchsia-500" style={{
                 borderRadius: '50%',
-                backgroundColor: character?.customization.color
+                backgroundColor: character?.customization?.color || '#a855f7'
               }}>
-                <span className="text-6xl">{character?.customization.avatar}</span>
+                <span className="text-6xl">{character?.customization?.avatar || '👤'}</span>
               </div>
             </div>
           </div>
 
           {/* Game Rooms */}
           <div className="bg-slate-800/90 border-4 border-purple-500 p-6" style={{
-            boxShadow: '6px 6px 0 0 #a855f7',
-            imageRendering: 'pixelated'
+            boxShadow: '6px 6px 0 0 #a855f7'
           }}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="pixel-font text-base text-purple-400">SALAS DE JUEGO</h3>
@@ -286,20 +286,18 @@ function Dashboard() {
                   <div key={room.room_id} className="bg-slate-700 border-4 border-purple-400 p-3" style={{ boxShadow: '3px 3px 0 0 #a855f7' }}>
                     <div className="flex justify-between items-center mb-2">
                       <p className="pixel-font text-sm text-white">{room.name}</p>
-                      <span className="text-xs px-2 py-1 bg-purple-600 text-white">{room.game_mode.toUpperCase()}</span>
+                      <span className="text-xs px-2 py-1 bg-purple-600 text-white">{room.game_mode?.toUpperCase()}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs text-purple-300 mb-2">
-                      <span>👥 {room.players.length}/{room.max_players}</span>
+                      <span>👥 {room.players?.length || 0}/{room.max_players}</span>
                       <span>📚 {room.subject}</span>
                       <span>🎓 Grado {room.grade_level}</span>
                       <span>⏱️ {room.time_per_question}s</span>
-                      <span className="col-span-2">❓ {room.total_questions} preguntas</span>
                     </div>
                     <button
                       onClick={() => handleJoinRoom(room.room_id)}
                       className="pixel-font w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white border-4 border-pink-500 text-xs mt-2"
                       style={{ boxShadow: '2px 2px 0 0 #ec4899' }}
-                      data-testid={`join-room-${room.room_id}`}
                     >
                       UNIRSE
                     </button>
@@ -311,9 +309,8 @@ function Dashboard() {
         </div>
 
         {/* Friends Sidebar */}
-        <div className="bg-slate-800/90 border-4 border-pink-500 p-6 pixel-dither" style={{
-          boxShadow: '6px 6px 0 0 #ec4899',
-          imageRendering: 'pixelated'
+        <div className="bg-slate-800/90 border-4 border-pink-500 p-6" style={{
+          boxShadow: '6px 6px 0 0 #ec4899'
         }}>
           <div className="flex justify-between items-center mb-4">
             <h3 className="pixel-font text-xs text-white">AMIGOS</h3>
@@ -347,8 +344,14 @@ function Dashboard() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 overflow-y-auto p-4" onClick={() => setShowCreateRoom(false)}>
           <div className="bg-slate-900 border-8 border-purple-500 p-8 max-w-2xl w-full my-8" style={{ boxShadow: '12px 12px 0 0 #a855f7' }} onClick={(e) => e.stopPropagation()}>
             <h3 className="pixel-font text-xl text-purple-400 mb-6 text-center">CREAR SALA</h3>
+            
+            {error && (
+              <div className="bg-red-900/50 border-4 border-red-500 p-3 mb-4 text-center">
+                <p className="text-red-300 text-sm">{error}</p>
+              </div>
+            )}
+
             <form onSubmit={handleCreateRoom} className="space-y-4">
-              {/* Nombre de la sala */}
               <div>
                 <label className="pixel-font text-xs text-purple-300 block mb-2">NOMBRE DE LA SALA</label>
                 <input
@@ -362,7 +365,6 @@ function Dashboard() {
                 />
               </div>
 
-              {/* Cantidad de jugadores */}
               <div>
                 <label className="pixel-font text-xs text-purple-300 block mb-2">JUGADORES MAXIMOS</label>
                 <select
@@ -371,14 +373,12 @@ function Dashboard() {
                   className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
                 >
                   <option value="2">2 Jugadores</option>
-                  <option value="3">3 Jugadores</option>
                   <option value="4">4 Jugadores</option>
                   <option value="6">6 Jugadores</option>
                   <option value="8">8 Jugadores</option>
                 </select>
               </div>
 
-              {/* Modo de juego */}
               <div>
                 <label className="pixel-font text-xs text-purple-300 block mb-2">MODO DE JUEGO</label>
                 <div className="grid grid-cols-2 gap-3">
@@ -407,15 +407,14 @@ function Dashboard() {
                 </div>
               </div>
 
-              {/* Materia */}
               <div>
                 <label className="pixel-font text-xs text-purple-300 block mb-2">MATERIA</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    {value: 'matematicas', label: '➕ MATEMATICAS', emoji: '📐'},
-                    {value: 'lengua', label: '📖 LENGUA', emoji: '📚'},
-                    {value: 'ciencias', label: '🔬 CIENCIAS', emoji: '⚗️'},
-                    {value: 'sociales', label: '🌍 SOCIALES', emoji: '🗺️'}
+                    {value: 'matematicas', emoji: '📐'},
+                    {value: 'lengua', emoji: '📚'},
+                    {value: 'ciencias', emoji: '⚗️'},
+                    {value: 'sociales', emoji: '🗺️'}
                   ].map(subject => (
                     <button
                       key={subject.value}
@@ -433,9 +432,8 @@ function Dashboard() {
                 </div>
               </div>
 
-              {/* Grado */}
               <div>
-                <label className="pixel-font text-xs text-purple-300 block mb-2">GRADO (SECUNDARIA)</label>
+                <label className="pixel-font text-xs text-purple-300 block mb-2">GRADO</label>
                 <div className="grid grid-cols-3 gap-3">
                   {['10', '11', '12'].map(grade => (
                     <button
@@ -454,37 +452,33 @@ function Dashboard() {
                 </div>
               </div>
 
-              {/* Tiempo por pregunta */}
-              <div>
-                <label className="pixel-font text-xs text-purple-300 block mb-2">TIEMPO POR PREGUNTA</label>
-                <select
-                  value={roomConfig.timePerQuestion}
-                  onChange={(e) => setRoomConfig({...roomConfig, timePerQuestion: parseInt(e.target.value)})}
-                  className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
-                >
-                  <option value="15">15 segundos</option>
-                  <option value="20">20 segundos</option>
-                  <option value="30">30 segundos</option>
-                  <option value="45">45 segundos</option>
-                  <option value="60">60 segundos</option>
-                  <option value="90">90 segundos</option>
-                </select>
-              </div>
-
-              {/* Cantidad de preguntas */}
-              <div>
-                <label className="pixel-font text-xs text-purple-300 block mb-2">CANTIDAD DE PREGUNTAS</label>
-                <select
-                  value={roomConfig.totalQuestions}
-                  onChange={(e) => setRoomConfig({...roomConfig, totalQuestions: parseInt(e.target.value)})}
-                  className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
-                >
-                  <option value="5">5 preguntas</option>
-                  <option value="10">10 preguntas</option>
-                  <option value="15">15 preguntas</option>
-                  <option value="20">20 preguntas</option>
-                  <option value="25">25 preguntas</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="pixel-font text-xs text-purple-300 block mb-2">TIEMPO/PREGUNTA</label>
+                  <select
+                    value={roomConfig.timePerQuestion}
+                    onChange={(e) => setRoomConfig({...roomConfig, timePerQuestion: parseInt(e.target.value)})}
+                    className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
+                  >
+                    <option value="15">15 seg</option>
+                    <option value="30">30 seg</option>
+                    <option value="45">45 seg</option>
+                    <option value="60">60 seg</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="pixel-font text-xs text-purple-300 block mb-2">PREGUNTAS</label>
+                  <select
+                    value={roomConfig.totalQuestions}
+                    onChange={(e) => setRoomConfig({...roomConfig, totalQuestions: parseInt(e.target.value)})}
+                    className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                  </select>
+                </div>
               </div>
 
               <button
@@ -507,17 +501,22 @@ function Dashboard() {
             <p className="text-purple-300 text-sm mb-4 text-center">
               Usa el formato: usuario#1234
             </p>
+            
+            {error && (
+              <div className="bg-red-900/50 border-4 border-red-500 p-3 mb-4 text-center">
+                <p className="text-red-300 text-sm">{error}</p>
+              </div>
+            )}
+
             <form onSubmit={handleAddFriend} className="space-y-4">
               <input
                 type="text"
-                value={friendEmail}
-                onChange={(e) => setFriendEmail(e.target.value)}
+                value={friendIdentifier}
+                onChange={(e) => setFriendIdentifier(e.target.value)}
                 placeholder="Ej: JugadorPro#1234"
                 className="w-full bg-slate-800 border-4 border-purple-400 px-4 py-3 text-white"
                 required
-                pattern="^[a-zA-Z0-9_]+#[0-9]{4}$"
-                title="Formato: usuario#1234"
-                data-testid="friend-email-input"
+                data-testid="friend-identifier-input"
               />
               <button
                 type="submit"
