@@ -135,7 +135,7 @@ function Login() {
             }}
             data-testid="login-button"
           >
-            {loading ? 'CARGANDO...' : '&gt; ENTRAR &lt;'}
+            {loading ? 'CARGANDO...' : '> ENTRAR <'}
           </button>
         </form>
 
