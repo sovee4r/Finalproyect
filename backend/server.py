@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter, HTTPException, WebSocket, WebSocketDisco
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+import aiomysql
 import os
 import logging
 from pathlib import Path
@@ -14,31 +14,35 @@ import bcrypt
 import jwt
 import httpx
 from jose import JWTError
+import json
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# MySQL Configuration
+MYSQL_HOST = os.environ.get('MYSQL_HOST', 'shuttle.proxy.rlwy.net')
+MYSQL_PORT = int(os.environ.get('MYSQL_PORT', '30456'))
+MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
+MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', '')
+MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE', 'railway')
+
+# Global connection pool
+pool = None
 
 # JWT Configuration
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_DAYS = 90  # 90 días para evitar re-login frecuente
+ACCESS_TOKEN_EXPIRE_DAYS = 90
 
-# Create the main app without a prefix
+# Create the main app
 app = FastAPI()
-
-# Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
 # WebSocket connection manager
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: Dict[str, List[WebSocket]] = {}  # room_id: [websockets]
-        self.user_connections: Dict[str, WebSocket] = {}  # user_id: websocket
+        self.active_connections: Dict[str, List[WebSocket]] = {}
+        self.user_connections: Dict[str, WebSocket] = {}
     
     async def connect(self, websocket: WebSocket, room_id: str, user_id: str):
         await websocket.accept()
@@ -75,72 +79,166 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-class User(BaseModel):
-    user_id: str
-    username: str
-    user_tag: Optional[str] = None
-    email: str
-    picture: Optional[str] = None
-    created_at: datetime
-
 class CharacterCustomization(BaseModel):
     avatar: str = "👤"
     color: str = "#a855f7"
     accessories: List[str] = []
 
-class Character(BaseModel):
-    character_id: str
-    user_id: str
-    customization: CharacterCustomization
-    inventory: List[str] = []
-    score: int = 0
+# ============ DATABASE HELPERS ============
 
-class Friend(BaseModel):
-    user_id: str
-    username: str
-    picture: Optional[str] = None
-    status: str  # "pending", "accepted"
+async def get_db():
+    global pool
+    if pool is None:
+        pool = await aiomysql.create_pool(
+            host=MYSQL_HOST,
+            port=MYSQL_PORT,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            db=MYSQL_DATABASE,
+            autocommit=True,
+            minsize=1,
+            maxsize=10
+        )
+    return pool
 
-class GameRoom(BaseModel):
-    room_id: str
-    name: str
-    host_user_id: str
-    players: List[str] = []
-    max_players: int = 4
-    game_mode: str = "normal"  # "normal" o "competencia"
-    subject: str = "matematicas"  # materias: matematicas, lengua, ciencias, sociales
-    grade_level: str = "10"  # 10, 11, 12 (últimos 3 años de secundaria)
-    time_per_question: int = 30  # segundos por pregunta
-    total_questions: int = 10  # cantidad de preguntas
-    status: str = "waiting"  # "waiting", "playing", "finished"
-    created_at: datetime
+async def execute_query(query: str, params: tuple = None, fetch_one: bool = False, fetch_all: bool = False):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(query, params)
+            if fetch_one:
+                return await cursor.fetchone()
+            if fetch_all:
+                return await cursor.fetchall()
+            return cursor.lastrowid
 
-class Question(BaseModel):
-    question_id: str
-    subject: str  # matematicas, lengua, ciencias, sociales
-    grade_level: str  # 10, 11, 12
-    question_text: str
-    options: List[str]  # 4 opciones
-    correct_answer: int  # índice de la respuesta correcta (0-3)
-    difficulty: str = "medium"  # easy, medium, hard
-
-class GameSession(BaseModel):
-    session_id: str
-    room_id: str
-    current_question: int = 0
-    questions: List[str] = []  # IDs de preguntas
-    player_scores: Dict[str, int] = {}
-    player_answers: Dict[str, List[int]] = {}  # user_id: [respuestas]
-    started_at: datetime
-    status: str = "active"  # active, finished
-
-class ChatMessage(BaseModel):
-    message_id: str
-    room_id: str
-    user_id: str
-    username: str
-    message: str
-    timestamp: datetime
+async def init_database():
+    """Initialize all MySQL tables"""
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            # Users table
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id VARCHAR(50) UNIQUE NOT NULL,
+                    username VARCHAR(100) NOT NULL,
+                    user_tag VARCHAR(4) NOT NULL,
+                    email VARCHAR(255) UNIQUE NOT NULL,
+                    password_hash VARCHAR(255),
+                    picture TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_email (email),
+                    INDEX idx_user_tag (username, user_tag)
+                )
+            """)
+            
+            # Characters table
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS characters (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    character_id VARCHAR(50) UNIQUE NOT NULL,
+                    user_id VARCHAR(50) NOT NULL,
+                    avatar VARCHAR(10) DEFAULT '👤',
+                    color VARCHAR(20) DEFAULT '#a855f7',
+                    accessories JSON,
+                    inventory JSON,
+                    score INT DEFAULT 0,
+                    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+                )
+            """)
+            
+            # Friendships table
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS friendships (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    friendship_id VARCHAR(50) UNIQUE NOT NULL,
+                    user_id VARCHAR(50) NOT NULL,
+                    friend_id VARCHAR(50) NOT NULL,
+                    status VARCHAR(20) DEFAULT 'accepted',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                    FOREIGN KEY (friend_id) REFERENCES users(user_id) ON DELETE CASCADE
+                )
+            """)
+            
+            # Game rooms table
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS game_rooms (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    room_id VARCHAR(50) UNIQUE NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    host_user_id VARCHAR(50) NOT NULL,
+                    players JSON,
+                    max_players INT DEFAULT 4,
+                    game_mode VARCHAR(50) DEFAULT 'normal',
+                    subject VARCHAR(100) DEFAULT 'matematicas',
+                    grade_level VARCHAR(10) DEFAULT '10',
+                    time_per_question INT DEFAULT 30,
+                    total_questions INT DEFAULT 10,
+                    status VARCHAR(20) DEFAULT 'waiting',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (host_user_id) REFERENCES users(user_id) ON DELETE CASCADE
+                )
+            """)
+            
+            # Questions table
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS questions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    question_id VARCHAR(50) UNIQUE NOT NULL,
+                    subject VARCHAR(100) NOT NULL,
+                    grade_level VARCHAR(10) NOT NULL,
+                    question_text TEXT NOT NULL,
+                    options JSON NOT NULL,
+                    correct_answer INT NOT NULL,
+                    difficulty VARCHAR(20) DEFAULT 'medium',
+                    INDEX idx_subject_grade (subject, grade_level)
+                )
+            """)
+            
+            # Game sessions table
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS game_sessions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    session_id VARCHAR(50) UNIQUE NOT NULL,
+                    room_id VARCHAR(50) NOT NULL,
+                    current_question INT DEFAULT 0,
+                    questions JSON,
+                    player_scores JSON,
+                    player_answers JSON,
+                    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    status VARCHAR(20) DEFAULT 'active'
+                )
+            """)
+            
+            # Chat messages table
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS chat_messages (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    message_id VARCHAR(50) UNIQUE NOT NULL,
+                    room_id VARCHAR(50) NOT NULL,
+                    user_id VARCHAR(50) NOT NULL,
+                    username VARCHAR(100) NOT NULL,
+                    message TEXT NOT NULL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # User sessions table (for OAuth)
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS user_sessions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id VARCHAR(50) NOT NULL,
+                    session_token VARCHAR(500) NOT NULL,
+                    expires_at TIMESTAMP NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_session_token (session_token(255))
+                )
+            """)
+            
+            await conn.commit()
+            print("✅ Database tables initialized!")
 
 # ============ HELPER FUNCTIONS ============
 
@@ -156,12 +254,9 @@ def create_access_token(user_id: str) -> str:
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 async def get_current_user(request: Request) -> dict:
-    """Get current user from session_token (cookie or Authorization header)"""
-    # REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
     session_token = request.cookies.get("session_token")
     
     if not session_token:
-        # Fallback to Authorization header
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
             session_token = auth_header.split(" ")[1]
@@ -169,127 +264,127 @@ async def get_current_user(request: Request) -> dict:
     if not session_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    # Check if it's a JWT token (traditional auth)
+    # Check JWT token
     try:
         payload = jwt.decode(session_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token")
         
-        user_doc = await db.users.find_one({"user_id": user_id}, {"_id": 0})
-        if not user_doc:
+        user = await execute_query(
+            "SELECT user_id, username, user_tag, email, picture, created_at FROM users WHERE user_id = %s",
+            (user_id,), fetch_one=True
+        )
+        if not user:
             raise HTTPException(status_code=401, detail="User not found")
         
-        return user_doc
+        return dict(user)
     except JWTError:
-        # Not a JWT, check if it's an Emergent OAuth session
-        session_doc = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
-        if not session_doc:
+        # Check OAuth session
+        session = await execute_query(
+            "SELECT user_id, expires_at FROM user_sessions WHERE session_token = %s",
+            (session_token,), fetch_one=True
+        )
+        if not session:
             raise HTTPException(status_code=401, detail="Invalid session")
         
-        # Check expiry
-        expires_at = session_doc["expires_at"]
-        if isinstance(expires_at, str):
-            expires_at = datetime.fromisoformat(expires_at)
-        if expires_at.tzinfo is None:
-            expires_at = expires_at.replace(tzinfo=timezone.utc)
-        if expires_at < datetime.now(timezone.utc):
+        if session['expires_at'] < datetime.now(timezone.utc):
             raise HTTPException(status_code=401, detail="Session expired")
         
-        user_doc = await db.users.find_one({"user_id": session_doc["user_id"]}, {"_id": 0})
-        if not user_doc:
+        user = await execute_query(
+            "SELECT user_id, username, user_tag, email, picture, created_at FROM users WHERE user_id = %s",
+            (session['user_id'],), fetch_one=True
+        )
+        if not user:
             raise HTTPException(status_code=401, detail="User not found")
         
-        return user_doc
+        return dict(user)
 
 # ============ AUTHENTICATION ROUTES ============
 
 @api_router.post("/auth/register")
 async def register(user_data: UserRegister):
-    """Traditional registration with email/password"""
     # Check if user exists
-    existing_user = await db.users.find_one({"email": user_data.email})
-    if existing_user:
+    existing = await execute_query(
+        "SELECT user_id FROM users WHERE email = %s",
+        (user_data.email,), fetch_one=True
+    )
+    if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Generate unique user tag (4 digits)
+    # Generate unique user tag
     import random
     user_tag = None
-    max_attempts = 10
-    for _ in range(max_attempts):
+    for _ in range(10):
         user_tag = f"{random.randint(1000, 9999)}"
-        # Check if username#tag combination exists
-        existing_tag = await db.users.find_one({
-            "username": user_data.username,
-            "user_tag": user_tag
-        })
+        existing_tag = await execute_query(
+            "SELECT user_id FROM users WHERE username = %s AND user_tag = %s",
+            (user_data.username, user_tag), fetch_one=True
+        )
         if not existing_tag:
             break
-    
-    if not user_tag:
-        raise HTTPException(status_code=500, detail="Could not generate unique user tag")
     
     # Create user
     user_id = f"user_{uuid.uuid4().hex[:12]}"
     hashed_password = hash_password(user_data.password)
     
-    user_doc = {
-        "user_id": user_id,
-        "username": user_data.username,
-        "user_tag": user_tag,
-        "email": user_data.email,
-        "password_hash": hashed_password,
-        "picture": None,
-        "created_at": datetime.now(timezone.utc)
-    }
-    
-    await db.users.insert_one(user_doc)
+    await execute_query(
+        """INSERT INTO users (user_id, username, user_tag, email, password_hash) 
+           VALUES (%s, %s, %s, %s, %s)""",
+        (user_id, user_data.username, user_tag, user_data.email, hashed_password)
+    )
     
     # Create default character
-    character_doc = {
-        "character_id": f"char_{uuid.uuid4().hex[:12]}",
-        "user_id": user_id,
-        "customization": {
-            "avatar": "👤",
-            "color": "#a855f7",
-            "accessories": []
-        },
-        "inventory": [],
-        "score": 0
-    }
-    await db.characters.insert_one(character_doc)
+    character_id = f"char_{uuid.uuid4().hex[:12]}"
+    await execute_query(
+        """INSERT INTO characters (character_id, user_id, avatar, color, accessories, inventory, score)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+        (character_id, user_id, "👤", "#a855f7", "[]", "[]", 0)
+    )
     
-    # Create token
     token = create_access_token(user_id)
     
-    user_doc.pop("password_hash", None)
-    user_doc.pop("_id", None)
-    
-    return {"access_token": token, "token_type": "bearer", "user": user_doc}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "user_id": user_id,
+            "username": user_data.username,
+            "user_tag": user_tag,
+            "email": user_data.email
+        }
+    }
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin):
-    """Traditional login with email/password"""
-    user_doc = await db.users.find_one({"email": credentials.email})
-    if not user_doc or not verify_password(credentials.password, user_doc["password_hash"]):
+    user = await execute_query(
+        "SELECT user_id, username, user_tag, email, password_hash, picture FROM users WHERE email = %s",
+        (credentials.email,), fetch_one=True
+    )
+    
+    if not user or not verify_password(credentials.password, user['password_hash']):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    token = create_access_token(user_doc["user_id"])
+    token = create_access_token(user['user_id'])
     
-    user_doc.pop("password_hash", None)
-    user_doc.pop("_id", None)
-    
-    return {"access_token": token, "token_type": "bearer", "user": user_doc}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "user_id": user['user_id'],
+            "username": user['username'],
+            "user_tag": user['user_tag'],
+            "email": user['email'],
+            "picture": user['picture']
+        }
+    }
 
 @api_router.get("/auth/session")
 async def process_google_session(request: Request, response: Response):
-    """Process Google OAuth session from Emergent Auth"""
-    # REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
     session_id = request.headers.get("X-Session-ID")
     if not session_id:
         raise HTTPException(status_code=400, detail="Session ID required")
     
-    # Get user data from Emergent Auth
     async with httpx.AsyncClient() as client:
         try:
             auth_response = await client.get(
@@ -302,60 +397,49 @@ async def process_google_session(request: Request, response: Response):
             raise HTTPException(status_code=400, detail=f"Failed to get session data: {str(e)}")
     
     # Check if user exists
-    user_doc = await db.users.find_one({"email": user_data["email"]}, {"_id": 0})
+    user = await execute_query(
+        "SELECT user_id, username, user_tag FROM users WHERE email = %s",
+        (user_data["email"],), fetch_one=True
+    )
     
-    if user_doc:
-        user_id = user_doc["user_id"]
-        # Update user tag if doesn't exist (for existing users)
-        if "user_tag" not in user_doc:
+    if user:
+        user_id = user['user_id']
+        if not user.get('user_tag'):
             import random
             user_tag = f"{random.randint(1000, 9999)}"
-            await db.users.update_one(
-                {"user_id": user_id},
-                {"$set": {"user_tag": user_tag}}
+            await execute_query(
+                "UPDATE users SET user_tag = %s WHERE user_id = %s",
+                (user_tag, user_id)
             )
-            user_doc["user_tag"] = user_tag
     else:
-        # Create new user
         import random
         user_tag = f"{random.randint(1000, 9999)}"
         user_id = f"user_{uuid.uuid4().hex[:12]}"
-        user_doc = {
-            "user_id": user_id,
-            "username": user_data["name"],
-            "user_tag": user_tag,
-            "email": user_data["email"],
-            "picture": user_data.get("picture"),
-            "created_at": datetime.now(timezone.utc)
-        }
-        await db.users.insert_one(user_doc)
+        
+        await execute_query(
+            """INSERT INTO users (user_id, username, user_tag, email, picture)
+               VALUES (%s, %s, %s, %s, %s)""",
+            (user_id, user_data["name"], user_tag, user_data["email"], user_data.get("picture"))
+        )
         
         # Create default character
-        character_doc = {
-            "character_id": f"char_{uuid.uuid4().hex[:12]}",
-            "user_id": user_id,
-            "customization": {
-                "avatar": "👤",
-                "color": "#a855f7",
-                "accessories": []
-            },
-            "inventory": [],
-            "score": 0
-        }
-        await db.characters.insert_one(character_doc)
+        character_id = f"char_{uuid.uuid4().hex[:12]}"
+        await execute_query(
+            """INSERT INTO characters (character_id, user_id, avatar, color, accessories, inventory, score)
+               VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (character_id, user_id, "👤", "#a855f7", "[]", "[]", 0)
+        )
     
-    # Store session with 90 days expiry
+    # Store session
     session_token = user_data["session_token"]
     expires_at = datetime.now(timezone.utc) + timedelta(days=90)
     
-    await db.user_sessions.insert_one({
-        "user_id": user_id,
-        "session_token": session_token,
-        "expires_at": expires_at,
-        "created_at": datetime.now(timezone.utc)
-    })
+    await execute_query(
+        """INSERT INTO user_sessions (user_id, session_token, expires_at)
+           VALUES (%s, %s, %s)""",
+        (user_id, session_token, expires_at)
+    )
     
-    # Set cookie
     response.set_cookie(
         key="session_token",
         value=session_token,
@@ -366,23 +450,25 @@ async def process_google_session(request: Request, response: Response):
         max_age=7*24*60*60
     )
     
-    user_doc.pop("_id", None)
-    user_doc.pop("password_hash", None)
+    user_doc = await execute_query(
+        "SELECT user_id, username, user_tag, email, picture FROM users WHERE user_id = %s",
+        (user_id,), fetch_one=True
+    )
     
-    return {"user": user_doc, "session_token": session_token}
+    return {"user": dict(user_doc), "session_token": session_token}
 
 @api_router.get("/auth/me")
 async def get_me(user: dict = Depends(get_current_user)):
-    """Get current authenticated user"""
-    user.pop("password_hash", None)
     return user
 
 @api_router.post("/auth/logout")
 async def logout(request: Request, response: Response):
-    """Logout user"""
     session_token = request.cookies.get("session_token")
     if session_token:
-        await db.user_sessions.delete_one({"session_token": session_token})
+        await execute_query(
+            "DELETE FROM user_sessions WHERE session_token = %s",
+            (session_token,)
+        )
     
     response.delete_cookie(key="session_token", path="/")
     return {"message": "Logged out successfully"}
@@ -391,63 +477,62 @@ async def logout(request: Request, response: Response):
 
 @api_router.get("/users/me/character")
 async def get_my_character(user: dict = Depends(get_current_user)):
-    """Get current user's character"""
-    character_doc = await db.characters.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    if not character_doc:
+    character = await execute_query(
+        "SELECT character_id, user_id, avatar, color, accessories, inventory, score FROM characters WHERE user_id = %s",
+        (user["user_id"],), fetch_one=True
+    )
+    if not character:
         raise HTTPException(status_code=404, detail="Character not found")
-    return character_doc
+    
+    result = dict(character)
+    result['accessories'] = json.loads(result['accessories']) if result['accessories'] else []
+    result['inventory'] = json.loads(result['inventory']) if result['inventory'] else []
+    result['customization'] = {
+        'avatar': result['avatar'],
+        'color': result['color'],
+        'accessories': result['accessories']
+    }
+    return result
 
 @api_router.put("/users/me/character")
 async def update_my_character(customization: CharacterCustomization, user: dict = Depends(get_current_user)):
-    """Update character customization"""
-    result = await db.characters.update_one(
-        {"user_id": user["user_id"]},
-        {"$set": {"customization": customization.model_dump()}}
+    await execute_query(
+        "UPDATE characters SET avatar = %s, color = %s, accessories = %s WHERE user_id = %s",
+        (customization.avatar, customization.color, json.dumps(customization.accessories), user["user_id"])
     )
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Character not found")
     
-    character_doc = await db.characters.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    return character_doc
-
-@api_router.post("/users/me/score")
-async def update_score(score_delta: int, user: dict = Depends(get_current_user)):
-    """Update user's score"""
-    await db.characters.update_one(
-        {"user_id": user["user_id"]},
-        {"$inc": {"score": score_delta}}
-    )
-    character_doc = await db.characters.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    return {"score": character_doc["score"]}
+    return await get_my_character(user)
 
 # ============ FRIENDS ROUTES ============
 
 @api_router.get("/friends")
 async def get_friends(user: dict = Depends(get_current_user)):
-    """Get user's friends list"""
-    friendships = await db.friendships.find(
-        {"$or": [{"user_id": user["user_id"]}, {"friend_id": user["user_id"]}]},
-        {"_id": 0}
-    ).to_list(100)
+    friendships = await execute_query(
+        """SELECT user_id, friend_id FROM friendships 
+           WHERE user_id = %s OR friend_id = %s""",
+        (user["user_id"], user["user_id"]), fetch_all=True
+    )
     
     friend_ids = []
-    for friendship in friendships:
-        if friendship["user_id"] == user["user_id"]:
-            friend_ids.append(friendship["friend_id"])
+    for f in friendships:
+        if f['user_id'] == user["user_id"]:
+            friend_ids.append(f['friend_id'])
         else:
-            friend_ids.append(friendship["user_id"])
+            friend_ids.append(f['user_id'])
     
-    friends = await db.users.find(
-        {"user_id": {"$in": friend_ids}},
-        {"_id": 0, "user_id": 1, "username": 1, "user_tag": 1, "picture": 1}
-    ).to_list(100)
+    if not friend_ids:
+        return []
     
-    return friends
+    placeholders = ','.join(['%s'] * len(friend_ids))
+    friends = await execute_query(
+        f"SELECT user_id, username, user_tag, picture FROM users WHERE user_id IN ({placeholders})",
+        tuple(friend_ids), fetch_all=True
+    )
+    
+    return [dict(f) for f in friends]
 
 @api_router.post("/friends/add")
 async def add_friend(friend_identifier: str, user: dict = Depends(get_current_user)):
-    """Send friend request using username#tag format"""
-    # Parse username#tag
     if '#' not in friend_identifier:
         raise HTTPException(status_code=400, detail="Use format: username#1234")
     
@@ -457,51 +542,49 @@ async def add_friend(friend_identifier: str, user: dict = Depends(get_current_us
     
     friend_username, friend_tag = parts
     
-    # Find friend by username and tag
-    friend_doc = await db.users.find_one({
-        "username": friend_username,
-        "user_tag": friend_tag
-    }, {"_id": 0})
+    friend = await execute_query(
+        "SELECT user_id, username, user_tag, picture FROM users WHERE username = %s AND user_tag = %s",
+        (friend_username, friend_tag), fetch_one=True
+    )
     
-    if not friend_doc:
+    if not friend:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
-    if friend_doc["user_id"] == user["user_id"]:
+    if friend["user_id"] == user["user_id"]:
         raise HTTPException(status_code=400, detail="No puedes agregarte a ti mismo")
     
-    # Check if already friends
-    existing = await db.friendships.find_one({
-        "$or": [
-            {"user_id": user["user_id"], "friend_id": friend_doc["user_id"]},
-            {"user_id": friend_doc["user_id"], "friend_id": user["user_id"]}
-        ]
-    })
+    existing = await execute_query(
+        """SELECT friendship_id FROM friendships 
+           WHERE (user_id = %s AND friend_id = %s) OR (user_id = %s AND friend_id = %s)""",
+        (user["user_id"], friend["user_id"], friend["user_id"], user["user_id"]), fetch_one=True
+    )
     
     if existing:
         raise HTTPException(status_code=400, detail="Ya son amigos")
     
-    friendship_doc = {
-        "friendship_id": f"friend_{uuid.uuid4().hex[:12]}",
-        "user_id": user["user_id"],
-        "friend_id": friend_doc["user_id"],
-        "status": "accepted",
-        "created_at": datetime.now(timezone.utc)
-    }
+    friendship_id = f"friend_{uuid.uuid4().hex[:12]}"
+    await execute_query(
+        """INSERT INTO friendships (friendship_id, user_id, friend_id, status)
+           VALUES (%s, %s, %s, %s)""",
+        (friendship_id, user["user_id"], friend["user_id"], "accepted")
+    )
     
-    await db.friendships.insert_one(friendship_doc)
-    
-    return {"message": "Amigo agregado exitosamente", "friend": friend_doc}
+    return {"message": "Amigo agregado exitosamente", "friend": dict(friend)}
 
 # ============ GAME ROOMS ROUTES ============
 
 @api_router.get("/rooms")
 async def get_rooms(user: dict = Depends(get_current_user)):
-    """Get all available game rooms"""
-    rooms = await db.game_rooms.find(
-        {"status": {"$in": ["waiting", "playing"]}},
-        {"_id": 0}
-    ).to_list(50)
-    return rooms
+    rooms = await execute_query(
+        "SELECT * FROM game_rooms WHERE status IN ('waiting', 'playing')",
+        fetch_all=True
+    )
+    result = []
+    for room in rooms:
+        r = dict(room)
+        r['players'] = json.loads(r['players']) if r['players'] else []
+        result.append(r)
+    return result
 
 @api_router.post("/rooms")
 async def create_room(
@@ -514,212 +597,252 @@ async def create_room(
     total_questions: int = 10,
     user: dict = Depends(get_current_user)
 ):
-    """Create a new game room with configuration"""
     room_id = f"room_{uuid.uuid4().hex[:8]}"
+    players = json.dumps([user["user_id"]])
     
-    room_doc = {
+    await execute_query(
+        """INSERT INTO game_rooms (room_id, name, host_user_id, players, max_players, game_mode, 
+           subject, grade_level, time_per_question, total_questions, status)
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+        (room_id, room_name, user["user_id"], players, max_players, game_mode,
+         subject, grade_level, time_per_question, total_questions, "waiting")
+    )
+    
+    return {
         "room_id": room_id,
         "name": room_name,
         "host_user_id": user["user_id"],
-        "players": [user["user_id"]],  # Host se une automáticamente
+        "players": [user["user_id"]],
         "max_players": max_players,
         "game_mode": game_mode,
         "subject": subject,
         "grade_level": grade_level,
         "time_per_question": time_per_question,
         "total_questions": total_questions,
-        "status": "waiting",
-        "created_at": datetime.now(timezone.utc)
+        "status": "waiting"
     }
+
+@api_router.get("/rooms/{room_id}")
+async def get_room(room_id: str, user: dict = Depends(get_current_user)):
+    room = await execute_query(
+        "SELECT * FROM game_rooms WHERE room_id = %s",
+        (room_id,), fetch_one=True
+    )
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
     
-    await db.game_rooms.insert_one(room_doc)
-    
-    room_doc.pop("_id", None)
-    return room_doc
+    result = dict(room)
+    result['players'] = json.loads(result['players']) if result['players'] else []
+    return result
 
 @api_router.post("/rooms/{room_id}/join")
 async def join_room(room_id: str, user: dict = Depends(get_current_user)):
-    """Join a game room"""
-    room_doc = await db.game_rooms.find_one({"room_id": room_id}, {"_id": 0})
-    if not room_doc:
+    room = await execute_query(
+        "SELECT players, max_players FROM game_rooms WHERE room_id = %s",
+        (room_id,), fetch_one=True
+    )
+    if not room:
         raise HTTPException(status_code=404, detail="Room not found")
     
-    if len(room_doc["players"]) >= room_doc["max_players"]:
+    players = json.loads(room['players']) if room['players'] else []
+    
+    if len(players) >= room['max_players']:
         raise HTTPException(status_code=400, detail="Room is full")
     
-    if user["user_id"] in room_doc["players"]:
+    if user["user_id"] in players:
         raise HTTPException(status_code=400, detail="Already in room")
     
-    await db.game_rooms.update_one(
-        {"room_id": room_id},
-        {"$push": {"players": user["user_id"]}}
+    players.append(user["user_id"])
+    
+    await execute_query(
+        "UPDATE game_rooms SET players = %s WHERE room_id = %s",
+        (json.dumps(players), room_id)
     )
     
     return {"message": "Joined room successfully"}
 
 @api_router.post("/rooms/{room_id}/leave")
 async def leave_room(room_id: str, user: dict = Depends(get_current_user)):
-    """Leave a game room"""
-    await db.game_rooms.update_one(
-        {"room_id": room_id},
-        {"$pull": {"players": user["user_id"]}}
+    room = await execute_query(
+        "SELECT players FROM game_rooms WHERE room_id = %s",
+        (room_id,), fetch_one=True
     )
     
-    # Check if room is empty
-    room_doc = await db.game_rooms.find_one({"room_id": room_id})
-    if not room_doc["players"]:
-        await db.game_rooms.delete_one({"room_id": room_id})
+    if room:
+        players = json.loads(room['players']) if room['players'] else []
+        if user["user_id"] in players:
+            players.remove(user["user_id"])
+        
+        if not players:
+            await execute_query("DELETE FROM game_rooms WHERE room_id = %s", (room_id,))
+        else:
+            await execute_query(
+                "UPDATE game_rooms SET players = %s WHERE room_id = %s",
+                (json.dumps(players), room_id)
+            )
     
     return {"message": "Left room successfully"}
 
-# ============ GAME QUESTIONS & SESSION ROUTES ============
+# ============ QUESTIONS ROUTES ============
 
 @api_router.post("/rooms/{room_id}/start")
 async def start_game_session(room_id: str, user: dict = Depends(get_current_user)):
-    """Start a game session and generate questions"""
-    room_doc = await db.game_rooms.find_one({"room_id": room_id}, {"_id": 0})
-    if not room_doc:
+    room = await execute_query(
+        "SELECT * FROM game_rooms WHERE room_id = %s",
+        (room_id,), fetch_one=True
+    )
+    if not room:
         raise HTTPException(status_code=404, detail="Room not found")
     
-    if room_doc["host_user_id"] != user["user_id"]:
+    if room["host_user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Only host can start game")
     
-    # Get questions for this subject and grade
-    questions = await db.questions.find({
-        "subject": room_doc["subject"],
-        "grade_level": room_doc["grade_level"]
-    }, {"_id": 0}).to_list(10)
+    # Get questions
+    questions = await execute_query(
+        "SELECT question_id, question_text, options, correct_answer, subject FROM questions WHERE subject = %s AND grade_level = %s LIMIT 20",
+        (room["subject"], room["grade_level"]), fetch_all=True
+    )
     
     if not questions:
-        # If no questions exist, create some default ones
-        questions = await create_default_questions(room_doc["subject"], room_doc["grade_level"])
+        questions = await create_default_questions(room["subject"], room["grade_level"])
     
-    # Limit to configured number of questions and shuffle
     import random
+    questions = list(questions)
     random.shuffle(questions)
-    questions = questions[:room_doc["total_questions"]]
+    questions = questions[:room["total_questions"]]
     
-    # Create game session
     session_id = f"session_{uuid.uuid4().hex[:12]}"
     question_ids = [q["question_id"] for q in questions]
     
-    # Initialize player scores
-    player_scores = {player_id: 0 for player_id in room_doc["players"]}
-    player_answers = {player_id: [] for player_id in room_doc["players"]}
+    players = json.loads(room['players']) if room['players'] else []
+    player_scores = {player_id: 0 for player_id in players}
+    player_answers = {player_id: [] for player_id in players}
     
-    session_doc = {
-        "session_id": session_id,
-        "room_id": room_id,
-        "current_question": 0,
-        "questions": question_ids,
-        "player_scores": player_scores,
-        "player_answers": player_answers,
-        "started_at": datetime.now(timezone.utc),
-        "status": "active"
-    }
-    
-    await db.game_sessions.insert_one(session_doc)
-    
-    # Update room status
-    await db.game_rooms.update_one(
-        {"room_id": room_id},
-        {"$set": {"status": "playing"}}
+    await execute_query(
+        """INSERT INTO game_sessions (session_id, room_id, current_question, questions, player_scores, player_answers, status)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+        (session_id, room_id, 0, json.dumps(question_ids), json.dumps(player_scores), json.dumps(player_answers), "active")
     )
+    
+    await execute_query(
+        "UPDATE game_rooms SET status = 'playing' WHERE room_id = %s",
+        (room_id,)
+    )
+    
+    questions_data = []
+    for q in questions:
+        qd = dict(q)
+        qd['options'] = json.loads(qd['options']) if isinstance(qd['options'], str) else qd['options']
+        questions_data.append(qd)
     
     return {
         "session_id": session_id,
-        "questions": questions,
+        "questions": questions_data,
         "total_questions": len(questions)
     }
 
 @api_router.get("/sessions/{session_id}/question/{question_num}")
 async def get_question(session_id: str, question_num: int, user: dict = Depends(get_current_user)):
-    """Get specific question for the game"""
-    session_doc = await db.game_sessions.find_one({"session_id": session_id}, {"_id": 0})
-    if not session_doc:
+    session = await execute_query(
+        "SELECT questions FROM game_sessions WHERE session_id = %s",
+        (session_id,), fetch_one=True
+    )
+    if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    if question_num >= len(session_doc["questions"]):
+    question_ids = json.loads(session['questions'])
+    if question_num >= len(question_ids):
         raise HTTPException(status_code=404, detail="Question not found")
     
-    question_id = session_doc["questions"][question_num]
-    question_doc = await db.questions.find_one({"question_id": question_id}, {"_id": 0})
+    question_id = question_ids[question_num]
+    question = await execute_query(
+        "SELECT question_id, subject, question_text, options FROM questions WHERE question_id = %s",
+        (question_id,), fetch_one=True
+    )
     
-    if not question_doc:
+    if not question:
         raise HTTPException(status_code=404, detail="Question not found")
     
-    # Don't send correct answer to frontend
-    question_response = question_doc.copy()
-    question_response.pop("correct_answer", None)
-    question_response["question_number"] = question_num + 1
-    question_response["total_questions"] = len(session_doc["questions"])
+    result = dict(question)
+    result['options'] = json.loads(result['options']) if isinstance(result['options'], str) else result['options']
+    result['question_number'] = question_num + 1
+    result['total_questions'] = len(question_ids)
     
-    return question_response
+    return result
 
 @api_router.post("/sessions/{session_id}/answer")
-async def submit_answer(
-    session_id: str,
-    question_num: int,
-    answer: int,
-    user: dict = Depends(get_current_user)
-):
-    """Submit answer for a question"""
-    session_doc = await db.game_sessions.find_one({"session_id": session_id}, {"_id": 0})
-    if not session_doc:
+async def submit_answer(session_id: str, question_num: int, answer: int, user: dict = Depends(get_current_user)):
+    session = await execute_query(
+        "SELECT questions, player_scores, player_answers FROM game_sessions WHERE session_id = %s",
+        (session_id,), fetch_one=True
+    )
+    if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    # Get the question
-    question_id = session_doc["questions"][question_num]
-    question_doc = await db.questions.find_one({"question_id": question_id}, {"_id": 0})
+    question_ids = json.loads(session['questions'])
+    question_id = question_ids[question_num]
     
-    # Check if answer is correct
-    is_correct = answer == question_doc["correct_answer"]
+    question = await execute_query(
+        "SELECT correct_answer, options FROM questions WHERE question_id = %s",
+        (question_id,), fetch_one=True
+    )
     
-    # Update player score
+    is_correct = answer == question['correct_answer']
+    options = json.loads(question['options']) if isinstance(question['options'], str) else question['options']
+    
+    player_scores = json.loads(session['player_scores'])
+    player_answers = json.loads(session['player_answers'])
+    
     if is_correct:
-        await db.game_sessions.update_one(
-            {"session_id": session_id},
-            {"$inc": {f"player_scores.{user['user_id']}": 1}}
-        )
+        player_scores[user['user_id']] = player_scores.get(user['user_id'], 0) + 1
     
-    # Record answer
-    await db.game_sessions.update_one(
-        {"session_id": session_id},
-        {"$push": {f"player_answers.{user['user_id']}": answer}}
+    if user['user_id'] not in player_answers:
+        player_answers[user['user_id']] = []
+    player_answers[user['user_id']].append(answer)
+    
+    await execute_query(
+        "UPDATE game_sessions SET player_scores = %s, player_answers = %s WHERE session_id = %s",
+        (json.dumps(player_scores), json.dumps(player_answers), session_id)
     )
     
     return {
         "is_correct": is_correct,
-        "correct_answer": question_doc["correct_answer"],
-        "explanation": f"La respuesta correcta es: {question_doc['options'][question_doc['correct_answer']]}"
+        "correct_answer": question['correct_answer'],
+        "explanation": f"La respuesta correcta es: {options[question['correct_answer']]}"
     }
 
 @api_router.get("/sessions/{session_id}/results")
 async def get_game_results(session_id: str, user: dict = Depends(get_current_user)):
-    """Get final game results"""
-    session_doc = await db.game_sessions.find_one({"session_id": session_id}, {"_id": 0})
-    if not session_doc:
+    session = await execute_query(
+        "SELECT questions, player_scores FROM game_sessions WHERE session_id = %s",
+        (session_id,), fetch_one=True
+    )
+    if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    # Get player usernames
-    player_ids = list(session_doc["player_scores"].keys())
-    players = await db.users.find(
-        {"user_id": {"$in": player_ids}},
-        {"_id": 0, "user_id": 1, "username": 1, "user_tag": 1}
-    ).to_list(100)
+    player_scores = json.loads(session['player_scores'])
+    questions = json.loads(session['questions'])
+    player_ids = list(player_scores.keys())
     
-    # Build results
+    if not player_ids:
+        return {"session_id": session_id, "results": [], "winner": None}
+    
+    placeholders = ','.join(['%s'] * len(player_ids))
+    players = await execute_query(
+        f"SELECT user_id, username, user_tag FROM users WHERE user_id IN ({placeholders})",
+        tuple(player_ids), fetch_all=True
+    )
+    
     results = []
     for player in players:
-        score = session_doc["player_scores"].get(player["user_id"], 0)
+        score = player_scores.get(player['user_id'], 0)
         results.append({
-            "user_id": player["user_id"],
+            "user_id": player['user_id'],
             "username": f"{player['username']}#{player.get('user_tag', '0000')}",
             "score": score,
-            "total_questions": len(session_doc["questions"])
+            "total_questions": len(questions)
         })
     
-    # Sort by score
     results.sort(key=lambda x: x["score"], reverse=True)
     
     return {
@@ -729,121 +852,109 @@ async def get_game_results(session_id: str, user: dict = Depends(get_current_use
     }
 
 async def create_default_questions(subject: str, grade_level: str):
-    """Create default questions if none exist"""
     default_questions = {
         "matematicas": {
             "10": [
-                {
-                    "question_text": "¿Cuál es el resultado de 2³ + 4²?",
-                    "options": ["24", "20", "16", "18"],
-                    "correct_answer": 0
-                },
-                {
-                    "question_text": "La ecuación x² - 5x + 6 = 0 tiene como soluciones:",
-                    "options": ["x = 2, x = 3", "x = 1, x = 6", "x = -2, x = -3", "x = 2, x = -3"],
-                    "correct_answer": 0
-                }
-            ],
-            "11": [
-                {
-                    "question_text": "¿Cuál es la derivada de f(x) = x³?",
-                    "options": ["3x²", "x²", "3x", "x³"],
-                    "correct_answer": 0
-                }
-            ],
-            "12": [
-                {
-                    "question_text": "La integral de 2x dx es:",
-                    "options": ["x² + C", "2x² + C", "x²/2 + C", "2x + C"],
-                    "correct_answer": 0
-                }
+                {"question_text": "¿Cuál es el resultado de 2³ + 4²?", "options": ["24", "20", "16", "18"], "correct_answer": 0},
+                {"question_text": "La ecuación x² - 5x + 6 = 0 tiene como soluciones:", "options": ["x = 2, x = 3", "x = 1, x = 6", "x = -2, x = -3", "x = 2, x = -3"], "correct_answer": 0},
+                {"question_text": "¿Cuál es la raíz cuadrada de 144?", "options": ["12", "14", "11", "13"], "correct_answer": 0},
+                {"question_text": "Si 3x + 7 = 22, entonces x =", "options": ["5", "7", "4", "6"], "correct_answer": 0},
+                {"question_text": "¿Cuánto es 15% de 200?", "options": ["30", "25", "35", "20"], "correct_answer": 0},
             ]
         },
         "lengua": {
             "10": [
-                {
-                    "question_text": "¿Qué figura literaria se usa en 'Sus ojos eran dos luceros'?",
-                    "options": ["Metáfora", "Símil", "Hipérbole", "Personificación"],
-                    "correct_answer": 0
-                }
+                {"question_text": "¿Qué figura literaria se usa en 'Sus ojos eran dos luceros'?", "options": ["Metáfora", "Símil", "Hipérbole", "Personificación"], "correct_answer": 0},
+                {"question_text": "¿Cuál es el sinónimo de 'efímero'?", "options": ["Pasajero", "Eterno", "Importante", "Grande"], "correct_answer": 0},
             ]
         },
         "ciencias": {
             "10": [
-                {
-                    "question_text": "¿Cuál es la fórmula química del agua?",
-                    "options": ["H₂O", "CO₂", "O₂", "H₂O₂"],
-                    "correct_answer": 0
-                }
+                {"question_text": "¿Cuál es la fórmula química del agua?", "options": ["H₂O", "CO₂", "O₂", "H₂O₂"], "correct_answer": 0},
+                {"question_text": "¿Cuántos planetas hay en el sistema solar?", "options": ["8", "9", "7", "10"], "correct_answer": 0},
             ]
         },
         "sociales": {
             "10": [
-                {
-                    "question_text": "¿En qué año comenzó la Segunda Guerra Mundial?",
-                    "options": ["1939", "1914", "1945", "1940"],
-                    "correct_answer": 0
-                }
+                {"question_text": "¿En qué año comenzó la Segunda Guerra Mundial?", "options": ["1939", "1914", "1945", "1940"], "correct_answer": 0},
+                {"question_text": "¿Cuál es la capital de Francia?", "options": ["París", "Londres", "Madrid", "Roma"], "correct_answer": 0},
             ]
         }
     }
     
     questions = []
-    if subject in default_questions and grade_level in default_questions[subject]:
-        for q_data in default_questions[subject][grade_level]:
+    if subject in default_questions:
+        grade_questions = default_questions[subject].get(grade_level, default_questions[subject].get("10", []))
+        for q_data in grade_questions:
             question_id = f"q_{uuid.uuid4().hex[:12]}"
-            question_doc = {
+            await execute_query(
+                """INSERT INTO questions (question_id, subject, grade_level, question_text, options, correct_answer, difficulty)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (question_id, subject, grade_level, q_data["question_text"], json.dumps(q_data["options"]), q_data["correct_answer"], "medium")
+            )
+            questions.append({
                 "question_id": question_id,
                 "subject": subject,
-                "grade_level": grade_level,
                 "question_text": q_data["question_text"],
                 "options": q_data["options"],
-                "correct_answer": q_data["correct_answer"],
-                "difficulty": "medium"
-            }
-            await db.questions.insert_one(question_doc)
-            questions.append(question_doc)
+                "correct_answer": q_data["correct_answer"]
+            })
     
     return questions
 
-# ============ WEBSOCKET ROUTE ============
+# ============ CHAT ROUTES ============
+
+@api_router.get("/rooms/{room_id}/messages")
+async def get_room_messages(room_id: str, user: dict = Depends(get_current_user)):
+    messages = await execute_query(
+        "SELECT message_id, room_id, user_id, username, message, timestamp FROM chat_messages WHERE room_id = %s ORDER BY timestamp ASC LIMIT 100",
+        (room_id,), fetch_all=True
+    )
+    return [dict(m) for m in messages]
+
+# ============ WEBSOCKET ============
 
 @app.websocket("/ws/{room_id}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str, token: str):
-    """WebSocket for real-time game and chat"""
     try:
-        # Verify token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         if not user_id:
             await websocket.close(code=1008)
             return
         
-        user_doc = await db.users.find_one({"user_id": user_id}, {"_id": 0})
-        if not user_doc:
+        user = await execute_query(
+            "SELECT user_id, username FROM users WHERE user_id = %s",
+            (user_id,), fetch_one=True
+        )
+        if not user:
             await websocket.close(code=1008)
             return
         
     except JWTError:
-        # Try Emergent session
-        session_doc = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
-        if not session_doc:
+        session = await execute_query(
+            "SELECT user_id FROM user_sessions WHERE session_token = %s",
+            (token,), fetch_one=True
+        )
+        if not session:
             await websocket.close(code=1008)
             return
         
-        user_doc = await db.users.find_one({"user_id": session_doc["user_id"]}, {"_id": 0})
-        if not user_doc:
+        user = await execute_query(
+            "SELECT user_id, username FROM users WHERE user_id = %s",
+            (session['user_id'],), fetch_one=True
+        )
+        if not user:
             await websocket.close(code=1008)
             return
-        user_id = user_doc["user_id"]
+        user_id = user['user_id']
     
     await manager.connect(websocket, room_id, user_id)
     
-    # Notify room that user joined
     await manager.broadcast_to_room(room_id, {
         "type": "user_joined",
         "user_id": user_id,
-        "username": user_doc["username"]
+        "username": user["username"]
     })
     
     try:
@@ -851,28 +962,24 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, token: str):
             data = await websocket.receive_json()
             
             if data["type"] == "chat":
-                # Save message
-                message_doc = {
-                    "message_id": f"msg_{uuid.uuid4().hex[:12]}",
-                    "room_id": room_id,
-                    "user_id": user_id,
-                    "username": user_doc["username"],
-                    "message": data["message"],
-                    "timestamp": datetime.now(timezone.utc)
-                }
-                await db.chat_messages.insert_one(message_doc)
+                message_id = f"msg_{uuid.uuid4().hex[:12]}"
+                timestamp = datetime.now(timezone.utc)
                 
-                # Broadcast to room
+                await execute_query(
+                    """INSERT INTO chat_messages (message_id, room_id, user_id, username, message, timestamp)
+                       VALUES (%s, %s, %s, %s, %s, %s)""",
+                    (message_id, room_id, user_id, user["username"], data["message"], timestamp)
+                )
+                
                 await manager.broadcast_to_room(room_id, {
                     "type": "chat",
                     "user_id": user_id,
-                    "username": user_doc["username"],
+                    "username": user["username"],
                     "message": data["message"],
-                    "timestamp": message_doc["timestamp"].isoformat()
+                    "timestamp": timestamp.isoformat()
                 })
             
             elif data["type"] == "game_action":
-                # Broadcast game action to room
                 await manager.broadcast_to_room(room_id, {
                     "type": "game_action",
                     "user_id": user_id,
@@ -885,30 +992,10 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, token: str):
         await manager.broadcast_to_room(room_id, {
             "type": "user_left",
             "user_id": user_id,
-            "username": user_doc["username"]
+            "username": user["username"]
         })
 
-# ============ CHAT ROUTES ============
-
-@api_router.get("/rooms/{room_id}")
-async def get_room(room_id: str, user: dict = Depends(get_current_user)):
-    """Get room details"""
-    room_doc = await db.game_rooms.find_one({"room_id": room_id}, {"_id": 0})
-    if not room_doc:
-        raise HTTPException(status_code=404, detail="Room not found")
-    return room_doc
-
-@api_router.get("/rooms/{room_id}/messages")
-async def get_room_messages(room_id: str, user: dict = Depends(get_current_user)):
-    """Get chat messages for a room"""
-    messages = await db.chat_messages.find(
-        {"room_id": room_id},
-        {"_id": 0}
-    ).sort("timestamp", 1).to_list(100)
-    
-    return messages
-
-# Include the router in the main app
+# Include router
 app.include_router(api_router)
 
 app.add_middleware(
@@ -919,13 +1006,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
+# Initialize database on startup
+@app.on_event("startup")
+async def startup_event():
+    await init_database()
+    print("✅ MySQL Database connected and initialized!")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    global pool
+    if pool:
+        pool.close()
+        await pool.wait_closed()
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
