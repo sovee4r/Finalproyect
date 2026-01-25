@@ -259,14 +259,11 @@ La autenticación está temporalmente deshabilitada para permitir trabajar en la
 ---
 
 ## Última Actualización
-**Fecha:** 19 de Enero, 2025  
+**Fecha:** 25 de Enero, 2025  
 **Cambios:**
-- Implementado modo desarrollo completo en Dashboard.js y GameRoom.js
-- Juego de trivia funcionando con preguntas locales para 4 materias
-- Sistema de amigos mock funcionando
-- **NUEVO**: Rediseño completo del GameRoom basado en mockup del usuario:
-  - Panel izquierdo: Ranking de jugadores en tiempo real (Top 3 ganan)
-  - Centro: Mesa pixel-art con jugadores + preguntas 2x2
-  - Panel derecho: Espacio para anuncio + info del juego
-  - Pantalla de resultados con podio Top 3
+- ✅ **AUTENTICACIÓN ACTIVADA** - Login/Register funcionando con MySQL
+- ✅ **Migración a MySQL** completada (Railway)
+- ✅ **Página de inicio** creada con explicación del juego
+- ✅ **Icono de casita** 🏠 agregado en todas las páginas para volver al inicio
+- ✅ Juego de trivia funcionando con preguntas de la BD
 - Documentación actualizada
