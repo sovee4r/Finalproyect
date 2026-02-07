@@ -1,73 +1,32 @@
-// Mobile Menu Toggle
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const mobileMenu = document.getElementById('mobileMenu');
-const menuIcon = document.getElementById('menuIcon');
+const slides = document.querySelectorAll(".slide");
+const dots = document.querySelectorAll(".dot");
 
-mobileMenuBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('active');
-    
-    // Toggle icon
-    if (mobileMenu.classList.contains('active')) {
-        menuIcon.classList.remove('fa-bars');
-        menuIcon.classList.add('fa-times');
-    } else {
-        menuIcon.classList.remove('fa-times');
-        menuIcon.classList.add('fa-bars');
-    }
-});
+let current = 0;
 
-// Mobile Games Dropdown
-const mobileGamesBtn = document.getElementById('mobileGamesBtn');
-const mobileGamesDropdown = document.getElementById('mobileGamesDropdown');
+function showSlide(index){
+slides.forEach(s => s.classList.remove("active"));
+dots.forEach(d => d.classList.remove("active"));
 
-mobileGamesBtn.addEventListener('click', () => {
-    mobileGamesDropdown.classList.toggle('active');
-});
-
-// Carousel Functionality
-let currentSlide = 0;
-const slides = document.querySelectorAll('.carousel-slide');
-const dots = document.querySelectorAll('.dot');
-const totalSlides = slides.length;
-
-function showSlide(index) {
-    // Remove active class from all slides and dots
-    slides.forEach(slide => slide.classList.remove('active'));
-    dots.forEach(dot => dot.classList.remove('active'));
-    
-    // Add active class to current slide and dot
-    slides[index].classList.add('active');
-    dots[index].classList.add('active');
+slides[index].classList.add("active");
+dots[index].classList.add("active");
 }
 
-function nextSlide() {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    showSlide(currentSlide);
-}
-
-// Dot click handlers
-dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => {
-        currentSlide = index;
-        showSlide(currentSlide);
-    });
+dots.forEach((dot,i)=>{
+dot.addEventListener("click",()=>{
+current = i;
+showSlide(current);
+});
 });
 
-// Auto-advance carousel every 4 seconds
-setInterval(nextSlide, 4000);
+setInterval(()=>{
+current = (current + 1) % slides.length;
+showSlide(current);
+},3000);
 
-// Initialize first slide
-showSlide(0);
+const menuBtn = document.getElementById("mobileMenuBtn");
+const mobileMenu = document.getElementById("mobileMenu");
 
-// Smooth scroll for anchor links (if needed in future)
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-    });
+menuBtn.addEventListener("click",()=>{
+mobileMenu.style.display =
+mobileMenu.style.display === "flex" ? "none" : "flex";
 });

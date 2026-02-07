@@ -1,308 +1,104 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">a
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saberix - Diviértete y Aprende</title>
-    <link rel="stylesheet" href="/Frontend/Public/Styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saberix</title>
+
+<link rel="stylesheet" href="styles.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-    
-    <div class="pixel-background"></div>
 
-  
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-content">
-              
-                <div class="nav-logo">
-                    <div class="logo-text">SABERIX</div>
-                </div>
+<nav class="navbar">
+<div class="container">
 
-             
-                <div class="nav-menu desktop-menu">
-                 
-                    <div class="dropdown" id="gamesDropdown">
-                        <button class="nav-link dropdown-toggle">
-                            JUEGOS
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" id="dropdownMenu">
-                            <button class="dropdown-item matematicas">MATEMÁTICAS</button>
-                            <button class="dropdown-item ciencias">CIENCIAS</button>
-                            <button class="dropdown-item lengua">LENGUA</button>
-                            <button class="dropdown-item sociales">SOCIALES</button>
-                        </div>
-                    </div>
+<div class="nav-content">
+<div class="logo-text">SABERIX</div>
 
-                    <button class="nav-link avatar-link">
-                        <i class="fas fa-user"></i>
-                        AVATAR
-                    </button>
-                    <button class="nav-link amigos-link">
-                        <i class="fas fa-users"></i>
-                        AMIGOS
-                    </button>
-                    <button class="nav-link contactos-link">
-                        <i class="fas fa-comment"></i>
-                        PERFIL
-                    </button>
-                </div>
+<div class="desktop-menu">
+<button class="nav-link">JUEGOS</button>
+<button class="nav-link">AVATAR</button>
+<button class="nav-link">AMIGOS</button>
+<button class="nav-link">CONTACTOS</button>
+</div>
 
+<button class="btn-login">LOGIN</button>
 
-                <div class="nav-login">
-                    <button class="btn-login">LOGIN</button>
-                </div>
+<button class="mobile-menu-btn" id="mobileMenuBtn">
+<i class="fas fa-bars"></i>
+</button>
+</div>
 
-      
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars" id="menuIcon"></i>
-                </button>
-            </div>
+<div class="mobile-menu" id="mobileMenu">
+<button class="mobile-nav-link">JUEGOS</button>
+<button class="mobile-nav-link">AVATAR</button>
+<button class="mobile-nav-link">AMIGOS</button>
+<button class="mobile-nav-link">CONTACTOS</button>
+<button class="btn-login mobile">LOGIN</button>
+</div>
 
+</div>
+</nav>
 
-            <div class="mobile-menu" id="mobileMenu">
-                <div class="mobile-dropdown">
-                    <button class="mobile-nav-link" id="mobileGamesBtn">
-                        JUEGOS ▼
-                    </button>
-                    <div class="mobile-dropdown-content" id="mobileGamesDropdown">
-                        <button class="mobile-dropdown-item matematicas">MATEMÁTICAS</button>
-                        <button class="mobile-dropdown-item ciencias">CIENCIAS</button>
-                        <button class="mobile-dropdown-item lengua">LENGUA</button>
-                        <button class="mobile-dropdown-item sociales">SOCIALES</button>
-                    </div>
-                </div>
-                <button class="mobile-nav-link">AVATAR</button>
-                <button class="mobile-nav-link">AMIGOS</button>
-                <button class="mobile-nav-link">CONTACTOS</button>
-                <button class="btn-login mobile">LOGIN</button>
-            </div>
-        </div>
-    </nav>
+<section class="hero-section">
+<div class="carousel">
+<img class="slide active" src="https://images.unsplash.com/photo-1668119064876-2ac62994e145?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080">
+<img class="slide" src="https://images.unsplash.com/photo-1646708198974-4c4893e8a2d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080">
+<img class="slide" src="https://images.unsplash.com/photo-1567027757540-7b572280fa22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080">
+</div>
 
-    <div class="main-container">
-     
-        <section class="hero-section">
-            <div class="carousel-wrapper">
-                <div class="carousel-container">
-                    <div class="carousel-glow"></div>
-                    <div class="carousel-frame">
-                        <div class="carousel-inner">
-                           
-                            <img src="/Frontend/Assets/saberix-logo.webp" 
-                                 alt="Logo Saberix" 
-                                 class="carousel-slide active">
-                            <img src="https://images.unsplash.com/photo-1668119064876-2ac62994e145?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" 
-                                 alt="Slide 2" 
-                                 class="carousel-slide">
-                            <img src="https://images.unsplash.com/photo-1646708198974-4c4893e8a2d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" 
-                                 alt="Slide 3" 
-                                 class="carousel-slide">
-                            <img src="https://images.unsplash.com/photo-1567027757540-7b572280fa22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080" 
-                                 alt="Slide 4" 
-                                 class="carousel-slide">
-                        </div>
+<div class="dots">
+<button class="dot active" data-slide="0"></button>
+<button class="dot" data-slide="1"></button>
+<button class="dot" data-slide="2"></button>
+</div>
 
-                  
-                        <div class="carousel-dots">
-                            <button class="dot active" data-slide="0"></button>
-                            <button class="dot" data-slide="1"></button>
-                            <button class="dot" data-slide="2"></button>
-                            <button class="dot" data-slide="3"></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <p class="hero-subtitle">¡Aprende jugando!</p>
-        </section>
+<p class="hero-subtitle">¡Aprende jugando!</p>
+</section>
 
-  
-        <section class="how-it-works">
-            <h2 class="section-title">¿CÓMO FUNCIONA?</h2>
+<section class="how-it-works">
+<h2>¿CÓMO FUNCIONA?</h2>
 
-            <div class="steps-grid">
-           
-                <div class="step-card">
-                    <div class="card-glow cyan"></div>
-                    <div class="card-content cyan-border">
-                        <div class="step-icon cyan-bg">
-                            <span class="emoji">👥</span>
-                        </div>
-                        <h3 class="step-title cyan-text">1. CREA O ÚNETE</h3>
-                        <p class="step-description">
-                            Crea una sala de juego o únete a una existente. Invita a tus amigos usando tu código único.
-                        </p>
-                    </div>
-                </div>
+<div class="steps">
+<div class="card cyan">
+<h3>1. CREA O ÚNETE</h3>
+<p>Crea una sala o únete con código.</p>
+</div>
 
-    
-                <div class="step-card">
-                    <div class="card-glow orange"></div>
-                    <div class="card-content orange-border">
-                        <div class="step-icon orange-bg">
-                            <span class="emoji">❓</span>
-                        </div>
-                        <h3 class="step-title orange-text">2. RESPONDE</h3>
-                        <p class="step-description">
-                            Responde preguntas de trivia contra el reloj. Elige entre 4 opciones y acumula puntos.
-                        </p>
-                    </div>
-                </div>
+<div class="card orange">
+<h3>2. RESPONDE</h3>
+<p>Responde preguntas rápido.</p>
+</div>
 
-         
-                <div class="step-card">
-                    <div class="card-glow yellow"></div>
-                    <div class="card-content yellow-border">
-                        <div class="step-icon yellow-bg">
-                            <span class="emoji">🏆</span>
-                        </div>
-                        <h3 class="step-title yellow-text">3. ¡GANA!</h3>
-                        <p class="step-description">
-                            Los 3 mejores jugadores ganan. Sube en el ranking y demuestra quién es más listo.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
+<div class="card yellow">
+<h3>3. GANA</h3>
+<p>Los mejores suben al ranking.</p>
+</div>
+</div>
+</section>
 
+<section class="subjects">
+<h2>MATERIAS</h2>
 
-        <section class="subjects-section">
-            <h2 class="section-title">MATERIAS DISPONIBLES</h2>
+<div class="subjects-grid">
+<div class="subject blue">MATEMÁTICAS</div>
+<div class="subject green">CIENCIAS</div>
+<div class="subject gold">LENGUA</div>
+<div class="subject red">SOCIALES</div>
+</div>
+</section>
 
-            <div class="subjects-grid">
-          
-                <div class="subject-card">
-                    <div class="card-glow blue"></div>
-                    <div class="card-content blue-border">
-                        <div class="subject-icon blue-bg">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <h3 class="subject-title blue-text">MATEMÁTICAS</h3>
-                    </div>
-                </div>
+<footer>
+<p>© 2026 SABERIX</p>
+</footer>
 
-    
-                <div class="subject-card">
-                    <div class="card-glow green"></div>
-                    <div class="card-content green-border">
-                        <div class="subject-icon green-bg">
-                            <i class="fas fa-flask"></i>
-                        </div>
-                        <h3 class="subject-title green-text">CIENCIAS</h3>
-                    </div>
-                </div>
-
-         
-                <div class="subject-card">
-                    <div class="card-glow gold"></div>
-                    <div class="card-content gold-border">
-                        <div class="subject-icon gold-bg">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                        <h3 class="subject-title gold-text">LENGUA</h3>
-                    </div>
-                </div>
-
-                <div class="subject-card">
-                    <div class="card-glow red"></div>
-                    <div class="card-content red-border">
-                        <div class="subject-icon red-bg">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                        <h3 class="subject-title red-text">SOCIALES</h3>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-       
-        <section class="game-modes">
-            <h2 class="section-title">MODOS DE JUEGO</h2>
-
-            <div class="modes-grid">
-     
-                <div class="mode-card">
-                    <div class="card-glow cyan"></div>
-                    <div class="card-content cyan-border">
-                        <div class="mode-header">
-                            <div class="mode-icon cyan-bg">
-                                <i class="fas fa-bullseye"></i>
-                            </div>
-                            <h3 class="mode-title cyan-text">MODO NORMAL</h3>
-                        </div>
-                        <p class="mode-description">
-                            Juego relajado para practicar y aprender. Perfecto para estudiar con amigos sin presión.
-                        </p>
-                    </div>
-                </div>
-
-     
-                <div class="mode-card">
-                    <div class="card-glow cyan"></div>
-                    <div class="card-content cyan-border">
-                        <div class="mode-header">
-                            <div class="mode-icon cyan-bg">
-                                <i class="fas fa-trophy"></i>
-                            </div>
-                            <h3 class="mode-title cyan-text">COMPETENCIA</h3>
-                        </div>
-                        <p class="mode-description">
-                            Modo competitivo intenso. La velocidad cuenta y solo los mejores llegarán al podio.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-          
-                <div class="footer-section">
-                    <p class="footer-text">
-                        Aprende mientras juegas. La plataforma educativa más divertida.
-                    </p>
-                </div>
-
-          
-                <div class="footer-section">
-                    <h3 class="footer-title">ENLACES</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Sobre Nosotros</a></li>
-                        <li><a href="#">Términos de Uso</a></li>
-                        <li><a href="#">Privacidad</a></li>
-                      
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h3 class="footer-title">SÍGUENOS</h3>
-                    <div class="social-icons">
-                        <button class="social-btn pink">
-                            <i class="fab fa-facebook-f"></i>
-                        </button>
-                        <button class="social-btn cyan">
-                            <i class="fab fa-twitter"></i>
-                        </button>
-                        <button class="social-btn yellow">
-                            <i class="fab fa-instagram"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        
-            <div class="footer-copyright">
-                <p class="copyright-text">© 2026 SABERIX - TODOS LOS DERECHOS RESERVADOS</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="/Frontend/Public/script.js"></script>
+<script src="scripts.js"></script>
 </body>
 </html>
