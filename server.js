@@ -4,11 +4,12 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// 📌 IMPORTANTE: ESTA ES LA RUTA CORRECTA PARA TU CASO
-app.use(express.static(path.join(__dirname, "Frontend/Public")));
+const publicPath = path.join(__dirname, "Frontend", "Index");
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "Frontend/Public/Index.html"));
+app.use(express.static(publicPath));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
 });
 
 app.listen(PORT, () => {
