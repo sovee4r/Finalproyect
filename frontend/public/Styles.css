@@ -1,133 +1,837 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:"Press Start 2P", monospace;
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-background:#0b0f1a;
-color:white;
+body {
+    min-height: 100vh;
+    background-color: #1a1f35;
+    position: relative;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
 }
 
-.navbar{
-background:#0a0d14;
-padding:20px;
-border-bottom:3px solid #00eaff;
+
+.pixel-background {
+    position: fixed;
+    inset: 0;
+    opacity: 0.1;
+    z-index: 0;
+    background-image: 
+        linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+    background-size: 50px 50px;
 }
 
-.nav-content{
-display:flex;
-justify-content:space-between;
-align-items:center;
+
+.pixel-font {
+    font-family: 'Press Start 2P', cursive;
 }
 
-.logo-text{
-color:#00ffcc;
-font-size:22px;
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
 
-.desktop-menu{
-display:flex;
-gap:15px;
+.navbar {
+    position: fixed;      
+    top: 0;               
+    left: 0;
+    width: 100%;         
+    z-index: 1000;      
+    background-color: #0f1425;
+    border-bottom: 4px solid #00d9ff;
+    box-shadow: 0 4px 0 rgba(0, 217, 255, 0.3);
 }
 
-.nav-link{
-background:none;
-color:white;
-border:none;
-cursor:pointer;
+
+.nav-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4rem;
 }
 
-.btn-login{
-background:#ff1493;
-color:white;
-border:none;
-padding:10px 20px;
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-.mobile-menu{
-display:none;
-flex-direction:column;
+.logo-text {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    font-size: 0.75rem;
 }
 
-.hero-section{
-text-align:center;
-padding:40px;
+
+.desktop-menu {
+    display: none;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
+    justify-content: center;
 }
 
-.carousel img{
-width:80%;
-display:none;
-margin:auto;
-border:3px solid #00eaff;
+.nav-link {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.carousel img.active{
-display:block;
+.nav-link:hover {
+    color: #00d9ff;
 }
 
-.dots{
-margin-top:15px;
+.nav-link.avatar-link:hover {
+    color: #ff8c00;
 }
 
-.dot{
-width:10px;
-height:10px;
-border-radius:50%;
-border:none;
-margin:5px;
+.nav-link.amigos-link:hover {
+    color: #ffd700;
 }
 
-.dot.active{
-background:#00eaff;
+.nav-link.contactos-link:hover {
+    color: #ff1b8d;
 }
 
-.how-it-works{
-text-align:center;
-padding:40px;
+
+.dropdown {
+    position: relative;
 }
 
-.steps{
-display:flex;
-justify-content:center;
-gap:20px;
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.card{
-width:250px;
-padding:20px;
-border:3px solid;
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background-color: #0f1425;
+    border: 4px solid #00d9ff;
+    min-width: 200px;
+    box-shadow: 0 4px 0 rgba(0, 217, 255, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
 }
 
-.cyan{border-color:#00eaff;}
-.orange{border-color:#ff8c00;}
-.yellow{border-color:#ffd700;}
-
-.subjects{
-text-align:center;
-padding:40px;
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
-.subjects-grid{
-display:flex;
-justify-content:center;
-gap:20px;
+.dropdown-item {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.subject{
-width:200px;
-padding:20px;
-border:3px solid;
+.dropdown-item:hover {
+    background-color: #1a1f35;
 }
 
-.blue{border-color:#00eaff;}
-.green{border-color:#00ff66;}
-.gold{border-color:#ffd700;}
-.red{border-color:#ff1f4f;}
+.dropdown-item.matematicas {
+    color: #4169E1;
+}
 
-footer{
-text-align:center;
-padding:30px;
-background:#090c12;
+.dropdown-item.ciencias {
+    color: #228B22;
+}
+
+.dropdown-item.lengua {
+    color: #DAA520;
+}
+
+.dropdown-item.sociales {
+    color: #DC143C;
+}
+
+
+.nav-login {
+    display: none;
+}
+
+.btn-login {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    background-color: #ff1b8d;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-bottom: 4px solid #a0115e;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-login:hover {
+    background-color: #ff3da1;
+    border-bottom: 2px solid #a0115e;
+    transform: translateY(2px);
+}
+
+.btn-login.mobile {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.mobile-menu-btn {
+    display: block;
+    background: none;
+    border: none;
+    color: #00d9ff;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+
+.mobile-menu {
+    display: none;
+    padding-bottom: 1rem;
+}
+
+.mobile-menu.active {
+    display: block;
+}
+
+.mobile-nav-link {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    color: white;
+    background: none;
+    border: none;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.mobile-nav-link:hover {
+    color: #00d9ff;
+}
+
+.mobile-dropdown-content {
+    display: none;
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+}
+
+.mobile-dropdown-content.active {
+    display: block;
+}
+
+.mobile-dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    background: none;
+    border: none;
+    padding: 0.25rem 0;
+    cursor: pointer;
+}
+
+.mobile-dropdown-item.matematicas {
+    color: #4169E1;
+}
+
+.mobile-dropdown-item.ciencias {
+    color: #228B22;
+}
+
+.mobile-dropdown-item.lengua {
+    color: #DAA520;
+}
+
+.mobile-dropdown-item.sociales {
+    color: #DC143C;
+}
+
+.main-container {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    margin-bottom: 4rem;
+}
+
+.carousel-wrapper {
+    position: relative;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 42rem;
+}
+
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-glow {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom right, #ff1b8d, #00d9ff, #ffd700);
+    filter: blur(3rem);
+    opacity: 0.5;
+    z-index: -1;
+}
+
+.carousel-frame {
+    position: relative;
+    background-color: #0f1425;
+    padding: 1.5rem;
+    box-shadow: 
+        0 0 0 4px #00d9ff,
+        0 0 0 8px #0f1425,
+        0 0 0 12px #ff1b8d,
+        0 0 20px rgba(0, 217, 255, 0.5),
+        0 0 40px rgba(255, 27, 141, 0.3);
+}
+
+.carousel-inner {
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+}
+
+.carousel-slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: #6b7280;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.dot.active {
+    background-color: #00d9ff;
+    transform: scale(1.25);
+}
+
+.hero-subtitle {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    text-align: center;
+    font-size: 0.75rem;
+    margin-top: 1rem;
+    padding: 0 1rem;
+    line-height: 1.8;
+}
+
+
+.how-it-works,
+.subjects-section,
+.game-modes {
+    margin-bottom: 5rem;
+}
+
+.section-title {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    text-align: center;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.step-card {
+    position: relative;
+    height: 100%;
+}
+
+.card-glow {
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    filter: blur(0.75rem);
+    transition: opacity 0.3s;
+}
+
+.card-glow.cyan {
+    background-color: #00d9ff;
+}
+
+.card-glow.orange {
+    background-color: #ff8c00;
+}
+
+.card-glow.yellow {
+    background-color: #ffd700;
+}
+
+.card-glow.blue {
+    background-color: #4169E1;
+}
+
+.card-glow.green {
+    background-color: #228B22;
+}
+
+.card-glow.gold {
+    background-color: #DAA520;
+}
+
+.card-glow.red {
+    background-color: #DC143C;
+}
+
+.step-card:hover .card-glow {
+    opacity: 0.4;
+}
+
+.card-content {
+    position: relative;
+    background-color: #1a1f35;
+    padding: 1.5rem;
+    border: 4px solid;
+    transition: transform 0.3s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.card-content:hover {
+    transform: scale(1.05);
+}
+
+.cyan-border {
+    border-color: #00d9ff;
+}
+
+.orange-border {
+    border-color: #ff8c00;
+}
+
+.yellow-border {
+    border-color: #ffd700;
+}
+
+.blue-border {
+    border-color: #4169E1;
+}
+
+.green-border {
+    border-color: #228B22;
+}
+
+.gold-border {
+    border-color: #DAA520;
+}
+
+.red-border {
+    border-color: #DC143C;
+}
+
+.step-icon {
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.cyan-bg {
+    background-color: #00d9ff;
+}
+
+.orange-bg {
+    background-color: #ff8c00;
+}
+
+.yellow-bg {
+    background-color: #ffd700;
+}
+
+.blue-bg {
+    background-color: #4169E1;
+}
+
+.green-bg {
+    background-color: #228B22;
+}
+
+.gold-bg {
+    background-color: #DAA520;
+}
+
+.red-bg {
+    background-color: #DC143C;
+}
+
+.emoji {
+    font-size: 2rem;
+    font-family: 'Press Start 2P', cursive;
+    color: #1a1f35;
+}
+
+.step-title {
+    font-family: 'Press Start 2P', cursive;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.cyan-text {
+    color: #00d9ff;
+}
+
+.orange-text {
+    color: #ff8c00;
+}
+
+.yellow-text {
+    color: #ffd700;
+}
+
+.blue-text {
+    color: #4169E1;
+}
+
+.green-text {
+    color: #228B22;
+}
+
+.gold-text {
+    color: #DAA520;
+}
+
+.red-text {
+    color: #DC143C;
+}
+
+.step-description {
+    color: white;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+
+.subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.subject-card {
+    position: relative;
+}
+
+.subject-icon {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.subject-title {
+    font-family: 'Press Start 2P', cursive;
+    text-align: center;
+    font-size: 0.6rem;
+    line-height: 1.6;
+}
+
+
+.modes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.mode-card {
+    position: relative;
+}
+
+.mode-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mode-icon {
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 2.5rem;
+    color: #1a1f35;
+}
+
+.mode-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.mode-description {
+    color: white;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.footer {
+    position: relative;
+    z-index: 10;
+    background-color: #0f1425;
+    border-top: 4px solid #00d9ff;
+    box-shadow: 0 -4px 0 rgba(0, 217, 255, 0.3);
+    margin-top: 5rem;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.footer-text {
+    color: white;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.footer-title {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: white;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #00d9ff;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.social-btn.pink {
+    background-color: #ff1b8d;
+    color: white;
+}
+
+.social-btn.pink:hover {
+    background-color: #ff3da1;
+}
+
+.social-btn.cyan {
+    background-color: #00d9ff;
+    color: #1a1f35;
+}
+
+.social-btn.cyan:hover {
+    background-color: #00e5ff;
+}
+
+.social-btn.yellow {
+    background-color: #ffd700;
+    color: #1a1f35;
+}
+
+.social-btn.yellow:hover {
+    background-color: #ffe44d;
+}
+
+.footer-copyright {
+    border-top: 2px solid #1a1f35;
+    padding-top: 1.5rem;
+    text-align: center;
+    padding-bottom: 2rem;
+}
+
+.copyright-text {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    font-size: 0.75rem;
+}
+
+
+@media (min-width: 640px) {
+    .logo-text {
+        font-size: 0.875rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.875rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .desktop-menu {
+        display: flex;
+    }
+
+    .nav-login {
+        display: block;
+    }
+
+    .mobile-menu-btn {
+        display: none;
+    }
+
+    .mobile-menu {
+        display: none !important;
+    }
+
+    .carousel-frame {
+        padding: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+    }
+
+    .steps-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .subjects-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .subject-icon {
+        width: 4rem;
+        height: 4rem;
+        font-size: 2.5rem;
+    }
+
+    .subject-title {
+        font-size: 0.75rem;
+    }
+
+    .modes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .subject-card .card-content {
+        padding: 1.5rem;
+    }
+
+    .mode-card .card-content {
+        padding: 2rem;
+    }
 }

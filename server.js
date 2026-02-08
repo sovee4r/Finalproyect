@@ -2,12 +2,17 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
-app.use(express.static(path.join(__dirname, "frontend", "public")));
+// Ruta real dentro del contenedor Railway
+const publicPath = path.join(process.cwd(), "frontend", "public");
+
+console.log("Sirviendo archivos desde:", publicPath);
+
+app.use(express.static(publicPath));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "public", "index.html"));
+  res.sendFile(path.join(publicPath, "index.html"));
 });
 
 app.listen(PORT, () => {

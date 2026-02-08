@@ -1,32 +1,60 @@
-const slides = document.querySelectorAll(".slide");
-const dots = document.querySelectorAll(".dot");
+document.addEventListener('DOMContentLoaded', function() {
+    const navbarToggle = document.getElementById('navbarToggle');
+    const navbarMenu = document.getElementById('navbarMenu');
+    
+    if (navbarToggle) {
+        navbarToggle.addEventListener('click', function() {
+            navbarMenu.classList.toggle('active');
+        });
+    }
+    
+    const navLinks = document.querySelectorAll('.navbar-menu a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            navbarMenu.classList.remove('active');
+        });
+    });
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                const targetPosition = targetSection.offsetTop - navbarHeight;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});
 
-let current = 0;
-
-function showSlide(index){
-slides.forEach(s => s.classList.remove("active"));
-dots.forEach(d => d.classList.remove("active"));
-
-slides[index].classList.add("active");
-dots[index].classList.add("active");
+function startGame() {
+    alert('¡Próximamente! El juego se conectará a la base de datos.');
 }
 
-dots.forEach((dot,i)=>{
-dot.addEventListener("click",()=>{
-current = i;
-showSlide(current);
-});
-});
+function handleScrollAnimations() {
+    const animatedElements = document.querySelectorAll('.scroll-animate');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+    
+    animatedElements.forEach(element => {
+        observer.observe(element);
+    });
+}
 
-setInterval(()=>{
-current = (current + 1) % slides.length;
-showSlide(current);
-},3000);
-
-const menuBtn = document.getElementById("mobileMenuBtn");
-const mobileMenu = document.getElementById("mobileMenu");
-
-menuBtn.addEventListener("click",()=>{
-mobileMenu.style.display =
-mobileMenu.style.display === "flex" ? "none" : "flex";
-});
+document.addEventListener('DOMContentLoaded', handleScrollAnimations);
