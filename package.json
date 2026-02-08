@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "start": "serve . -l $PORT"
+    "start": "npx serve . -l $PORT"
   },
   "dependencies": {
     "serve": "^14.2.5"
