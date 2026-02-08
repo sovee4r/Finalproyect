@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "start": "npx serve . -l $PORT"
+    "start": "node server.js"
   },
   "dependencies": {
-    "serve": "^14.2.5"
+    "express": "^4.22.1"
   }
 }
