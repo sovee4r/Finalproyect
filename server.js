@@ -4,7 +4,7 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const publicPath = path.join(__dirname, "Frontend", "Index");
+const publicPath = path.join(__dirname, "frontend");
 
 app.use(express.static(publicPath));
 
