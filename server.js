@@ -4,17 +4,12 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Ruta real dentro del contenedor Railway
-const publicPath = path.join(process.cwd(), "frontend", "public");
-
-console.log("Sirviendo archivos desde:", publicPath);
-
-app.use(express.static(publicPath));
+app.use(express.static(path.join(__dirname, "frontend")));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(publicPath, "index.html"));
+  res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log("Servidor corriendo en puerto " + PORT);
 });
