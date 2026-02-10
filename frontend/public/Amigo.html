@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amigos - Saberix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="stylesheet" href="Amigo.css">
+</head>
+<body>
+
+    <div class="pixel-background"></div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+          <div class="navbar-logo">
+    <a href="index.html" class="navbar-title-btn">SABERIX</a>
+</div>
+            
+            <button class="navbar-toggle" id="navbarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <ul class="navbar-menu" id="navbarMenu">
+                <li class="dropdown" id="juegosDropdown">
+                    <a href="#juegos" class="dropdown-toggle">
+                        JUEGOS
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="dropdown-menu" id="dropdownMenu">
+                        <li><a href="#matematicas" class="matematicas">MATEMÁTICAS</a></li>
+                        <li><a href="#ciencias" class="ciencias">CIENCIAS</a></li>
+                        <li><a href="#lengua" class="lengua">LENGUA</a></li>
+                        <li><a href="#sociales" class="sociales">SOCIALES</a></li>
+                    </ul>
+                </li>
+                <li><a href="#avatar">👤 AVATAR</a></li>
+                <li><a href="#amigos">👥 AMIGOS</a></li>
+                <li><a href="#perfil">📊 PERFIL</a></li>
+            </ul>
+            
+            <button class="login-btn">LOGIN</button>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <section class="friends-page">
+            <h2 class="section-title">AMIGOS</h2>
+
+            <div class="friends-container">
+                <!-- Buscador -->
+              <div class="friends-search-bar">
+    <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="addFriendInput" placeholder="Buscar amigos o agregar por código..." class="friends-search-input">
+        <button id="btnAddFriend" class="btn-add-friend">AGREGAR</button>
+    </div>
+</div>
+
+                <!-- Tabs -->
+                <div class="friends-tabs">
+                    <button class="tab-btn active" data-tab="all">TODOS</button>
+                    <button class="tab-btn" data-tab="online">EN LÍNEA</button>
+                    <button class="tab-btn" data-tab="requests">SOLICITUDES</button>
+                </div>
+
+                <!-- Lista de amigos (se llena desde BD) -->
+                <div class="friends-list" id="friendsList">
+                    <!-- Las tarjetas se agregan dinámicamente con JS -->
+                </div>
+
+                <!-- Mensaje cuando no hay amigos -->
+                <div class="no-friends" id="noFriendsMessage">
+                    <p>Aún no tienes amigos en Saberix 😢</p>
+                    <button class="btn-search-friends">BUSCAR AMIGOS</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal de Chat -->
+    <div class="chat-overlay" id="chatOverlay">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3>Chat con <span id="chatWith">Amigo</span></h3>
+                <button id="closeChat"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
+                <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+  <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-about">
+                <p class="footer-description">Aprende mientras juegas. La plataforma educativa más divertida.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4 class="footer-heading">ENLACES</h4>
+                <ul>
+                    <li><a href="#nosotros">Sobre Nosotros</a></li>
+                    <li><a href="#terminos">Términos de Uso</a></li>
+                    <li><a href="#privacidad">Privacidad</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-social">
+                <h4 class="footer-heading">SÍGUENOS</h4>
+                <div class="social-icons">
+                    <a href="#" class="social-icon social-facebook" aria-label="Facebook">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-icon social-twitter" aria-label="Twitter">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-icon social-instagram" aria-label="Instagram">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2026 SABERIX - TODOS LOS DERECHOS RESERVADOS</p>
+        </div>
+    </footer>
+
+    <script src="Amigo.js"></script>
+
+</body>
+</html>
+

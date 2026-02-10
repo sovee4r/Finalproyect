@@ -1,0 +1,1178 @@
+/* Amigos.css */
+
+.friends-page {
+    padding: 2rem 1rem 4rem;
+}
+
+.section-title {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    text-align: center;
+    font-size: 1.8rem;
+    text-shadow: 0 0 12px #00ff88;
+    margin-bottom: 2.5rem;
+}
+
+.friends-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Buscador */
+.friends-search-bar {
+    margin-bottom: 2.5rem;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background: #0f1425;
+    border: 3px solid #ff1b8d;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 27, 141, 0.25);
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    padding: 1rem 1.2rem;
+    color: #ff1b8d;
+    font-size: 1.4rem;
+}
+
+.friends-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    padding: 1rem 0.8rem;
+    outline: none;
+}
+
+.friends-search-input::placeholder {
+    color: #a0a0c0;
+}
+
+.btn-add-friend {
+    background: #00d9ff;
+    color: #0f1425;
+    border: none;
+    padding: 1rem 1.8rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 50px;
+    box-shadow: 0 4px 0 rgba(0, 217, 255, 0.4);
+    margin-left: 0.5rem;
+}
+
+.btn-add-friend:hover {
+    background: #00e5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 217, 255, 0.6);
+}
+
+/* Tabs retro y funcionales */
+.friends-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #1a1f35;
+    color: white;
+    border: 3px solid #6b7280;
+    padding: 0.8rem 1.6rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 8px;
+    min-width: 130px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tab-btn.active {
+    background: #00ff88;
+    color: #0f1425;
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    transform: translateY(-3px);
+}
+
+.tab-btn:hover:not(.active) {
+    border-color: #00d9ff;
+    color: #00d9ff;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+}
+
+/* Tarjetas de amigos */
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.friend-card {
+    position: relative;
+}
+
+.friend-glow {
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(45deg, #00d9ff, #ff1b8d);
+    border-radius: 12px;
+    filter: blur(12px);
+    opacity: 0.4;
+    z-index: -1;
+}
+
+.friend-card:hover .friend-glow {
+    opacity: 0.7;
+}
+
+.friend-content {
+    position: relative;
+    background: #1a1f35;
+    border: 3px solid #00d9ff;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+    z-index: 2;
+}
+
+.friend-avatar img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 3px solid #00ff88;
+    border-radius: 8px;
+}
+
+.status-dot {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid #1a1f35;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.status-dot.online {
+    background: #00ff88;
+    box-shadow: 0 0 12px #00ff88;
+}
+
+.friend-name {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.95rem;
+    color: #00d9ff;
+    margin-bottom: 0.3rem;
+}
+
+.friend-status {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    color: #b0b0d0;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-left: auto;
+}
+
+.btn-invite,
+.btn-chat {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.65rem;
+    padding: 0.7rem 1.3rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 110px;
+    text-align: center;
+}
+
+.btn-invite {
+    background: #ff1b8d;
+    color: white;
+    box-shadow: 0 3px 0 #a0115e;
+}
+
+.btn-chat {
+    background: #ffd700;
+    color: #0f1425;
+    box-shadow: 0 3px 0 #b8860b;
+}
+
+/* Chat */
+.chat-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 20, 37, 0.95);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-container {
+    background: #1a1f35;
+    border: 5px solid #00d9ff;
+    width: 90%;
+    max-width: 520px;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.5);
+}
+
+.chat-header {
+    background: #0f1425;
+    padding: 1.2rem;
+    border-bottom: 4px solid #00d9ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    color: #00ff88;
+    font-size: 1rem;
+    margin: 0;
+}
+
+#closeChat {
+    background: none;
+    border: none;
+    color: #ff1b8d;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1.8rem;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 1.2rem;
+    padding: 1rem 1.4rem;
+    max-width: 80%;
+}
+
+.message.received {
+    background: #2a3249;
+    border: 2px solid #00d9ff;
+}
+
+.message.sent {
+    background: #ff1b8d;
+    color: white;
+    margin-left: auto;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    color: #a0a0c0;
+    margin-top: 0.5rem;
+    text-align: right;
+    display: block;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 1.2rem;
+    background: #0f1425;
+    border-top: 4px solid #00d9ff;
+}
+
+#chatInput {
+    flex: 1;
+    background: #1a1f35;
+    border: 3px solid #ff1b8d;
+    color: white;
+    padding: 1rem;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+#sendMessage {
+    background: #00ff88;
+    border: none;
+    width: 60px;
+    height: 60px;
+    margin-left: 1rem;
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+
+#sendMessage:hover {
+    background: #33ffaa;
+}
+/* Botón AGREGAR - letras más pequeñas */
+.btn-add-friend {
+    background: #00d9ff;
+    color: #0f1425;
+    border: none;
+    padding: 0.9rem 1.6rem; /* un poco más pequeño */
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.65rem; /* LETRAS MÁS PEQUEÑAS */
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 50px;
+    box-shadow: 0 4px 0 rgba(0, 217, 255, 0.4);
+    margin-left: 0.5rem;
+}
+
+.btn-add-friend:hover {
+    background: #00e5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 217, 255, 0.6);
+}
+
+/* Tabs - letras más pequeñas */
+.friends-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #1a1f35;
+    color: white;
+    border: 3px solid #6b7280;
+    padding: 0.7rem 1.4rem; /* más compacto */
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.65rem; /* LETRAS MÁS PEQUEÑAS */
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 8px;
+    min-width: 120px; /* un poco más angosto */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tab-btn.active {
+    background: #00ff88;
+    color: #0f1425;
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    transform: translateY(-3px);
+}
+
+.tab-btn:hover:not(.active) {
+    border-color: #00d9ff;
+    color: #00d9ff;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+}
+
+/* Buscador - aseguramos que el input sea escribible */
+.friends-search-bar {
+    margin-bottom: 2.5rem;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background: #0f1425;
+    border: 3px solid #ff1b8d;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 27, 141, 0.25);
+    max-width: 650px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10; /* para que no quede tapado */
+}
+
+.search-icon {
+    padding: 1rem 1.2rem;
+    color: #ff1b8d;
+    font-size: 1.4rem;
+    pointer-events: none; /* el ícono no interfiere */
+}
+
+.friends-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    padding: 1rem 0.8rem;
+    outline: none;
+    width: 100%;
+    pointer-events: auto !important; /* forzamos que sea escribible */
+    z-index: 11;
+}
+
+.friends-search-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.friends-search-input::placeholder {
+    color: #a0a0c0;
+}
+
+.btn-add-friend {
+    background: #00d9ff;
+    color: #0f1425;
+    border: none;
+    padding: 0.9rem 1.6rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 50px;
+    box-shadow: 0 4px 0 rgba(0, 217, 255, 0.4);
+    margin-right: 0.5rem;
+    z-index: 11;
+}
+
+.btn-add-friend:hover {
+    background: #00e5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 217, 255, 0.6);
+}
+
+/* Tabs - estilo retro */
+.friends-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #1a1f35;
+    color: white;
+    border: 3px solid #6b7280;
+    padding: 0.7rem 1.4rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 8px;
+    min-width: 120px;
+    text-align: center;
+}
+
+.tab-btn.active {
+    background: #00ff88;
+    color: #0f1425;
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    transform: translateY(-3px);
+}
+
+.tab-btn:hover:not(.active) {
+    border-color: #00d9ff;
+    color: #00d9ff;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+}
+
+/* Forzar que los botones y tabs respondan al mouse */
+.friends-tabs,
+.friends-search-bar,
+.tab-btn,
+.btn-add-friend,
+.btn-invite,
+.btn-chat {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10 !important;
+}
+
+/* Quitar cualquier bloqueo en contenedores padres */
+.friends-container,
+.friends-page,
+.main-container,
+body {
+    pointer-events: auto !important;
+}
+
+/* Si hay un overlay o fondo que tapa */
+.pixel-background,
+.chat-overlay {
+    pointer-events: none !important;
+}
+
+/* Amigos.css */
+
+.friends-page {
+    padding: 2rem 1rem 4rem;
+}
+
+.section-title {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    text-align: center;
+    font-size: 1.8rem;
+    text-shadow: 0 0 12px #00ff88;
+    margin-bottom: 2.5rem;
+}
+
+.friends-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Buscador */
+.friends-search-bar {
+    margin-bottom: 2.5rem;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background: #0f1425;
+    border: 3px solid #ff1b8d;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 27, 141, 0.25);
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    padding: 1rem 1.2rem;
+    color: #ff1b8d;
+    font-size: 1.4rem;
+}
+
+.friends-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    padding: 1rem 0.8rem;
+    outline: none;
+}
+
+.friends-search-input::placeholder {
+    color: #a0a0c0;
+}
+
+.btn-add-friend {
+    background: #00d9ff;
+    color: #0f1425;
+    border: none;
+    padding: 1rem 1.8rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 50px;
+    box-shadow: 0 4px 0 rgba(0, 217, 255, 0.4);
+    margin-left: 0.5rem;
+}
+
+.btn-add-friend:hover {
+    background: #00e5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 217, 255, 0.6);
+}
+
+/* Tabs */
+.friends-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #1a1f35;
+    color: white;
+    border: 3px solid #6b7280;
+    padding: 0.8rem 1.6rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 8px;
+    min-width: 130px;
+    text-align: center;
+}
+
+.tab-btn.active {
+    background: #00ff88;
+    color: #0f1425;
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+}
+
+/* Mensaje cuando no hay amigos - ESTILO QUE TE GUSTA */
+.no-friends {
+    text-align: center;
+    padding: 6rem 1rem;
+    color: #00ff88;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    background: rgba(26, 31, 53, 0.6);
+    border: 3px solid #00d9ff;
+    border-radius: 12px;
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+}
+
+.no-friends p {
+    margin-bottom: 1.5rem;
+}
+
+.btn-search-friends {
+    background: #ff1b8d;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 0 #a0115e;
+    transition: all 0.3s;
+}
+
+.btn-search-friends:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 0 #a0115e;
+    background: #ff3da1;
+}
+
+/* Tarjetas de amigos (compactas) */
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.friend-card {
+    position: relative;
+}
+
+.friend-glow {
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(45deg, #00d9ff, #ff1b8d);
+    border-radius: 12px;
+    filter: blur(12px);
+    opacity: 0.4;
+    z-index: -1;
+}
+
+.friend-content {
+    position: relative;
+    background: #1a1f35;
+    border: 3px solid #00d9ff;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+}
+
+.friend-avatar img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 3px solid #00ff88;
+    border-radius: 8px;
+}
+
+.status-dot {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid #1a1f35;
+}
+
+.status-dot.online { background: #00ff88; }
+
+.friend-name {
+    font-size: 0.95rem;
+    color: #00d9ff;
+    margin-bottom: 0.3rem;
+}
+
+.friend-status {
+    font-size: 0.7rem;
+    color: #b0b0d0;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin-left: auto;
+}
+
+.btn-invite,
+.btn-chat {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.65rem;
+    padding: 0.7rem 1.3rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    min-width: 110px;
+    text-align: center;
+}
+
+.btn-invite {
+    background: #ff1b8d;
+    color: white;
+}
+
+.btn-chat {
+    background: #ffd700;
+    color: #0f1425;
+}
+
+/* Chat */
+.chat-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 20, 37, 0.95);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-container {
+    background: #1a1f35;
+    border: 5px solid #00d9ff;
+    width: 90%;
+    max-width: 520px;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: #0f1425;
+    padding: 1.2rem;
+    border-bottom: 4px solid #00d9ff;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-header h3 {
+    color: #00ff88;
+    font-size: 1rem;
+    margin: 0;
+}
+
+#closeChat {
+    background: none;
+    border: none;
+    color: #ff1b8d;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1.8rem;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 1.2rem;
+    padding: 1rem 1.4rem;
+    max-width: 80%;
+}
+
+.message.received {
+    background: #2a3249;
+    border: 2px solid #00d9ff;
+}
+
+.message.sent {
+    background: #ff1b8d;
+    color: white;
+    margin-left: auto;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    color: #a0a0c0;
+    margin-top: 0.5rem;
+    text-align: right;
+    display: block;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 1.2rem;
+    background: #0f1425;
+    border-top: 4px solid #00d9ff;
+}
+
+#chatInput {
+    flex: 1;
+    background: #1a1f35;
+    border: 3px solid #ff1b8d;
+    color: white;
+    padding: 1rem;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+#sendMessage {
+    background: #00ff88;
+    border: none;
+    width: 60px;
+    height: 60px;
+    margin-left: 1rem;
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+
+/* Mensaje cuando no hay amigos - estilo bonito como en tu captura */
+.no-friends {
+    text-align: center;
+    padding: 6rem 1rem;
+    color: #00ff88;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    background: rgba(26, 31, 53, 0.6);
+    border: 3px solid #00d9ff;
+    border-radius: 12px;
+    max-width: 700px;
+    margin: 4rem auto 0;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+}
+
+.no-friends p {
+    margin-bottom: 1.5rem;
+}
+
+.btn-search-friends {
+    background: #ff1b8d;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 0 #a0115e;
+    transition: all 0.3s;
+}
+
+.btn-search-friends:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 0 #a0115e;
+    background: #ff3da1;
+}
+
+/* Para que el tab SOLICITUDES se vea diferente cuando está activo */
+.tab-btn[data-tab="requests"].active {
+    background: #ff1b8d;
+    color: white;
+    border-color: #ff1b8d;
+    box-shadow: 0 0 20px rgba(255, 27, 141, 0.6);
+}
+
+/* Amigos.css */
+
+.friends-page {
+    padding: 2rem 1rem 4rem;
+}
+
+.section-title {
+    font-family: 'Press Start 2P', cursive;
+    color: #00ff88;
+    text-align: center;
+    font-size: 1.8rem;
+    text-shadow: 0 0 12px #00ff88;
+    margin-bottom: 2.5rem;
+}
+
+.friends-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Buscador */
+.friends-search-bar {
+    margin-bottom: 2.5rem;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background: #0f1425;
+    border: 3px solid #ff1b8d;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 27, 141, 0.25);
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    padding: 1rem 1.2rem;
+    color: #ff1b8d;
+    font-size: 1.4rem;
+}
+
+.friends-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    padding: 1rem 0.8rem;
+    outline: none;
+}
+
+.friends-search-input::placeholder {
+    color: #a0a0c0;
+}
+
+.btn-add-friend {
+    background: #00d9ff;
+    color: #0f1425;
+    border: none;
+    padding: 1rem 1.8rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 50px;
+    box-shadow: 0 4px 0 rgba(0, 217, 255, 0.4);
+    margin-left: 0.5rem;
+}
+
+.btn-add-friend:hover {
+    background: #00e5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 217, 255, 0.6);
+}
+
+/* Tabs */
+.friends-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #1a1f35;
+    color: white;
+    border: 3px solid #6b7280;
+    padding: 0.8rem 1.6rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 8px;
+    min-width: 130px;
+    text-align: center;
+}
+
+.tab-btn.active {
+    background: #00ff88;
+    color: #0f1425;
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+}
+
+/* Tab SOLICITUDES especial */
+.tab-btn[data-tab="requests"].active {
+    background: #ff1b8d;
+    color: white;
+    border-color: #ff1b8d;
+    box-shadow: 0 0 25px rgba(255, 27, 141, 0.6);
+}
+
+/* Mensaje cuando no hay amigos (como en tu captura) */
+.no-friends {
+    text-align: center;
+    padding: 6rem 1rem;
+    color: #00ff88;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    background: rgba(26, 31, 53, 0.6);
+    border: 3px solid #00d9ff;
+    border-radius: 12px;
+    max-width: 700px;
+    margin: 4rem auto 0;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+}
+
+.no-friends p {
+    margin-bottom: 1.5rem;
+}
+
+.btn-search-friends {
+    background: #ff1b8d;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 0 #a0115e;
+    transition: all 0.3s;
+}
+
+.btn-search-friends:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 0 #a0115e;
+    background: #ff3da1;
+}
+
+/* Tarjetas (se llenan desde BD) */
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+/* Chat (ya funciona) */
+.chat-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 20, 37, 0.95);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-container {
+    background: #1a1f35;
+    border: 5px solid #00d9ff;
+    width: 90%;
+    max-width: 520px;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: #0f1425;
+    padding: 1.2rem;
+    border-bottom: 4px solid #00d9ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    color: #00ff88;
+    font-size: 1rem;
+    margin: 0;
+}
+
+#closeChat {
+    background: none;
+    border: none;
+    color: #ff1b8d;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1.8rem;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 1.2rem;
+    padding: 1rem 1.4rem;
+    max-width: 80%;
+}
+
+.message.received {
+    background: #2a3249;
+    border: 2px solid #00d9ff;
+}
+
+.message.sent {
+    background: #ff1b8d;
+    color: white;
+    margin-left: auto;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    color: #a0a0c0;
+    margin-top: 0.5rem;
+    text-align: right;
+    display: block;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 1.2rem;
+    background: #0f1425;
+    border-top: 4px solid #00d9ff;
+}
+
+#chatInput {
+    flex: 1;
+    background: #1a1f35;
+    border: 3px solid #ff1b8d;
+    color: white;
+    padding: 1rem;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+#sendMessage {
+    background: #00ff88;
+    border: none;
+    width: 60px;
+    height: 60px;
+    margin-left: 1rem;
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+
+#sendMessage:hover {
+    background: #33ffaa;
+}
