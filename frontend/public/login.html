@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Retro Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <div class="bg-image"></div>
+
+    <!-- Botón de cerrar/volver -->
+    <a href="index.html" class="btn-close">✕</a>
+
+    <div class="login-container">
+        <h1>INICIAR SESIÓN</h1>
+        
+        <form action="login.php" method="POST">
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Introduce tu email" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" placeholder="********" required>
+            </div>
+            
+            <button type="submit" class="btn-entrar">ENTRAR</button>
+        </form>
+
+        <div class="links">
+            <a href="crear cuenta.html">Crear cuenta gratis</a>
+        </div>
+
+        <hr class="divider">
+
+        <div id="g_id_onload"
+             data-client_id="TU_CLIENT_ID_DE_GOOGLE"
+             data-callback="handleCredentialResponse">
+        </div>
+        <div class="g_id_signin" data-type="standard"></div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

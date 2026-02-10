@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Retro - Pixel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="bg-image"></div>
+
+    <div class="login-container registro">
+        <h1>CREAR CUENTA</h1>
+        
+        <form action="registrar_usuario.php" method="POST">
+            <div class="input-group">
+                <label>Nombre de Usuario</label>
+                <input type="text" name="username" placeholder="Tu nombre" required>
+            </div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" placeholder="********" required>
+            </div>
+
+            <div class="input-group">
+                <label>Confirmar Contraseña</label>
+                <input type="password" name="confirm_password" placeholder="********" required>
+            </div>
+            
+            <button type="submit" class="btn-entrar">REGISTRARME</button>
+        </form>
+
+        <div class="links">
+            <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
+        </div>
+    </div>
+</body>
+</html>
