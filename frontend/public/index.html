@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saberix</title>
-    <link rel="stylesheet" href="Styles.css">
+    <title>Saberix - Aprende Jugando</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="pixel-background"></div>
     
     <nav class="navbar">
         <div class="navbar-container">
-            <div class="navbar-logo">
-                <button class="navbar-title-btn" id="logoBtn">SABERIX</button>
-            </div>
+            <a href="index.html" class="navbar-logo">SABERIX</a>
             
             <button class="navbar-toggle" id="navbarToggle">
                 <span></span>
@@ -22,45 +22,40 @@
             </button>
             
             <ul class="navbar-menu" id="navbarMenu">
-                <li class="dropdown" id="juegosDropdown">
-                    <a href="#juegos" class="dropdown-toggle">
-                        JUEGOS
-                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
+                <li class="dropdown">
+                    <a href="juegos-main.html" class="dropdown-toggle">
+                        JUEGOS <i data-lucide="chevron-down" class="icon-sm"></i>
                     </a>
-                    <ul class="dropdown-menu" id="dropdownMenu">
-                        <li><a href="#matematicas" class="matematicas">MATEMÁTICAS</a></li>
-                        <li><a href="#ciencias" class="ciencias">CIENCIAS</a></li>
-                        <li><a href="#lengua" class="lengua">LENGUA</a></li>
-                        <li><a href="#sociales" class="sociales">SOCIALES</a></li>
+                    <ul class="dropdown-menu">
+                        <li><a href="juegos-main.html#matematicas" style="color: #4169E1;">MATEMÁTICAS</a></li>
+                        <li><a href="juegos-main.html#ciencias" style="color: #228B22;">CIENCIAS</a></li>
+                        <li><a href="juegos-main.html#lengua" style="color: #DAA520;">LENGUA</a></li>
+                        <li><a href="juegos-main.html#sociales" style="color: #DC143C;">SOCIALES</a></li>
                     </ul>
                 </li>
-                <li><a href="#avatar">👤 AVATAR</a></li>
-                <li><a href="Amigo.html">👥 AMIGOS</a></li>
-                <li><a href="#perfil">📊 PERFIL</a></li>
+                <li><a href="#"><i data-lucide="user" class="icon-sm"></i> AVATAR</a></li>
+                <li><a href="/frontend/Public/Amigo.html"><i data-lucide="users" class="icon-sm"></i> AMIGOS</a></li>
+                <li><a href="#"><i data-lucide="target" class="icon-sm"></i> PERFIL</a></li>
             </ul>
             
-<a href="login.html">
-  <button class="login-btn">LOGIN</button>
-</a>
+            <button class="login-btn">LOGIN</button>
         </div>
     </nav>
 
     <main>
         <section class="hero-section">
             <div class="floating-icons">
-                <div class="floating-icon icon-1">📐</div>
-                <div class="floating-icon icon-2">🧪</div>
-                <div class="floating-icon icon-3">📚</div>
-                <div class="floating-icon icon-4">🌍</div>
-                <div class="floating-icon icon-5">⭐</div>
-                <div class="floating-icon icon-6">🧠</div>
-                <div class="floating-icon icon-7">🧩</div>
-                <div class="floating-icon icon-8">💡</div>
+                <i data-lucide="calculator" class="float-icon icon-1"></i>
+                <i data-lucide="flask-conical" class="float-icon icon-2"></i>
+                <i data-lucide="book-open" class="float-icon icon-3"></i>
+                <i data-lucide="globe-2" class="float-icon icon-4"></i>
+                <i data-lucide="star" class="float-icon icon-5"></i>
+                <i data-lucide="brain" class="float-icon icon-6"></i>
+                <i data-lucide="puzzle" class="float-icon icon-7"></i>
+                <i data-lucide="lightbulb" class="float-icon icon-8"></i>
             </div>
 
-            <div class="hero-logo-container">
+            <div class="hero-content">
                 <div class="hero-glow"></div>
                 <h1 class="hero-title">SABERIX</h1>
                 <p class="hero-tagline">¡APRENDE JUGANDO!</p>
@@ -68,78 +63,40 @@
 
             <div class="stats-grid">
                 <div class="stat-card stat-magenta scroll-animate">
-                    <div class="stat-glow"></div>
-                    <div class="stat-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </div>
-                    <div class="stat-content">
+                    <div class="stat-icon-wrapper"><i data-lucide="users"></i></div>
+                    <div class="stat-info">
                         <div class="stat-number">131</div>
                         <div class="stat-label">JUGADORES ONLINE</div>
                     </div>
                 </div>
 
                 <div class="stat-card stat-cyan scroll-animate">
-    <div class="stat-glow"></div>
-    <div class="stat-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="6" y1="12" x2="10" y2="12"></line>
-            <line x1="8" y1="10" x2="8" y2="14"></line>
-            <line x1="15" y1="13" x2="15.01" y2="13"></line>
-            <line x1="18" y1="11" x2="18.01" y2="11"></line>
-            <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-        </svg>
-    </div>
-    <div class="stat-content">
-        <div class="stat-number">137</div>
-        <div class="stat-label">PARTIDAS JUGADAS</div>
-    </div>
-</div>
-
+                    <div class="stat-icon-wrapper"><i data-lucide="gamepad-2"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-number">137</div>
+                        <div class="stat-label">PARTIDAS JUGADAS</div>
+                    </div>
+                </div>
 
                 <div class="stat-card stat-yellow scroll-animate">
-                    <div class="stat-glow"></div>
-                    <div class="stat-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                        </svg>
-                    </div>
-                    <div class="stat-content">
+                    <div class="stat-icon-wrapper"><i data-lucide="help-circle"></i></div>
+                    <div class="stat-info">
                         <div class="stat-number">342</div>
                         <div class="stat-label">PREGUNTAS RESPONDIDAS</div>
                     </div>
                 </div>
 
                 <div class="stat-card stat-green scroll-animate">
-                    <div class="stat-glow"></div>
-                    <div class="stat-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                            <path d="M4 22h16"></path>jkl-j
-                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                        </svg>
-                    </div>
-                    <div class="stat-content">
+                    <div class="stat-icon-wrapper"><i data-lucide="trophy"></i></div>
+                    <div class="stat-info">
                         <div class="stat-number">91</div>
                         <div class="stat-label">GANADORES HOY</div>
                     </div>
                 </div>
             </div>
 
-            <button class="cta-button" onclick="startGame()">
-                <span>¡COMENZAR A JUGAR!</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
+            <button class="cta-button" onclick="window.location.href='juegos-main.html'">
+                ¡COMENZAR A JUGAR! <i data-lucide="play" class="icon-sm"></i>
             </button>
         </section>
 
@@ -147,108 +104,58 @@
             <h2 class="section-title scroll-animate">¿CÓMO FUNCIONA?</h2>
             <div class="cards-grid cards-3">
                 <div class="card card-cyan scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="card-emoji">👥</div>
+                    <div class="card-icon-circle"><i data-lucide="users"></i></div>
                     <h3 class="card-title">1. CREA O ÚNETE</h3>
                     <p class="card-description">Crea una sala de juego o únete a una existente. Invita a tus amigos usando tu código único.</p>
                 </div>
                 <div class="card card-orange scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="card-emoji">❓</div>
+                    <div class="card-icon-circle"><i data-lucide="help-circle"></i></div>
                     <h3 class="card-title">2. RESPONDE</h3>
-                    <p class="card-description">Responde preguntas de trivia contra el reloj. Elige entre 4 opciones y acumula puntos.</p>
+                    <p class="card-description">Responde preguntas de trivia contra el reloj. Elige entre 4 opciones y acumula monedas.</p>
                 </div>
                 <div class="card card-yellow scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="card-emoji">🏆</div>
+                    <div class="card-icon-circle"><i data-lucide="trophy"></i></div>
                     <h3 class="card-title">3. ¡GANA!</h3>
                     <p class="card-description">Los 3 mejores jugadores ganan. Sube en el ranking y demuestra quién es más listo.</p>
                 </div>
             </div>
         </section>
 
-        <section class="section" id="materias">
+        <section class="section" id="materias-home">
             <h2 class="section-title scroll-animate">MATERIAS DISPONIBLES</h2>
             <div class="cards-grid cards-4">
-                <div class="subject-card subject-blue scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="subject-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="9" y1="9" x2="15" y2="15"></line>
-                            <line x1="15" y1="9" x2="9" y2="15"></line>
-                        </svg>
-                    </div>
+                <a href="juegos-main.html#matematicas" class="subject-card subject-blue scroll-animate">
+                    <div class="subject-icon"><i data-lucide="calculator"></i></div>
                     <h3 class="subject-title">MATEMÁTICAS</h3>
-                </div>
-                <div class="subject-card subject-green scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="subject-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17V3"></path>
-                            <path d="M17 17V9"></path>
-                            <path d="M12 17v-5"></path>
-                            <path d="M2 17h20"></path>
-                        </svg>
-                    </div>
+                </a>
+                <a href="juegos-main.html#ciencias" class="subject-card subject-green scroll-animate">
+                    <div class="subject-icon"><i data-lucide="flask-conical"></i></div>
                     <h3 class="subject-title">CIENCIAS</h3>
-                </div>
-                <div class="subject-card subject-gold scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="subject-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                        </svg>
-                    </div>
+                </a>
+                <a href="juegos-main.html#lengua" class="subject-card subject-gold scroll-animate">
+                    <div class="subject-icon"><i data-lucide="book-open"></i></div>
                     <h3 class="subject-title">LENGUA</h3>
-                </div>
-                <div class="subject-card subject-red scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="subject-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="2" y1="12" x2="22" y2="12"></line>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                        </svg>
-                    </div>
+                </a>
+                <a href="juegos-main.html#sociales" class="subject-card subject-red scroll-animate">
+                    <div class="subject-icon"><i data-lucide="globe-2"></i></div>
                     <h3 class="subject-title">SOCIALES</h3>
-                </div>
+                </a>
             </div>
         </section>
 
-        <section class="section" id="modos">
+        <section class="section" id="modos-home">
             <h2 class="section-title scroll-animate">MODOS DE JUEGO</h2>
             <div class="cards-grid cards-2">
                 <div class="mode-card scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="mode-content">
-                        <div class="mode-icon">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <circle cx="12" cy="12" r="6"></circle>
-                                <circle cx="12" cy="12" r="2"></circle>
-                            </svg>
-                        </div>
-                        <h3 class="mode-title">MODO NORMAL</h3>
-                    </div>
+                    <div class="mode-badge">RELAX</div>
+                    <div class="card-icon-circle mode-icon"><i data-lucide="smile"></i></div>
+                    <h3 class="mode-title">MODO NORMAL</h3>
                     <p class="mode-description">Juego relajado para practicar y aprender. Perfecto para estudiar con amigos sin presión.</p>
                 </div>
                 <div class="mode-card scroll-animate">
-                    <div class="card-glow"></div>
-                    <div class="mode-content">
-                        <div class="mode-icon">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                                <path d="M4 22h16"></path>
-                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="mode-title">COMPETENCIA</h3>
-                    </div>
+                    <div class="mode-badge hot">HARDCORE</div>
+                    <div class="card-icon-circle mode-icon"><i data-lucide="trophy"></i></div>
+                    <h3 class="mode-title">COMPETENCIA</h3>
                     <p class="mode-description">Modo competitivo intenso. La velocidad cuenta y solo los mejores llegarán al podio.</p>
                 </div>
             </div>
@@ -258,38 +165,27 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-about">
-                <p class="footer-description">Aprende mientras juegas. La plataforma educativa más divertida.</p>
+                <div class="footer-logo">SABERIX</div>
+                <p class="footer-description">Aprende mientras juegas. La plataforma educativa más divertida y segura para demostrar tus conocimientos.</p>
             </div>
             
             <div class="footer-links">
-                <h4 class="footer-heading">ENLACES</h4>
+                <h4>ENLACES</h4>
                 <ul>
-                    <li><a href="#nosotros">Sobre Nosotros</a></li>
-                    <li><a href="#terminos">Términos de Uso</a></li>
-                    <li><a href="#privacidad">Privacidad</a></li>
+                    <li><a href="#">Sobre Nosotros</a></li>
+                    <li><a href="#">Términos de Uso</a></li>
+                    <li><a href="#">Privacidad</a></li>
                 </ul>
             </div>
             
             <div class="footer-social">
-                <h4 class="footer-heading">SÍGUENOS</h4>
+                <h4>SÍGUENOS</h4>
                 <div class="social-icons">
-                    <a href="https://www.facebook.com/share/1N9EDADDSW/?mibextid=wwXIfr" class="social-icon social-facebook" aria-label="Facebook">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                        </svg>
+                    <a href="https://www.facebook.com/share/1N9EDADDSW/?mibextid=wwXIfr" target="_blank" class="social-icon facebook"><i data-lucide="facebook"></i></a>
+                    <a href="https://x.com/SaberixEdu" target="_blank" class="social-icon twitter">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
                     </a>
-                    <a href="https://x.com/SaberixEdu" class="social-icon social-twitter" aria-label="Twitter">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-                        </svg>
-                    </a>
-                    <a href="https://www.instagram.com/saberixedu?igsh=MWU0YXFpendyd2cwOA==" class="social-icon social-instagram" aria-label="Instagram">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                        </svg>
-                    </a>
+                    <a href="https://www.instagram.com/saberixedu?igsh=MWU0YXFpendyd2cwOA==" target="_blank" class="social-icon instagram"><i data-lucide="instagram"></i></a>
                 </div>
             </div>
         </div>
@@ -299,6 +195,6 @@
         </div>
     </footer>
 
-   <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

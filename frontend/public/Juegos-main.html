@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos - Saberix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="juegos-main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="pixel-background"></div>
+    
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">SABERIX</a>
+            
+            <button class="navbar-toggle" id="navbarToggle">
+                <span></span><span></span><span></span>
+            </button>
+            
+            <ul class="navbar-menu" id="navbarMenu">
+                <li class="dropdown" id="juegosDropdown">
+                    <a href="juegos-main.html" class="dropdown-toggle">
+                        JUEGOS <i data-lucide="chevron-down" class="icon-sm"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="dropdownMenu">
+                        <li><a href="#matematicas" style="color: #4169E1;">MATEMÁTICAS</a></li>
+                        <li><a href="#ciencias" style="color: #228B22;">CIENCIAS</a></li>
+                        <li><a href="#lengua" style="color: #DAA520;">LENGUA</a></li>
+                        <li><a href="#sociales" style="color: #DC143C;">SOCIALES</a></li>
+                    </ul>
+                </li>
+                <li><a href="#"><i data-lucide="user" class="icon-sm"></i> AVATAR</a></li>
+                <li><a href="/frontend/Public/Amigo.html"><i data-lucide="users" class="icon-sm"></i> AMIGOS</a></li>
+                <li><a href="#"><i data-lucide="target" class="icon-sm"></i> PERFIL</a></li>
+            </ul>
+            
+            <button class="login-btn">LOGIN</button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero-section games-hero">
+            <div class="floating-icons">
+                <i data-lucide="gamepad-2" class="float-icon icon-1"></i>
+                <i data-lucide="trophy" class="float-icon icon-2"></i>
+                <i data-lucide="zap" class="float-icon icon-3"></i>
+                <i data-lucide="target" class="float-icon icon-4"></i>
+                <i data-lucide="sparkles" class="float-icon icon-5"></i>
+            </div>
+            
+            <div class="hero-content">
+                <h1 class="hero-title">SELECCIONA<br>TU JUEGO</h1>
+                <p class="hero-tagline">Elige una materia y demuestra tus conocimientos para ganar monedas</p>
+            </div>
+        </section>
+
+        <!-- Sección Materias -->
+        <section id="materias" class="section">
+            <h2 class="section-title scroll-animate">MATERIAS</h2>
+            <div class="cards-grid cards-2">
+                <div class="game-card matematicas scroll-animate" id="matematicas" data-subject="matematicas">
+                    <div class="glow-bg"></div>
+                    <div class="game-icon-wrapper"><i data-lucide="calculator"></i></div>
+                    <h3 class="game-title">MATEMÁTICAS</h3>
+                    <p class="game-desc">Números, operaciones y geometría</p>
+                    <div class="game-meta">
+                        <span><i data-lucide="coins" class="icon-sm"></i> 250 Monedas</span>
+                        <span><i data-lucide="clock" class="icon-sm"></i> 15 min</span>
+                    </div>
+                    <button class="play-btn">JUGAR AHORA</button>
+                </div>
+
+                <div class="game-card ciencias scroll-animate" id="ciencias" data-subject="ciencias">
+                    <div class="glow-bg"></div>
+                    <div class="game-icon-wrapper"><i data-lucide="flask-conical"></i></div>
+                    <h3 class="game-title">CIENCIAS</h3>
+                    <p class="game-desc">Biología, química y física</p>
+                    <div class="game-meta">
+                        <span><i data-lucide="coins" class="icon-sm"></i> 200 Monedas</span>
+                        <span><i data-lucide="clock" class="icon-sm"></i> 12 min</span>
+                    </div>
+                    <button class="play-btn">JUGAR AHORA</button>
+                </div>
+
+                <div class="game-card lengua scroll-animate" id="lengua" data-subject="lengua">
+                    <div class="glow-bg"></div>
+                    <div class="game-icon-wrapper"><i data-lucide="book-open"></i></div>
+                    <h3 class="game-title">LENGUA</h3>
+                    <p class="game-desc">Gramática, ortografía y literatura</p>
+                    <div class="game-meta">
+                        <span><i data-lucide="coins" class="icon-sm"></i> 180 Monedas</span>
+                        <span><i data-lucide="clock" class="icon-sm"></i> 10 min</span>
+                    </div>
+                    <button class="play-btn">JUGAR AHORA</button>
+                </div>
+
+                <div class="game-card sociales scroll-animate" id="sociales" data-subject="sociales">
+                    <div class="glow-bg"></div>
+                    <div class="game-icon-wrapper"><i data-lucide="globe-2"></i></div>
+                    <h3 class="game-title">SOCIALES</h3>
+                    <p class="game-desc">Historia, geografía y cultura</p>
+                    <div class="game-meta">
+                        <span><i data-lucide="coins" class="icon-sm"></i> 220 Monedas</span>
+                        <span><i data-lucide="clock" class="icon-sm"></i> 13 min</span>
+                    </div>
+                    <button class="play-btn">JUGAR AHORA</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modos de Juego -->
+        <section id="modos" class="section">
+            <h2 class="section-title scroll-animate">MODOS DE JUEGO</h2>
+            <div class="cards-grid cards-3">
+                <div class="mode-card scroll-animate">
+                    <div class="mode-badge">POPULAR</div>
+                    <div class="card-icon-circle mode-icon"><i data-lucide="brain"></i></div>
+                    <h3 class="mode-title">MODO NORMAL</h3>
+                    <p class="mode-description">Juega sin presión de tiempo. Ideal para aprender y practicar.</p>
+                    <ul class="mode-features">
+                        <li>✓ Sin límite de tiempo</li>
+                        <li>✓ Pistas disponibles</li>
+                        <li>✓ Explicaciones detalladas</li>
+                    </ul>
+                </div>
+                <div class="mode-card scroll-animate">
+                    <div class="mode-badge hot">¡HOT!</div>
+                    <div class="card-icon-circle mode-icon"><i data-lucide="trophy"></i></div>
+                    <h3 class="mode-title">COMPETENCIA</h3>
+                    <p class="mode-description">Compite contra otros jugadores. ¡Solo los mejores ganan!</p>
+                    <ul class="mode-features">
+                        <li>✓ Contra el tiempo</li>
+                        <li>✓ Ranking en vivo</li>
+                        <li>✓ Premios especiales</li>
+                    </ul>
+                </div>
+                <div class="mode-card scroll-animate">
+                    <div class="mode-badge new">NUEVO</div>
+                    <div class="card-icon-circle mode-icon"><i data-lucide="users"></i></div>
+                    <h3 class="mode-title">MULTIJUGADOR</h3>
+                    <p class="mode-description">Juega con amigos en tiempo real. ¡Hasta 8 jugadores!</p>
+                    <ul class="mode-features">
+                        <li>✓ Salas privadas</li>
+                        <li>✓ Chat en vivo</li>
+                        <li>✓ Equipos disponibles</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dificultad -->
+        <section id="dificultad" class="section">
+            <h2 class="section-title scroll-animate">NIVELES DE DIFICULTAD</h2>
+            <div class="cards-grid cards-3">
+                <div class="diff-card easy scroll-animate">
+                    <div class="diff-icon"><i data-lucide="shield"></i></div>
+                    <h3>FÁCIL</h3>
+                    <p>Perfecto para comenzar</p>
+                    <div class="bars"><span class="active"></span><span></span><span></span></div>
+                </div>
+                <div class="diff-card medium scroll-animate">
+                    <div class="diff-icon"><i data-lucide="rocket"></i></div>
+                    <h3>MEDIO</h3>
+                    <p>Para jugadores regulares</p>
+                    <div class="bars"><span class="active"></span><span class="active"></span><span></span></div>
+                </div>
+                <div class="diff-card hard scroll-animate">
+                    <div class="diff-icon"><i data-lucide="sword"></i></div>
+                    <h3>DIFÍCIL</h3>
+                    <p>Solo para expertos</p>
+                    <div class="bars"><span class="active"></span><span class="active"></span><span class="active"></span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leaderboard -->
+        <section id="ranking" class="section">
+            <h2 class="section-title scroll-animate">TOP JUGADORES HOY</h2>
+            <div class="leaderboard-container scroll-animate">
+                <div class="leaderboard-item rank-1">
+                    <div class="rank">🥇</div>
+                    <div class="player">
+                        <span class="name">AlexMaster</span>
+                        <span class="subject">Matemáticas</span>
+                    </div>
+                    <div class="score"><i data-lucide="coins" class="icon-sm"></i> 1,250</div>
+                </div>
+                <div class="leaderboard-item rank-2">
+                    <div class="rank">🥈</div>
+                    <div class="player">
+                        <span class="name">SaraGenius</span>
+                        <span class="subject">Ciencias</span>
+                    </div>
+                    <div class="score"><i data-lucide="coins" class="icon-sm"></i> 1,180</div>
+                </div>
+                <div class="leaderboard-item rank-3">
+                    <div class="rank">🥉</div>
+                    <div class="player">
+                        <span class="name">LuisPro</span>
+                        <span class="subject">Lengua</span>
+                    </div>
+                    <div class="score"><i data-lucide="coins" class="icon-sm"></i> 1,050</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">4</div>
+                    <div class="player">
+                        <span class="name">MariaBrain</span>
+                        <span class="subject">Sociales</span>
+                    </div>
+                    <div class="score"><i data-lucide="coins" class="icon-sm"></i> 980</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">5</div>
+                    <div class="player">
+                        <span class="name">CarlosSmart</span>
+                        <span class="subject">Matemáticas</span>
+                    </div>
+                    <div class="score"><i data-lucide="coins" class="icon-sm"></i> 920</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-about">
+                <div class="footer-logo">SABERIX</div>
+                <p class="footer-description">Aprende mientras juegas. La plataforma educativa más divertida y segura para demostrar tus conocimientos.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>ENLACES</h4>
+                <ul>
+                    <li><a href="#">Sobre Nosotros</a></li>
+                    <li><a href="#">Términos de Uso</a></li>
+                    <li><a href="#">Privacidad</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-social">
+                <h4>SÍGUENOS</h4>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/share/1N9EDADDSW/?mibextid=wwXIfr" target="_blank" class="social-icon facebook"><i data-lucide="facebook"></i></a>
+                    <a href="https://x.com/SaberixEdu" target="_blank" class="social-icon twitter">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/saberixedu?igsh=MWU0YXFpendyd2cwOA==" target="_blank" class="social-icon instagram"><i data-lucide="instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2026 SABERIX - TODOS LOS DERECHOS RESERVADOS</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="juegos-main.js"></script>
+</body>
+</html>
