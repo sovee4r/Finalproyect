@@ -174,10 +174,10 @@ export function GamesHub() {
                     {index === 0 ? "1" : index === 1 ? "2" : index === 2 ? "3" : index + 1}
                 </div>
                 <div className="flex-1 px-3">
-                    <div className="font-['Press_Start_2P'] text-[10px] md:text-xs text-white">{player.name}</div>
-                    <div className="text-[10px] text-gray-400">{player.subject}</div>
+                    <div className="font-['Press_Start_2P'] text-xs md:text-sm text-white">{player.name}</div>
+                    <div className="text-xs text-gray-400">{player.subject}</div>
                 </div>
-                <div className="flex items-center gap-1.5 font-['Press_Start_2P'] text-[10px] text-[#00ff88]">
+                <div className="flex items-center gap-1.5 font-['Press_Start_2P'] text-sm text-[#00ff88]">
                     <Coins size={12} className="text-[#ffd700]" />
                     {player.score}
                 </div>
@@ -198,7 +198,7 @@ export function GamesHub() {
               className="bg-[#0f1425] border-4 border-[#00d9ff] w-full max-w-md rounded-xl shadow-[0_0_40px_rgba(0,217,255,0.5)] overflow-hidden"
             >
               <div className="flex justify-between items-center p-4 border-b-2 border-[#00d9ff]">
-                <h2 className="font-['Press_Start_2P'] text-xs text-[#00ff88]">CONFIGURAR JUEGO</h2>
+                <h2 className="font-['Press_Start_2P'] text-sm text-[#00ff88]">CONFIGURAR JUEGO</h2>
                 <button onClick={closeModal} className="text-[#ff1b8d] hover:scale-110 transition-transform">
                   <X size={20} />
                 </button>
@@ -274,7 +274,7 @@ const GameCard = ({ title, desc, coins, time, color, icon, onClick }: any) => (
       </div>
       
       <h3 className="font-['Press_Start_2P'] text-sm mb-1 text-white">{title}</h3>
-      <p className="text-gray-400 text-xs mb-4 font-['Inter']">{desc}</p>
+      <p className="text-gray-400 text-sm mb-4 font-['Inter']">{desc}</p>
       
       <div className="mt-auto flex items-center gap-4 text-xs font-bold text-[#00d9ff]">
         <span className="flex items-center gap-1"><Coins size={12} /> {coins}</span>
@@ -306,7 +306,7 @@ const ModeCard = ({ badge, title, desc, icon, color, isHot, isNew }: any) => (
             {icon}
         </div>
         <div>
-            <h3 className="font-['Press_Start_2P'] text-xs text-white mb-1">{title}</h3>
+            <h3 className="font-['Press_Start_2P'] text-sm text-white mb-1">{title}</h3>
             <p className="text-gray-400 text-[10px] leading-tight">{desc}</p>
         </div>
     </div>

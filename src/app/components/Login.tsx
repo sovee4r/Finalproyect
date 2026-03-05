@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { X } from "lucide-react";
-import loginBg from "../../assets/logo.png"; // Using the same asset as background placeholder or use a color if image not suitable for BG. 
+import loginBg from "figma:asset/8192cdc8f3d56f90793caa80c9d862ce5c1f4ad0.png"; // Using the same asset as background placeholder or use a color if image not suitable for BG. 
 // Note: The user provided "fondo login" in CSS but didn't upload a separate image for it. 
 // I will use a dark gradient + blur effect instead to match the description.
 

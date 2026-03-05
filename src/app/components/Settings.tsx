@@ -1,9 +1,8 @@
 import React from "react";
 import { motion } from "motion/react";
 import { Volume2, Bell, Shield, LogOut, Moon, Monitor, Keyboard, HelpCircle } from "lucide-react";
-function cn(...classes: any[]) {
-  return classes.filter(Boolean).join(" ");
-}
+import { cn } from "../../lib/utils";
+
 export function Settings() {
   return (
     <div className="w-full max-w-3xl mx-auto pb-20">

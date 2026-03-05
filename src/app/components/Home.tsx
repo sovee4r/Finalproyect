@@ -194,16 +194,9 @@ const FeatureCard = ({ icon, title, desc, color }: { icon: any; title: string; d
     </motion.div>
 );
 
-const subjectRoutes: Record<string, string> = {
-    "MATEMÁTICAS": "/games/math",
-    "CIENCIAS":    "/games/science",
-    "LENGUA":      "/games/language",
-    "SOCIALES":    "/games/social",
-};
-
 const SubjectCard = ({ icon, title, color }: { icon: any; title: string; color: string }) => (
-    <motion.a
-        href={subjectRoutes[title] ?? "#"}
+    <motion.a 
+        href="#"
         whileHover={{ y: -8 }}
         className="bg-[#1a1f35] border-4 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-6 shadow-lg group cursor-pointer"
         style={{ borderColor: color }}
