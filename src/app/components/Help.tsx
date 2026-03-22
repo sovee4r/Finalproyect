@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import AIChatbox from './Chatbox';
 import {
   HelpCircle, MessageCircle, Mail, Instagram,
   Facebook, Twitter, ChevronDown, BookOpen,
@@ -199,6 +200,7 @@ export function Help() {
   );
 }
 
+<AIChatbox />
 /* ─── Section wrapper ─── */
 function Section({ title, icon, color, children }: {
   title: string; icon: React.ReactNode; color: string; children: React.ReactNode;
