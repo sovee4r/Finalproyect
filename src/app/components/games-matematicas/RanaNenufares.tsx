@@ -8,7 +8,7 @@ import {
   Volume2, VolumeX, RotateCcw, Trophy, Star,
   CheckCircle2, XCircle, LogOut,
   User, Users, AlertTriangle, Settings, Zap
-} from "lucide-react";
+, Lightbulb } from "lucide-react";
 import { Link } from "react-router";
 import { useAuth } from "../../AuthContext";
 import { useMonedas } from "../../../hooks/useMonedas";
@@ -202,6 +202,7 @@ export function RanaNenufares() {
   const [exitConfirm, setExitConfirm] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [mostrarExplicacion, setMostrarExplicacion] = useState(false);
+  const [mostrarPista, setMostrarPista] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [splash, setSplash] = useState<number | null>(null); // índice del nenúfar que splash
 
@@ -653,7 +654,26 @@ export function RanaNenufares() {
               )}
             </AnimatePresence>
 
+            {mostrarPista && !confirmado && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                className="w-full rounded-xl p-4 mb-3 flex items-start gap-3"
+                style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.3)" }}>
+                <Lightbulb size={16} className="text-[#ffd700] flex-shrink-0 mt-0.5" />
+                <p className="text-[#ffd700] text-xs leading-relaxed font-bold">💡 {preguntaActual.explicacion}</p>
+              </motion.div>
+            )}
             {/* Botones */}
+            {!confirmado && !mostrarPista && (
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  if (!gastarMonedas(5000)) { alert("No tienes suficientes monedas (necesitas 5,000 🪙)"); return; }
+                  setMostrarPista(true);
+                }}
+                className="w-full py-3 rounded-2xl border-2 flex items-center justify-center gap-2 font-bold text-xs mb-3 transition-all"
+                style={{ borderColor: "rgba(255,215,0,0.3)", background: "rgba(255,215,0,0.06)", color: "#ffd700" }}>
+                <Lightbulb size={14} /> Pista (-5,000 🪙)
+              </motion.button>
+            )}
             {!confirmado ? (
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={confirmarSalto}
                 disabled={seleccionado === null || saltando}
