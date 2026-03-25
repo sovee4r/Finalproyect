@@ -655,21 +655,30 @@ export function QuizCiencias() {
               </motion.div>
             )}
 
-            {/* Botones de acción */}
-            <div className="w-full flex gap-3">
-              {!confirmada &&               {/* Botón pista */}
-              {!confirmada && !mostrarPista && (
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    if (!gastarMonedas(5000)) { alert("No tienes suficientes monedas (necesitas 5,000 🪙)"); return; }
-                    setMostrarPista(true);
-                  }}
-                  className="px-4 py-4 rounded-2xl border-2 flex items-center gap-2 font-bold text-xs flex-shrink-0 transition-all"
-                  style={{ borderColor: "rgba(255,215,0,0.3)", background: "rgba(255,215,0,0.06)", color: "#ffd700" }}>
-                  <Lightbulb size={14} />
-                  <span className="hidden sm:inline">-5,000 🪙</span>
-                </motion.button>
-              )}}
+        <div className="w-full flex gap-3">
+  {/* Botón pista */}
+  {!confirmada && !mostrarPista && (
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={() => {
+        if (!gastarMonedas(5000)) {
+          alert("No tienes suficientes monedas (necesitas 5,000 🪙)");
+          return;
+        }
+        setMostrarPista(true);
+      }}
+      className="px-4 py-4 rounded-2xl border-2 flex items-center gap-2 font-bold text-xs flex-shrink-0 transition-all"
+      style={{
+        borderColor: "rgba(255,215,0,0.3)",
+        background: "rgba(255,215,0,0.06)",
+        color: "#ffd700",
+      }}
+    >
+      <Lightbulb size={14} />
+      <span className="hidden sm:inline">-5,000 🪙</span>
+    </motion.button>
+  )}
               {!confirmada ? (
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                   onClick={confirmarRespuesta}
