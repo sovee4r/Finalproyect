@@ -146,12 +146,12 @@ function Recompensas({puntos}:{puntos:number}){
       </div>
       <div className="flex justify-center gap-10">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mx-auto mb-2" style={{background:"linear-gradient(135deg,#ffd700,#ff9800)",boxShadow:"0 0 16px rgba(255,215,0,0.5)"}}>🪙</div>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mx-auto mb-2" style={{background:"linear-gradient(135deg,#ffd700,#ff9800)",boxShadow:"0 0 20px rgba(255,215,0,0.7),0 0 40px rgba(255,215,0,0.2)"}}>🪙</div>
           <div className="font-['Press_Start_2P'] text-2xl text-[#ff9800]">+{puntos}</div>
           <div className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">Monedas</div>
         </div>
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mx-auto mb-2" style={{background:"linear-gradient(135deg,#a78bfa,#7c3aed)",boxShadow:"0 0 16px rgba(167,139,250,0.5)"}}>⚡</div>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mx-auto mb-2" style={{background:"linear-gradient(135deg,#a78bfa,#7c3aed)",boxShadow:"0 0 20px rgba(167,139,250,0.7),0 0 40px rgba(167,139,250,0.2)"}}>⚡</div>
           <div className="font-['Press_Start_2P'] text-2xl text-[#a78bfa]">+{Math.round(puntos*1.5)}</div>
           <div className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">Experiencia</div>
         </div>
@@ -254,7 +254,7 @@ export function LineaTiempo(){
   if(screen==="resultados"){
     const stars=puntos>=500?3:puntos>=200?2:1;
     return(
-      <motion.div initial={{opacity:0}} animate={{opacity:1}} className="w-full min-h-screen flex flex-col items-center px-4 py-10 overflow-y-auto"
+      <motion.div initial={{opacity:0}} animate={{opacity:1}} className="w-full min-h-screen flex flex-col items-center px-4 py-10 overflow-y-auto" style={{background:"linear-gradient(160deg,#080d1e 0%,#0d0a1a 100%)"}}
         style={{background:"linear-gradient(135deg,#06091a 0%,#1a0606 50%,#06091a 100%)"}}>
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           {["#DC143C","#ffd700","#ff9800","#00e5ff","#a78bfa","#00ff88","#ff4757"].map((c,i)=>(
@@ -273,7 +273,7 @@ export function LineaTiempo(){
           </motion.h2>
           <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.3}} className="flex justify-center gap-2 mb-8">
             {[1,2,3].map(s=>(<motion.div key={s} initial={{scale:0}} animate={{scale:1}} transition={{delay:0.3+s*0.12,type:"spring",stiffness:300}}>
-              <Star size={36} className={s<=stars?"text-[#ffd700]":"text-gray-700"} fill={s<=stars?"#ffd700":"none"} style={s<=stars?{filter:"drop-shadow(0 0 8px rgba(255,215,0,0.6))"}:{}}/>
+              <Star size={36} className={s<=stars?"text-[#ffd700]":"text-gray-700"} fill={s<=stars?"#ffd700":"none"} style={s<=stars?{filter:"drop-shadow(0 0 12px rgba(255,215,0,0.8)) drop-shadow(0 0 20px rgba(255,215,0,0.3))"}:{}}/>
             </motion.div>))}
           </motion.div>
           <div className="grid grid-cols-2 gap-3 mb-6">
@@ -310,7 +310,7 @@ export function LineaTiempo(){
         <Link to="/games/social" className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"><ArrowLeft size={22}/></Link>
         <div><h1 className="font-['Press_Start_2P'] text-xl text-[#DC143C]">LÍNEA DEL TIEMPO</h1><p className="text-gray-400 text-sm font-bold mt-1">Estudios Sociales</p></div>
       </div>
-      <div className="relative overflow-hidden rounded-2xl border-2 border-[#DC143C]/30 bg-[#0f1425] p-6 mb-5" style={{boxShadow:"0 4px 28px rgba(220,20,60,0.1)"}}>
+      <div className="relative overflow-hidden rounded-2xl border-2 border-[#DC143C]/30 bg-[#080d1e] p-6 mb-5" style={{boxShadow:"0 4px 28px rgba(220,20,60,0.1)"}}>
         <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none opacity-20" style={{background:"radial-gradient(circle,#DC143C,transparent)",transform:"translate(30%,-30%)"}}/>
         <div className="flex items-start gap-5">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-3xl" style={{background:"rgba(220,20,60,0.15)",border:"1.5px solid rgba(220,20,60,0.35)"}}>📜</div>
@@ -325,7 +325,7 @@ export function LineaTiempo(){
           </div>
         </div>
       </div>
-      <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+      <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
         <p className="text-xs font-extrabold text-[#DC143C] tracking-widest uppercase mb-3">Grado</p>
         <div className="grid grid-cols-3 gap-2">
           {[4,5,6].map(g=>(
@@ -335,12 +335,12 @@ export function LineaTiempo(){
           ))}
         </div>
       </div>
-      <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+      <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
         <p className="text-xs font-extrabold text-[#DC143C] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13}/> Tu nombre</p>
         <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold outline-none focus:border-[#DC143C]/60 transition-all placeholder:text-gray-600"
           disabled={!!user} placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
       </div>
-      <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-6">
+      <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-6">
         <p className="text-xs font-extrabold text-[#00ff88] tracking-widest uppercase mb-3 flex items-center gap-2"><Play size={13}/> Modo de juego</p>
         <div className="grid grid-cols-2 gap-2 mb-4">
           <button onClick={()=>setModo("solo")} className={`py-3 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition-all ${modo==="solo"?"border-[#00ff88] bg-[#00ff88]/10 text-[#00ff88]":"border-white/10 bg-white/3 text-gray-400 hover:border-white/25"}`}><User size={15}/> Solitario</button>
@@ -371,7 +371,7 @@ export function LineaTiempo(){
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div animate={{x:[0,40,0],y:[0,-30,0]}} transition={{duration:14,repeat:Infinity,ease:"easeInOut"}}
           className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full blur-3xl opacity-30"
-          style={{background:"radial-gradient(circle,rgba(220,20,60,0.15),transparent)"}}/>
+          style={{background:"radial-gradient(circle,rgba(220,20,60,0.18),rgba(255,152,0,0.06),transparent)"}}/>
       </div>
 
       {/* Exit Modal */}
@@ -379,14 +379,14 @@ export function LineaTiempo(){
         {exitConfirm&&(
           <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-[60] flex items-center justify-center px-4" style={{background:"rgba(0,0,0,0.88)",backdropFilter:"blur(12px)"}}>
             <motion.div initial={{scale:0.82,opacity:0,y:24}} animate={{scale:1,opacity:1,y:0}} exit={{scale:0.9,opacity:0}} transition={{type:"spring",stiffness:340,damping:28}}
-              className="w-full max-w-xs rounded-3xl overflow-hidden" style={{background:"linear-gradient(145deg,#16111f,#0e0c1a)",border:"2px solid rgba(255,71,87,0.4)"}}>
+              className="w-full max-w-xs rounded-3xl overflow-hidden" style={{background:"linear-gradient(145deg,#12101e,#0a0815)",border:"2px solid rgba(255,71,87,0.4)"}}>
               <div className="h-1 w-full" style={{background:"linear-gradient(90deg,transparent,#ff4757 40%,#ff6b7a 60%,transparent)"}}/>
               <div className="px-7 pt-6 pb-7 flex flex-col items-center text-center gap-5">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{background:"rgba(255,71,87,0.1)",border:"1.5px solid rgba(255,71,87,0.35)"}}><AlertTriangle size={30} className="text-[#ff4757]"/></div>
                 <div><h3 className="font-['Press_Start_2P'] text-sm text-white mb-2">Salir del juego</h3><p className="text-gray-500 text-xs">Tu progreso se perderá.</p></div>
                 <div className="w-full flex flex-col gap-2.5">
                   <button onClick={()=>{music.stop();setExitConfirm(false);setScreen("config");}} className="w-full py-3.5 rounded-2xl font-['Press_Start_2P'] text-xs text-white" style={{background:"linear-gradient(135deg,#ff4757,#c0392b)"}}>Sí, salir</button>
-                  <button onClick={()=>setExitConfirm(false)} className="w-full py-3.5 rounded-2xl font-bold text-sm text-gray-400" style={{background:"rgba(255,255,255,0.04)",border:"1.5px solid rgba(255,255,255,0.08)"}}>Continuar</button>
+                  <button onClick={()=>setExitConfirm(false)} className="w-full py-3.5 rounded-2xl font-bold text-sm text-gray-400" style={{background:"rgba(255,255,255,0.03)",border:"1.5px solid rgba(255,255,255,0.08)"}}>Continuar</button>
                 </div>
               </div>
             </motion.div>
@@ -399,7 +399,7 @@ export function LineaTiempo(){
         {settOpen&&(
           <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center px-4" onClick={()=>setSettOpen(false)}>
             <motion.div initial={{scale:0.88,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:0.9,opacity:0}} transition={{type:"spring",stiffness:300,damping:25}}
-              className="w-full max-w-sm rounded-2xl overflow-hidden" style={{background:"#12111e",border:"2px solid rgba(220,20,60,0.3)"}} onClick={e=>e.stopPropagation()}>
+              className="w-full max-w-sm rounded-2xl overflow-hidden" style={{background:"#0d0b1a",border:"2px solid rgba(220,20,60,0.3)"}} onClick={e=>e.stopPropagation()}>
               <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/5">
                 <p className="font-['Press_Start_2P'] text-xs text-white">Configuración</p>
                 <button onClick={()=>setSettOpen(false)} className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 text-gray-400"><X size={14}/></button>
@@ -427,7 +427,7 @@ export function LineaTiempo(){
       </AnimatePresence>
 
       {/* TOPBAR */}
-      <div className="relative z-10 flex items-center gap-2 px-3 md:px-4 py-2 border-b border-white/5" style={{background:"rgba(6,9,26,0.95)",backdropFilter:"blur(16px)"}}>
+      <div className="relative z-10 flex items-center gap-2 px-3 md:px-4 py-2 border-b border-white/5" style={{background:"rgba(4,6,18,0.97)",backdropFilter:"blur(20px)",borderBottom:`1px solid rgba(220,20,60,0.2)`}}>
         <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
           {modo==="multi"&&multiState.sala&&multiState.sala.jugadores.length>0?(
             <div className="flex items-center gap-2 overflow-x-auto pb-0.5 flex-1"><MiniJugadores jugadores={multiState.sala.jugadores} nombrePropio={playerName}/></div>
@@ -459,8 +459,8 @@ export function LineaTiempo(){
       </div>
 
       {/* Progress bar */}
-      <div className="relative z-10 w-full h-1.5" style={{background:"rgba(255,255,255,0.04)"}}>
-        <div className="h-full transition-all duration-500" style={{width:`${(completadas/Math.max(1,totalRondas))*100}%`,background:"linear-gradient(90deg,#DC143C,#ff9800)",boxShadow:"0 0 10px rgba(220,20,60,0.6)"}}/>
+      <div className="relative z-10 w-full h-1.5" style={{background:"rgba(255,255,255,0.03)"}}>
+        <div className="h-full transition-all duration-500" style={{width:`${(completadas/Math.max(1,totalRondas))*100}%`,background:"linear-gradient(90deg,#DC143C,#ff9800)",boxShadow:"0 0 16px rgba(220,20,60,0.7),0 0 30px rgba(220,20,60,0.3)"}}/>
       </div>
 
       {/* CONTENIDO */}
@@ -498,7 +498,7 @@ export function LineaTiempo(){
                 onDragEnd={()=>{setDragging(null);setDragOver(null);}}
                 className="flex items-center gap-3 pl-12 pr-4 py-3 rounded-2xl border-2 cursor-grab active:cursor-grabbing select-none relative transition-all"
                 style={{
-                  background: correcto?"rgba(0,255,136,0.08)":incorrecto?"rgba(255,71,87,0.08)":dragOver===ev.id?"rgba(220,20,60,0.15)":"rgba(255,255,255,0.04)",
+                  background: correcto?"rgba(0,255,136,0.08)":incorrecto?"rgba(255,71,87,0.08)":dragOver===ev.id?"rgba(220,20,60,0.15)":"rgba(255,255,255,0.03)",
                   borderColor: correcto?"#00ff88":incorrecto?"#ff4757":dragOver===ev.id?"#DC143C":"rgba(255,255,255,0.1)",
                   opacity: dragging===ev.id?0.4:1,
                 }}>

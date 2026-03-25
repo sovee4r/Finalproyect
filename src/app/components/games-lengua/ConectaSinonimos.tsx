@@ -16,7 +16,7 @@ import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from
 import { MiniJugadores } from "../MultiLobby";
 import logoImg from "../../../assets/logo.png";
 
-const API   = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
+const API   = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 type Screen    = "splash" | "config" | "juego" | "resultados";
 type Modo      = "solo" | "multi";
 type TipoJuego = "sinonimos" | "antonimos";
@@ -262,7 +262,7 @@ export function ConectaSinonimos(){
           <motion.div initial={{scale:0.82,opacity:0,y:24}} animate={{scale:1,opacity:1,y:0}} exit={{scale:0.9,opacity:0}}
             transition={{type:"spring",stiffness:340,damping:28}}
             className="w-full max-w-xs rounded-3xl overflow-hidden"
-            style={{background:"linear-gradient(145deg,#16111f,#0e0c1a)",border:"2px solid rgba(255,71,87,0.4)",boxShadow:"0 30px 80px rgba(0,0,0,0.9)"}}>
+            style={{background:"linear-gradient(145deg,#12101e,#0a0815)",border:"2px solid rgba(255,71,87,0.4)",boxShadow:"0 30px 80px rgba(0,0,0,0.9)"}}>
             <div className="h-1 w-full" style={{background:"linear-gradient(90deg,transparent,#ff4757 40%,#ff6b7a 60%,transparent)"}}/>
             <div className="px-7 pt-6 pb-7 flex flex-col items-center text-center gap-5">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{background:"rgba(255,71,87,0.1)",border:"1.5px solid rgba(255,71,87,0.35)"}}>
@@ -275,7 +275,7 @@ export function ConectaSinonimos(){
                   style={{background:"linear-gradient(135deg,#ff4757,#c0392b)"}}>Sí, salir</motion.button>
                 <motion.button whileHover={{scale:1.01}} whileTap={{scale:0.98}} onClick={cancelExit}
                   className="w-full py-3.5 rounded-2xl font-bold text-sm text-gray-400"
-                  style={{background:"rgba(255,255,255,0.04)",border:"1.5px solid rgba(255,255,255,0.08)"}}>Continuar jugando</motion.button>
+                  style={{background:"rgba(255,255,255,0.03)",border:"1.5px solid rgba(255,255,255,0.08)"}}>Continuar jugando</motion.button>
               </div>
             </div>
           </motion.div>
@@ -293,7 +293,7 @@ export function ConectaSinonimos(){
           <motion.div initial={{scale:0.88,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:0.9,opacity:0}}
             transition={{type:"spring",stiffness:300,damping:25}}
             className="w-full max-w-sm rounded-2xl overflow-hidden"
-            style={{background:"#12111e",border:`2px solid ${CA}33`,boxShadow:"0 20px 60px rgba(0,0,0,0.8)"}}
+            style={{background:"#0d0b1a",border:`2px solid ${CA}33`,boxShadow:"0 20px 60px rgba(0,0,0,0.8)"}}
             onClick={e=>e.stopPropagation()}>
             <div className="h-0.5" style={{background:`linear-gradient(90deg,transparent,${CA},transparent)`}}/>
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/5">
@@ -402,7 +402,7 @@ export function ConectaSinonimos(){
           </div>
 
           {/* Info card */}
-          <div className="relative overflow-hidden rounded-2xl border-2 bg-[#0f1425] p-6 mb-5"
+          <div className="relative overflow-hidden rounded-2xl border-2 bg-[#080d1e] p-6 mb-5"
             style={{borderColor:`${CA}44`,boxShadow:`0 4px 28px ${CA}12`}}>
             <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none opacity-20"
               style={{background:`radial-gradient(circle,${CA},transparent)`,transform:"translate(30%,-30%)"}}/>
@@ -427,7 +427,7 @@ export function ConectaSinonimos(){
           </div>
 
           {/* Tipo */}
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold tracking-widest uppercase mb-3" style={{color:CA}}>Tipo de juego</p>
             <div className="grid grid-cols-2 gap-2">
               {(["sinonimos","antonimos"] as TipoJuego[]).map(t=>(
@@ -441,7 +441,7 @@ export function ConectaSinonimos(){
           </div>
 
           {/* Grado */}
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold tracking-widest uppercase mb-3" style={{color:CA}}>Grado</p>
             <div className="grid grid-cols-3 gap-2">
               {[4,5,6].map(g=>(
@@ -455,14 +455,14 @@ export function ConectaSinonimos(){
           </div>
 
           {/* Nombre */}
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold tracking-widest uppercase mb-3 flex items-center gap-2" style={{color:CA}}><User size={13}/> Tu nombre</p>
             <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold outline-none transition-all placeholder:text-gray-600"
               disabled={!!user} placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
           </div>
 
           {/* Modo */}
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#00ff88] tracking-widest uppercase mb-3 flex items-center gap-2"><Play size={13}/> Modo de juego</p>
             <div className="grid grid-cols-2 gap-2 mb-4">
               <button onClick={()=>setModo("solo")}
@@ -519,7 +519,7 @@ export function ConectaSinonimos(){
               return(
                 <motion.div key={s} initial={{scale:0}} animate={{scale:1}} transition={{delay:0.3+s*0.1,type:"spring"}}>
                   <Star size={40} className={s<=stars?"text-[#ffd700]":"text-gray-700"} fill={s<=stars?"#ffd700":"none"}
-                    style={s<=stars?{filter:"drop-shadow(0 0 8px rgba(255,215,0,0.6))"}:{}}/>
+                    style={s<=stars?{filter:"drop-shadow(0 0 12px rgba(255,215,0,0.8)) drop-shadow(0 0 20px rgba(255,215,0,0.3))"}:{}}/>
                 </motion.div>
               );
             })}
@@ -550,7 +550,7 @@ export function ConectaSinonimos(){
               <div>
                 <div className="flex justify-center mb-2">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-                    style={{background:"linear-gradient(135deg,#ffd700,#ff9800)",boxShadow:"0 0 16px rgba(255,215,0,0.5)"}}>🪙</div>
+                    style={{background:"linear-gradient(135deg,#ffd700,#ff9800)",boxShadow:"0 0 20px rgba(255,215,0,0.7),0 0 40px rgba(255,215,0,0.2)"}}>🪙</div>
                 </div>
                 <div className="font-['Press_Start_2P'] text-2xl text-[#ff9800]">+{puntos}</div>
                 <div className="text-xs font-bold text-gray-500 mt-2 uppercase tracking-widest">Monedas</div>
@@ -598,7 +598,7 @@ export function ConectaSinonimos(){
 
           {/* TOPBAR */}
           <div className="relative z-10 flex items-center gap-2 px-3 md:px-4 py-2 border-b border-white/5"
-            style={{background:"rgba(6,9,26,0.95)",backdropFilter:"blur(16px)"}}>
+            style={{background:"rgba(4,6,18,0.97)",backdropFilter:"blur(20px)",borderBottom:`1px solid rgba(218,165,32,0.2)`}}>
             <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
               {modo==="multi"&&multiState.sala&&multiState.sala.jugadores.length>0?(
                 <div className="flex items-center gap-2 overflow-x-auto pb-0.5 flex-1">
@@ -654,7 +654,7 @@ export function ConectaSinonimos(){
           </div>
 
           {/* Barra progreso */}
-          <div className="relative z-10 w-full h-1.5" style={{background:"rgba(255,255,255,0.04)"}}>
+          <div className="relative z-10 w-full h-1.5" style={{background:"rgba(255,255,255,0.03)"}}>
             <motion.div className="h-full" animate={{width:`${(totalCorrectas/Math.max(1,pares.length))*100}%`}}
               transition={{duration:0.4}} style={{background:`linear-gradient(90deg,${CA},#00e5ff)`,boxShadow:`0 0 10px ${CA}80`}}/>
           </div>
@@ -759,5 +759,3 @@ export function ConectaSinonimos(){
     </div>
   );
 }
-
-

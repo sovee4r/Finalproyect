@@ -6,7 +6,7 @@ import {
   Volume2, VolumeX, RotateCcw, Trophy, Star,
   CheckCircle2, XCircle, LogOut, HelpCircle,
   User, Users, AlertTriangle, Settings, Zap
-} from "lucide-react";
+, Lightbulb } from "lucide-react";
 import { Link } from "react-router";
 import { useAuth } from "../../AuthContext";
 import { useMonedas } from "../../../hooks/useMonedas";
@@ -154,7 +154,7 @@ function useMusic() {
   return { start, stop, toggleMute, setVolume, playVictory, muted, vol };
 }
 
-async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string }) {
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string ; user_id?: number}) {
   try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "quiz_ciencias", materia: "ciencias" }) }); } catch (_) {}
 }
 
@@ -202,6 +202,7 @@ export function QuizCiencias() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [mostrarExplicacion, setMostrarExplicacion] = useState(false);
+  const [mostrarPista, setMostrarPista] = useState(false);
 
   const pauseRef = useRef(false);
   const playerNameRef = useRef(playerName);
@@ -274,7 +275,7 @@ export function QuizCiencias() {
       if (correctas + (seleccionada === preguntas[idx].correcta ? 1 : 0) >= Math.ceil(preguntas.length * 0.7)) {
         music.playVictory(); setShowConfetti(true);
       } else { music.stop(); }
-      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo });
+      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo, user_id: user?.id });
       agregarMonedas(score);
       setScreen("resultados");
     } else {
@@ -307,7 +308,7 @@ export function QuizCiencias() {
           <motion.div initial={{ scale: 0.82, opacity: 0, y: 24 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 340, damping: 28 }}
             className="w-full max-w-xs rounded-3xl overflow-hidden"
-            style={{ background: "linear-gradient(145deg,#16111f,#0e0c1a)", border: "2px solid rgba(255,71,87,0.4)", boxShadow: "0 30px 80px rgba(0,0,0,0.9)" }}>
+            style={{ background:"linear-gradient(145deg,#12101e,#0a0815)", border: "2px solid rgba(255,71,87,0.4)", boxShadow: "0 30px 80px rgba(0,0,0,0.9)" }}>
             <div className="h-1 w-full" style={{ background: "linear-gradient(90deg,transparent,#ff4757 40%,#ff6b7a 60%,transparent)" }} />
             <div className="px-7 pt-6 pb-7 flex flex-col items-center text-center gap-5">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "rgba(255,71,87,0.1)", border: "1.5px solid rgba(255,71,87,0.35)" }}>
@@ -320,7 +321,7 @@ export function QuizCiencias() {
                   style={{ background: "linear-gradient(135deg,#ff4757,#c0392b)", boxShadow: "0 4px 20px rgba(255,71,87,0.35)" }}>Sí, salir</motion.button>
                 <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={cancelExit}
                   className="w-full py-3.5 rounded-2xl font-bold text-sm text-gray-400 transition-all"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.08)" }}>Continuar jugando</motion.button>
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1.5px solid rgba(255,255,255,0.08)" }}>Continuar jugando</motion.button>
               </div>
             </div>
           </motion.div>
@@ -338,7 +339,7 @@ export function QuizCiencias() {
           <motion.div initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="w-full max-w-sm rounded-2xl overflow-hidden"
-            style={{ background: "#12111e", border: `2px solid ${COLOR_BORDER}`, boxShadow: "0 20px 60px rgba(0,0,0,0.8)" }}
+            style={{ background: "#0d0b1a", border: `2px solid ${COLOR_BORDER}`, boxShadow: "0 20px 60px rgba(0,0,0,0.8)" }}
             onClick={e => e.stopPropagation()}>
             <div className="h-0.5" style={{ background: `linear-gradient(90deg,transparent,${COLOR},transparent)` }} />
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/5">
@@ -444,7 +445,7 @@ export function QuizCiencias() {
               <p className="text-gray-400 text-sm font-bold mt-1">Pon a prueba tus conocimientos</p>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-2xl border-2 bg-[#0f1425] p-6 mb-5" style={{ borderColor: COLOR_BORDER, boxShadow: `0 4px 28px rgba(34,139,34,0.1)` }}>
+          <div className="relative overflow-hidden rounded-2xl border-2 bg-[#080d1e] p-6 mb-5" style={{ borderColor: COLOR_BORDER, boxShadow: `0 4px 28px rgba(34,139,34,0.1)` }}>
             <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none opacity-20" style={{ background: `radial-gradient(circle,${COLOR},transparent)`, transform: "translate(30%,-30%)" }} />
             <div className="flex items-start gap-5">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: COLOR_LIGHT, border: `1.5px solid ${COLOR_BORDER}` }}><FlaskConical size={26} style={{ color: COLOR }} /></div>
@@ -459,12 +460,12 @@ export function QuizCiencias() {
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#00e5ff] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13} /> Tu nombre</p>
             <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold text-base outline-none focus:border-[#00e5ff]/60 transition-all placeholder:text-gray-600"
               placeholder="Escribe tu nombre..." value={playerName} onChange={e => setPlayerName(e.target.value)} maxLength={20} />
           </div>
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#ffd700] tracking-widest uppercase mb-3 flex items-center gap-2"><Star size={13} /> Grado</p>
             <div className="grid grid-cols-3 gap-2">
               {[4, 5, 6].map(g => (
@@ -473,7 +474,7 @@ export function QuizCiencias() {
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#00ff88] tracking-widest uppercase mb-3 flex items-center gap-2"><Play size={13} /> Modo de juego</p>
             <div className="grid grid-cols-2 gap-2 mb-4">
               <button onClick={() => setModo("solo")} className={`py-3 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition-all ${modo === "solo" ? "border-[#00ff88] bg-[#00ff88]/10 text-[#00ff88]" : "border-white/10 bg-white/3 text-gray-400 hover:border-white/25"}`}><User size={15} /> Solitario</button>
@@ -504,7 +505,7 @@ export function QuizCiencias() {
       {/* ─── JUEGO ─── */}
       {screen === "juego" && preguntaActual && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full min-h-screen flex flex-col"
-          style={{ background: "linear-gradient(135deg,#06091a 0%,#091a09 50%,#06091a 100%)" }}>
+          style={{ background:"linear-gradient(160deg,#060a06 0%,#001a09 45%,#060a06 100%)" }}>
 
           {/* TOPBAR */}
           <div className="relative z-10 flex items-center justify-between px-4 py-3 border-b border-white/5"
@@ -556,7 +557,7 @@ export function QuizCiencias() {
           </div>
 
           {/* Barra de progreso */}
-          <div className="relative z-10 w-full h-1.5" style={{ background: "rgba(255,255,255,0.04)" }}>
+          <div className="relative z-10 w-full h-1.5" style={{ background: "rgba(255,255,255,0.03)" }}>
             <motion.div className="h-full" animate={{ width: `${progreso}%` }} transition={{ duration: 0.5 }}
               style={{ background: `linear-gradient(90deg,${COLOR},#00ff88)`, boxShadow: `0 0 10px rgba(34,139,34,0.6)` }} />
           </div>
@@ -591,7 +592,7 @@ export function QuizCiencias() {
             {/* Pregunta */}
             <motion.div key={`q-${idx}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               className="w-full rounded-2xl p-5 mb-5 text-center"
-              style={{ background: "rgba(34,139,34,0.08)", border: `2px solid ${COLOR_BORDER}` }}>
+              style={{ background: "rgba(34,139,34,0.06)", border: `2px solid ${COLOR_BORDER}`, boxShadow: `0 0 24px ${COLOR_BORDER}` }}>
               <p className="text-white font-bold text-base md:text-lg leading-relaxed">{preguntaActual.pregunta}</p>
             </motion.div>
 
@@ -600,7 +601,7 @@ export function QuizCiencias() {
               {preguntaActual.opciones.map((op, i) => {
                 const esCorrecto = i === preguntaActual.correcta;
                 const esSeleccionada = i === seleccionada;
-                let bg = "rgba(255,255,255,0.04)";
+                let bg = "rgba(255,255,255,0.03)";
                 let border = "rgba(255,255,255,0.1)";
                 let textColor = "white";
                 if (confirmada) {
@@ -644,8 +645,31 @@ export function QuizCiencias() {
               )}
             </AnimatePresence>
 
+            {/* Pista hint display */}
+            {mostrarPista && !confirmada && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                className="w-full rounded-xl p-4 mb-2 flex items-start gap-3"
+                style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.3)" }}>
+                <Lightbulb size={16} className="text-[#ffd700] flex-shrink-0 mt-0.5" />
+                <p className="text-[#ffd700] text-xs leading-relaxed font-bold">💡 {preguntaActual.explicacion}</p>
+              </motion.div>
+            )}
+
             {/* Botones de acción */}
             <div className="w-full flex gap-3">
+              {!confirmada &&               {/* Botón pista */}
+              {!confirmada && !mostrarPista && (
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    if (!gastarMonedas(5000)) { alert("No tienes suficientes monedas (necesitas 5,000 🪙)"); return; }
+                    setMostrarPista(true);
+                  }}
+                  className="px-4 py-4 rounded-2xl border-2 flex items-center gap-2 font-bold text-xs flex-shrink-0 transition-all"
+                  style={{ borderColor: "rgba(255,215,0,0.3)", background: "rgba(255,215,0,0.06)", color: "#ffd700" }}>
+                  <Lightbulb size={14} />
+                  <span className="hidden sm:inline">-5,000 🪙</span>
+                </motion.button>
+              )}}
               {!confirmada ? (
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                   onClick={confirmarRespuesta}
@@ -737,7 +761,7 @@ export function QuizCiencias() {
               <Link to="/games/science" className="w-full">
                 <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                   className="w-full py-4 rounded-2xl font-bold text-sm text-gray-400 transition-all"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.08)" }}>
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1.5px solid rgba(255,255,255,0.08)" }}>
                   Volver a Ciencias
                 </motion.button>
               </Link>
@@ -748,5 +772,3 @@ export function QuizCiencias() {
     </div>
   );
 }
-
-

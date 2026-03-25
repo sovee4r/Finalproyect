@@ -154,7 +154,7 @@ function useMusic() {
   return { start, stop, toggleMute, setVolume, playVictory, muted, vol };
 }
 
-async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string }) {
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string ; user_id?: number}) {
   try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "quiz_sociales", materia: "sociales" }) }); } catch (_) {}
 }
 
@@ -271,7 +271,7 @@ export function QuizSociales() {
       if (correctas + (seleccionada === preguntas[idx].correcta ? 1 : 0) >= Math.ceil(preguntas.length * 0.7)) {
         music.playVictory(); setShowConfetti(true);
       } else { music.stop(); }
-      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo });
+      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo, user_id: user?.id });
       agregarMonedas(score);
       setScreen("resultados");
     } else {
@@ -303,7 +303,7 @@ export function QuizSociales() {
           <motion.div initial={{ scale: 0.82, opacity: 0, y: 24 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 340, damping: 28 }}
             className="w-full max-w-xs rounded-3xl overflow-hidden"
-            style={{ background: "linear-gradient(145deg,#16111f,#0e0c1a)", border: "2px solid rgba(255,71,87,0.4)", boxShadow: "0 30px 80px rgba(0,0,0,0.9)" }}>
+            style={{ background:"linear-gradient(145deg,#12101e,#0a0815)", border: "2px solid rgba(255,71,87,0.4)", boxShadow: "0 30px 80px rgba(0,0,0,0.9)" }}>
             <div className="h-1 w-full" style={{ background: "linear-gradient(90deg,transparent,#ff4757 40%,#ff6b7a 60%,transparent)" }} />
             <div className="px-7 pt-6 pb-7 flex flex-col items-center text-center gap-5">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "rgba(255,71,87,0.1)", border: "1.5px solid rgba(255,71,87,0.35)" }}>
@@ -316,7 +316,7 @@ export function QuizSociales() {
                   style={{ background: "linear-gradient(135deg,#ff4757,#c0392b)", boxShadow: "0 4px 20px rgba(255,71,87,0.35)" }}>Sí, salir</motion.button>
                 <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={cancelExit}
                   className="w-full py-3.5 rounded-2xl font-bold text-sm text-gray-400"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.08)" }}>Continuar jugando</motion.button>
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1.5px solid rgba(255,255,255,0.08)" }}>Continuar jugando</motion.button>
               </div>
             </div>
           </motion.div>
@@ -334,7 +334,7 @@ export function QuizSociales() {
           <motion.div initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="w-full max-w-sm rounded-2xl overflow-hidden"
-            style={{ background: "#12111e", border: `2px solid ${COLOR_BORDER}`, boxShadow: "0 20px 60px rgba(0,0,0,0.8)" }}
+            style={{ background: "#0d0b1a", border: `2px solid ${COLOR_BORDER}`, boxShadow: "0 20px 60px rgba(0,0,0,0.8)" }}
             onClick={e => e.stopPropagation()}>
             <div className="h-0.5" style={{ background: `linear-gradient(90deg,transparent,${COLOR},transparent)` }} />
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/5">
@@ -440,7 +440,7 @@ export function QuizSociales() {
               <p className="text-gray-400 text-sm font-bold mt-1">Historia y ciudadanía dominicana</p>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-2xl border-2 bg-[#0f1425] p-6 mb-5" style={{ borderColor: COLOR_BORDER, boxShadow: `0 4px 28px rgba(220,20,60,0.1)` }}>
+          <div className="relative overflow-hidden rounded-2xl border-2 bg-[#080d1e] p-6 mb-5" style={{ borderColor: COLOR_BORDER, boxShadow: `0 4px 28px rgba(220,20,60,0.1)` }}>
             <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none opacity-20" style={{ background: `radial-gradient(circle,${COLOR},transparent)`, transform: "translate(30%,-30%)" }} />
             <div className="flex items-start gap-5">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: COLOR_LIGHT, border: `1.5px solid ${COLOR_BORDER}` }}><Globe2 size={26} style={{ color: COLOR }} /></div>
@@ -455,12 +455,12 @@ export function QuizSociales() {
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#00e5ff] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13} /> Tu nombre</p>
             <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold text-base outline-none focus:border-[#00e5ff]/60 transition-all placeholder:text-gray-600"
               placeholder="Escribe tu nombre..." value={playerName} onChange={e => setPlayerName(e.target.value)} maxLength={20} />
           </div>
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#ffd700] tracking-widest uppercase mb-3 flex items-center gap-2"><Star size={13} /> Grado</p>
             <div className="grid grid-cols-3 gap-2">
               {[4, 5, 6].map(g => (
@@ -469,7 +469,7 @@ export function QuizSociales() {
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
+          <div className="rounded-2xl border-2 border-white/8 bg-[#080d1e] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#00ff88] tracking-widest uppercase mb-3 flex items-center gap-2"><Play size={13} /> Modo de juego</p>
             <div className="grid grid-cols-2 gap-2 mb-4">
               <button onClick={() => setModo("solo")} className={`py-3 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition-all ${modo === "solo" ? "border-[#00ff88] bg-[#00ff88]/10 text-[#00ff88]" : "border-white/10 bg-white/3 text-gray-400 hover:border-white/25"}`}><User size={15} /> Solitario</button>
@@ -500,9 +500,9 @@ export function QuizSociales() {
       {/* ─── JUEGO ─── */}
       {screen === "juego" && preguntaActual && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full min-h-screen flex flex-col"
-          style={{ background: "linear-gradient(135deg,#06091a 0%,#1a0408 50%,#06091a 100%)" }}>
+          style={{ background: "linear-gradient(160deg,#0a0206 0%,#150000 45%,#0a0206 100%)" }}>
           <div className="relative z-10 flex items-center justify-between px-4 py-3 border-b border-white/5"
-            style={{ background: "rgba(6,9,26,0.9)", backdropFilter: "blur(16px)" }}>
+            style={{ background: "rgba(4,6,18,0.97)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(220,20,60,0.2)" }}>
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: COLOR_LIGHT, border: `1.5px solid ${COLOR_BORDER}` }}>
                 <Globe2 size={14} style={{ color: COLOR }} />
@@ -548,7 +548,7 @@ export function QuizSociales() {
               )}
             </div>
           </div>
-          <div className="relative z-10 w-full h-1.5" style={{ background: "rgba(255,255,255,0.04)" }}>
+          <div className="relative z-10 w-full h-1.5" style={{ background: "rgba(255,255,255,0.03)" }}>
             <motion.div className="h-full" animate={{ width: `${progreso}%` }} transition={{ duration: 0.5 }}
               style={{ background: `linear-gradient(90deg,${COLOR},#ff4757)`, boxShadow: `0 0 10px rgba(220,20,60,0.6)` }} />
           </div>
@@ -578,7 +578,7 @@ export function QuizSociales() {
               {preguntaActual.opciones.map((op, i) => {
                 const esCorrecto = i === preguntaActual.correcta;
                 const esSeleccionada = i === seleccionada;
-                let bg = "rgba(255,255,255,0.04)", border = "rgba(255,255,255,0.1)", textColor = "white";
+                let bg = "rgba(255,255,255,0.03)", border = "rgba(255,255,255,0.1)", textColor = "white";
                 if (confirmada) {
                   if (esCorrecto) { bg = "rgba(0,255,136,0.12)"; border = "#00ff88"; textColor = "#00ff88"; }
                   else if (esSeleccionada) { bg = "rgba(255,71,87,0.12)"; border = "#ff4757"; textColor = "#ff4757"; }
@@ -663,7 +663,7 @@ export function QuizSociales() {
       {screen === "resultados" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           className="w-full min-h-screen flex flex-col items-center justify-start px-4 py-10 overflow-y-auto"
-          style={{ background: "linear-gradient(135deg,#06091a 0%,#1a0408 50%,#06091a 100%)" }}>
+          style={{ background: "linear-gradient(160deg,#0a0206 0%,#150000 45%,#0a0206 100%)" }}>
           <div className="fixed inset-0 pointer-events-none overflow-hidden">
             <motion.div animate={{ x: [0, 40, 0], y: [0, -30, 0] }} transition={{ duration: 12, repeat: Infinity }}
               className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-3xl opacity-40"
@@ -708,7 +708,7 @@ export function QuizSociales() {
               <Link to="/games/social" className="w-full">
                 <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                   className="w-full py-4 rounded-2xl font-bold text-sm text-gray-400"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.08)" }}>
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1.5px solid rgba(255,255,255,0.08)" }}>
                   Volver a Sociales
                 </motion.button>
               </Link>
@@ -719,5 +719,3 @@ export function QuizSociales() {
     </div>
   );
 }
-
-
