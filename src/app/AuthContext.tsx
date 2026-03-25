@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+﻿import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 
-const API = "https://finalproyect-da83.onrender.com";
+const API = "https://finalproyect-production-3837.up.railway.app";
 
 export interface UserData {
   id:          number;
@@ -112,3 +112,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+

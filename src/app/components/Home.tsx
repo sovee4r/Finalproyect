@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import {
@@ -206,3 +206,5 @@ const ModeCard = ({ badge, icon, title, desc, color, isHot }: { badge: string; i
     <p className="text-gray-300 text-sm leading-relaxed">{desc}</p>
   </motion.div>
 );
+
+

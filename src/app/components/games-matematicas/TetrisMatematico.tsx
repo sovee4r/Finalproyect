@@ -1,4 +1,4 @@
-// TetrisMatematico.tsx — Matemáticas 4to-6to
+﻿// TetrisMatematico.tsx — Matemáticas 4to-6to
 // Bloques con números caen desde arriba. En la parte inferior aparece una operación.
 // El jugador debe escribir o seleccionar la respuesta antes de que el bloque llegue al fondo.
 // Si aciertas: el bloque desaparece y sumas puntos. Si fallas o se acaba el tiempo: el bloque se apila.
@@ -843,3 +843,5 @@ export function TetrisMatematico() {
     </div>
   );
 }
+
+

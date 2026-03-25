@@ -1,4 +1,4 @@
-// CarreraCohetes.tsx — Matemáticas 4to-6to
+﻿// CarreraCohetes.tsx — Matemáticas 4to-6to
 // El jugador responde preguntas para hacer avanzar su cohete hacia la meta.
 // Cada respuesta correcta impulsa el cohete. Incorrecta: retrocede un poco.
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -755,3 +755,5 @@ export function CarreraCohetes() {
     </div>
   );
 }
+
+

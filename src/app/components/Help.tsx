@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { motion } from "motion/react";
 import {
   HelpCircle, MessageCircle, Mail,
@@ -46,7 +46,7 @@ const SOCIALS = [
 ];
 
 const SUPPORT = [
-  { label: "Correo de soporte", value: "soporte@saberix.com.do", Icon: Mail,           color: "#a78bfa" },
+  { label: "Correo de soporte", value: "saberixedu@gmail.com", Icon: Mail,           color: "#a78bfa" },
   { label: "WhatsApp",          value: "+1 (809) 555-0123",       Icon: Phone,          color: "#00ff88" },
   { label: "Chat en vivo",      value: "Disponible 8am - 8pm",    Icon: MessageCircle,  color: "#00d9ff" },
 ];
@@ -210,3 +210,4 @@ function Section({ title, icon, color, children }: {
     </motion.div>
   );
 }
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowLeft, Play, Pause, X, BookOpen,
@@ -818,3 +818,5 @@ export function AhorcadoLengua() {
     </div>
   );
 }
+
+

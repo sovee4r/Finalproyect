@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+﻿import React, { useState, useEffect, useCallback } from "react";
 import { Users, Search, Check, X, UserPlus, Clock, Loader2, MessageCircle } from "lucide-react";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router";
@@ -324,3 +324,5 @@ export function Friends() {
     </div>
   );
 }
+
+

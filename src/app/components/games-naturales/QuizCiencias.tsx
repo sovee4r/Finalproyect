@@ -1,4 +1,4 @@
-// QuizCiencias.tsx — Ciencias de la Naturaleza 4to-6to
+﻿// QuizCiencias.tsx — Ciencias de la Naturaleza 4to-6to
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -748,3 +748,5 @@ export function QuizCiencias() {
     </div>
   );
 }
+
+

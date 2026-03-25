@@ -1,4 +1,4 @@
-// QuizMatematicas.tsx — Matemáticas 4to-6to
+﻿// QuizMatematicas.tsx — Matemáticas 4to-6to
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -675,3 +675,5 @@ export function QuizMatematicas() {
     </div>
   );
 }
+
+

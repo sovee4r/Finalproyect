@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+﻿import { Router, Request, Response } from "express";
 import { getPreguntas, getLeaderboard } from "../db/queries";
 import { pool } from "../db/connection";
 import crypto from "crypto";
@@ -615,6 +615,67 @@ apiRouter.put("/mensajes/leer/:deId/:paraId", async (req: Request, res: Response
     );
     res.json({ ok: true });
   } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+// ════════════════════════════════════
+// REEMPLAZA el bloque "// Sumar monedas" al final del archivo routes.ts
+// por este bloque completo:
+// ════════════════════════════════════
+
+/* POST /api/monedas/:userId — sumar o restar monedas (cantidad negativa = gastar) */
+apiRouter.post("/monedas/:userId", async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { cantidad } = req.body;
+  if (!userId || cantidad === undefined || isNaN(Number(cantidad))) 
+    return res.status(400).json({ ok: false, error: "userId y cantidad requeridos" });
+  try {
+    const amount = Number(cantidad);
+    // Si es negativo verificar saldo suficiente
+    if (amount < 0) {
+      const [rows]: any = await pool.execute(
+        "SELECT monedas FROM usuarios WHERE id = ?", [userId]
+      );
+      const saldo = Number((rows as any[])[0]?.monedas ?? 0);
+      if (saldo + amount < 0)
+        return res.status(400).json({ ok: false, error: "Saldo insuficiente", saldo });
+    }
+    await pool.execute(
+      "UPDATE usuarios SET monedas = GREATEST(0, monedas + ?) WHERE id = ?",
+      [amount, userId]
+    );
+    const [updated]: any = await pool.execute(
+      "SELECT monedas FROM usuarios WHERE id = ?", [userId]
+    );
+    res.json({ ok: true, monedas: Number((updated as any[])[0]?.monedas ?? 0) });
+  } catch (e) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* PATCH /api/monedas/:userId — alias de POST para compatibilidad */
+apiRouter.patch("/monedas/:userId", async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { cantidad, delta } = req.body;
+  req.body.cantidad = cantidad ?? delta;
+  // redirigir a la misma lógica
+  const amount = Number(cantidad ?? delta ?? 0);
+  if (!userId || isNaN(amount))
+    return res.status(400).json({ ok: false });
+  try {
+    if (amount < 0) {
+      const [rows]: any = await pool.execute("SELECT monedas FROM usuarios WHERE id = ?", [userId]);
+      const saldo = Number((rows as any[])[0]?.monedas ?? 0);
+      if (saldo + amount < 0)
+        return res.status(400).json({ ok: false, error: "Saldo insuficiente", saldo });
+    }
+    await pool.execute(
+      "UPDATE usuarios SET monedas = GREATEST(0, monedas + ?) WHERE id = ?",
+      [amount, userId]
+    );
+    const [updated]: any = await pool.execute("SELECT monedas FROM usuarios WHERE id = ?", [userId]);
+    res.json({ ok: true, monedas: Number((updated as any[])[0]?.monedas ?? 0) });
+  } catch (e) {
     res.status(500).json({ ok: false });
   }
 });

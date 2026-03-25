@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Send, User, Loader2, Pencil, Trash2, Check, CheckCheck } from "lucide-react";
 import { useAuth } from "../AuthContext";
@@ -268,3 +268,5 @@ export function Chat() {
     </div>
   );
 }
+
+

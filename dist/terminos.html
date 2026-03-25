@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Términos de Uso | SaberIX</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        color: #e0e0e0;
+        line-height: 1.75;
+        background: #0f0f1e;
+        overflow-x: hidden;
+    }
+
+    /* BOTÓN MENÚ FLOTANTE */
+    .menu-btn {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #440dcf 100%);
+        border: none;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5);
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 1001;
+    }
+
+    .menu-btn:hover {
+        transform: scale(1.15) rotate(90deg);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.7);
+    }
+
+    .menu-btn.active {
+        transform: rotate(180deg);
+        background: linear-gradient(135deg, #0318fe 0%, #f5576c 100%);
+    }
+
+    .menu-btn svg {
+        width: 26px;
+        height: 26px;
+        stroke: white;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -380px;
+        width: 380px;
+        height: 100vh;
+        background: linear-gradient(180deg, rgba(15, 15, 30, 0.98) 0%, rgba(30, 30, 60, 0.98) 100%);
+        backdrop-filter: blur(30px);
+        box-shadow: 5px 0 40px rgba(0, 0, 0, 0.6);
+        transition: left 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 1000;
+        padding: 120px 45px 45px;
+        overflow-y: auto;
+        border-right: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+        z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .sidebar .logo {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        margin-bottom: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+    }
+
+    .nav-menu {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .nav-menu li {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    .sidebar.active .nav-menu li {
+        animation: slideInLeft 0.5s ease forwards;
+    }
+
+    .nav-menu li:nth-child(1) { animation-delay: 0.1s; }
+    .nav-menu li:nth-child(2) { animation-delay: 0.15s; }
+    .nav-menu li:nth-child(3) { animation-delay: 0.2s; }
+    .nav-menu li:nth-child(4) { animation-delay: 0.25s; }
+    .nav-menu li:nth-child(5) { animation-delay: 0.3s; }
+    .nav-menu li:nth-child(6) { animation-delay: 0.35s; }
+    .nav-menu li:nth-child(7) { animation-delay: 0.4s; }
+    .nav-menu li:nth-child(8) { animation-delay: 0.45s; }
+
+    @keyframes slideInLeft {
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .nav-menu li a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 1.05rem;
+        letter-spacing: 1.5px;
+        transition: all 0.3s ease;
+        padding: 16px 25px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-menu li a::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 5px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        border-radius: 0 5px 5px 0;
+    }
+
+    .nav-menu li a:hover::before,
+    .nav-menu li a.active::before { transform: scaleY(1); }
+
+    .nav-menu li a::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(102,126,234,0.15) 0%, rgba(118,75,162,0.15) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 15px;
+    }
+
+    .nav-menu li a:hover::after,
+    .nav-menu li a.active::after { opacity: 1; }
+
+    .nav-menu li a:hover,
+    .nav-menu li a.active {
+        color: white;
+        transform: translateX(8px);
+    }
+
+    .nav-menu li a .icon {
+        width: 24px; height: 24px;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    .nav-menu li a .icon svg {
+        width: 22px; height: 22px;
+        stroke: currentColor; fill: none; stroke-width: 2;
+    }
+
+    /* HEADER HERO */
+    header.hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #ffffff;
+        padding: 180px 30px 120px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    header.hero::before {
+        content: '';
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: moveBackground 20s linear infinite;
+    }
+
+    @keyframes moveBackground {
+        0%   { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+
+    header.hero h1 {
+        font-size: 4.5rem;
+        font-weight: 400;
+        letter-spacing: 12px;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    header.hero p {
+        font-size: 1.4rem;
+        font-weight: 300;
+        letter-spacing: 4px;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease 0.3s backwards;
+    }
+
+    header.hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 180px;
+        height: 5px;
+        background: rgba(255,255,255,0.5);
+        z-index: 1;
+        animation: expandWidth 1s ease 0.6s backwards;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes expandWidth {
+        from { width: 0; }
+        to   { width: 180px; }
+    }
+
+    .scroll-indicator {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        animation: bounce 2s infinite;
+    }
+
+    .scroll-indicator svg {
+        width: 35px; height: 35px;
+        stroke: white; fill: none; stroke-width: 2;
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50%       { transform: translateX(-50%) translateY(15px); }
+    }
+
+    /* CONTAINER */
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 30px;
+    }
+
+    /* SECCIONES */
+    section {
+        padding: 100px 0;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    section.visible {
+        animation: fadeInSection 0.8s ease forwards;
+    }
+
+    @keyframes fadeInSection {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    section.alt {
+        background: #1a1a2e;
+    }
+
+    /* SECTION TITLES */
+    .section-title {
+        font-size: 2.8rem;
+        font-weight: 400;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: white;
+        text-align: center;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 30px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 50%;
+        transform: translateX(-50%);
+        width: 100px; height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: rgba(255,255,255,0.6);
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        margin-bottom: 70px;
+    }
+
+    /* TARJETA DE TÉRMINO */
+    .termino-card {
+        background: linear-gradient(135deg, rgba(30,30,60,0.8) 0%, rgba(50,50,80,0.6) 100%);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        border: 1px solid rgba(102,126,234,0.2);
+        padding: 50px 55px;
+        margin-bottom: 35px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s ease;
+    }
+
+    .termino-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102,126,234,0.1), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .termino-card:hover::before { left: 100%; }
+
+    .termino-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 30px 80px rgba(102,126,234,0.3);
+        border-color: rgba(102,126,234,0.4);
+    }
+
+    .termino-card-header {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .termino-num {
+        min-width: 60px; height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        flex-shrink: 0;
+    }
+
+    .termino-card h2 {
+        font-size: 1.7rem;
+        color: white;
+        letter-spacing: 2px;
+        position: relative;
+        font-weight: 400;
+    }
+
+    .termino-card h2::after {
+        content: '';
+        position: absolute;
+        bottom: -8px; left: 0;
+        width: 60px; height: 3px;
+        background: linear-gradient(90deg, #667eea 0%, #6013ad 100%);
+        border-radius: 2px;
+    }
+
+    .termino-card p {
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.78);
+        line-height: 2;
+        text-align: justify;
+    }
+
+    .termino-card ul {
+        list-style: none;
+        margin-top: 15px;
+    }
+
+    .termino-card ul li {
+        padding: 10px 0 10px 30px;
+        color: rgba(255,255,255,0.75);
+        font-size: 1.02rem;
+        line-height: 1.8;
+        position: relative;
+        border-bottom: 1px solid rgba(102,126,234,0.1);
+    }
+
+    .termino-card ul li:last-child { border-bottom: none; }
+
+    .termino-card ul li::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 50%;
+        transform: translateY(-50%);
+        width: 10px; height: 10px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+    }
+
+    /* BANNER AVISO */
+    .aviso-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 50px 55px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 35px;
+    }
+
+    .aviso-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+        background-size: 40px 40px;
+    }
+
+    .aviso-banner p {
+        font-size: 1.15rem;
+        color: rgba(255,255,255,0.95);
+        line-height: 2;
+        position: relative;
+        z-index: 1;
+    }
+
+    .aviso-banner strong {
+        color: white;
+        letter-spacing: 1px;
+        font-size: 1.3rem;
+        display: block;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    /* FECHA VIGENCIA */
+    .fecha-vigencia {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(102,126,234,0.15);
+        border: 1px solid rgba(102,126,234,0.3);
+        border-radius: 50px;
+        padding: 12px 28px;
+        font-size: 0.95rem;
+        color: rgba(255,255,255,0.7);
+        letter-spacing: 1.5px;
+        margin-bottom: 70px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .fecha-vigencia svg {
+        width: 18px; height: 18px;
+        stroke: #667eea; fill: none; stroke-width: 2;
+    }
+
+    /* CONTACTO CTA */
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 100px 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: moveBackground 25s linear infinite;
+    }
+
+    .cta-section h2 {
+        font-size: 3rem;
+        font-weight: 400;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        color: white;
+        margin-bottom: 20px;
+        position: relative; z-index: 1;
+        text-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        animation: fadeInUp 1s ease;
+    }
+
+    .cta-section p {
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.85);
+        letter-spacing: 2px;
+        margin-bottom: 45px;
+        position: relative; z-index: 1;
+    }
+
+    .btn-cta {
+        display: inline-block;
+        background: white;
+        color: #667eea;
+        text-decoration: none;
+        padding: 18px 50px;
+        border-radius: 50px;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative; z-index: 1;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .btn-cta:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        background: #f0f0ff;
+    }
+
+    /* FOOTER */
+    footer {
+        background: #080815;
+        padding: 50px 30px;
+        text-align: center;
+        border-top: 1px solid rgba(102,126,234,0.2);
+    }
+
+    footer p {
+        color: rgba(255,255,255,0.5);
+        font-size: 0.95rem;
+        letter-spacing: 2px;
+    }
+
+    .divider {
+        width: 60px; height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        margin: 20px auto;
+        border-radius: 2px;
+    }
+
+    /* ÍNDICE RÁPIDO */
+    .indice-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .indice-item {
+        background: linear-gradient(135deg, rgba(30,30,60,0.8) 0%, rgba(50,50,80,0.6) 100%);
+        border: 1px solid rgba(102,126,234,0.2);
+        border-radius: 15px;
+        padding: 20px 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        text-decoration: none;
+        color: rgba(255,255,255,0.7);
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .indice-item:hover {
+        color: white;
+        border-color: rgba(102,126,234,0.5);
+        background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(102,126,234,0.2);
+    }
+
+    .indice-item .num {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        header.hero h1 { font-size: 2.5rem; letter-spacing: 5px; }
+        .sidebar { width: 300px; padding: 100px 30px 30px; }
+        .termino-card { padding: 35px 30px; }
+        .termino-card-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .indice-grid { grid-template-columns: 1fr 1fr; }
+        .cta-section h2 { font-size: 2rem; letter-spacing: 3px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- BOTÓN MENÚ -->
+<button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+    <svg viewBox="0 0 24 24">
+        <line x1="3" y1="6"  x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+</button>
+
+<!-- OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+    <div class="logo">SaberIX</div>
+    <ul class="nav-menu">
+        <li>
+            <a href="#inicio" class="nav-link active">
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+                Inicio
+            </a>
+        </li>
+        <li>
+            <a href="#aceptacion" class="nav-link">
+                <span class="icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Aceptación
+            </a>
+        </li>
+        <li>
+            <a href="#uso" class="nav-link">
+                <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+                Uso del Servicio
+            </a>
+        </li>
+        <li>
+            <a href="#propiedad" class="nav-link">
+                <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+                Propiedad Intelectual
+            </a>
+        </li>
+        <li>
+            <a href="#privacidad" class="nav-link">
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+                Privacidad
+            </a>
+        </li>
+        <li>
+            <a href="#responsabilidad" class="nav-link">
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                Responsabilidad
+            </a>
+        </li>
+        <li>
+            <a href="#modificaciones" class="nav-link">
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
+                Modificaciones
+            </a>
+        </li>
+        <li>
+            <a href="#contacto" class="nav-link">
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                Contacto
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- HERO HEADER -->
+<header class="hero" id="inicio">
+    <h1>Términos de Uso</h1>
+    <p>Condiciones que rigen el uso de nuestros servicios</p>
+    <div class="scroll-indicator">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+</header>
+
+<!-- ÍNDICE -->
+<section id="indice">
+    <div class="container">
+        <h2 class="section-title">Índice</h2>
+        <p class="section-subtitle">Navega rápidamente a la sección que necesitas</p>
+
+        <div class="aviso-banner" style="margin-bottom: 50px;">
+            <strong>⚠ Lectura Recomendada</strong>
+            <p>Al acceder y utilizar los servicios de SaberIX, aceptas cumplir con los presentes Términos de Uso. Te recomendamos leer este documento detenidamente antes de continuar usando nuestra plataforma.</p>
+        </div>
+
+        <div class="indice-grid">
+            <a href="#aceptacion" class="indice-item"><span class="num">1</span> Aceptación de Términos</a>
+            <a href="#uso" class="indice-item"><span class="num">2</span> Uso del Servicio</a>
+            <a href="#propiedad" class="indice-item"><span class="num">3</span> Propiedad Intelectual</a>
+            <a href="#privacidad" class="indice-item"><span class="num">4</span> Privacidad de Datos</a>
+            <a href="#responsabilidad" class="indice-item"><span class="num">5</span> Limitación de Responsabilidad</a>
+            <a href="#modificaciones" class="indice-item"><span class="num">6</span> Modificaciones</a>
+            <a href="#conducta" class="indice-item"><span class="num">7</span> Conducta del Usuario</a>
+            <a href="#contacto" class="indice-item"><span class="num">8</span> Contacto</a>
+        </div>
+
+        <div style="display:flex; justify-content:center; margin-top: 20px;">
+            <div class="fecha-vigencia">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Vigente desde: 1 de enero de 2026 &nbsp;|&nbsp; Última actualización: 16 de marzo de 2026
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ACEPTACIÓN -->
+<section class="alt" id="aceptacion">
+    <div class="container">
+        <h2 class="section-title">Aceptación</h2>
+        <p class="section-subtitle">Base legal del acuerdo entre usuario y SaberIX</p>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">1</div>
+                <h2>Aceptación de los Términos</h2>
+            </div>
+            <p>Al acceder, registrarte o utilizar cualquier servicio ofrecido por SaberIX — incluyendo nuestra plataforma web, aplicaciones móviles y materiales educativos — manifiestas tu conformidad plena y sin reservas con los presentes Términos de Uso. Si no estás de acuerdo con alguna de las disposiciones aquí contenidas, te pedimos que te abstengas de utilizar nuestros servicios.</p>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">1.1</div>
+                <h2>Capacidad Legal</h2>
+            </div>
+            <p>Para hacer uso de los servicios de SaberIX debes ser mayor de 13 años. Los menores entre 13 y 17 años deberán contar con la autorización expresa de un padre, madre o tutor legal para registrarse y utilizar la plataforma. Al aceptar estos términos, declaras que cumples con los requisitos de edad aplicables en tu jurisdicción.</p>
+        </div>
+    </div>
+</section>
+
+<!-- USO DEL SERVICIO -->
+<section id="uso">
+    <div class="container">
+        <h2 class="section-title">Uso del Servicio</h2>
+        <p class="section-subtitle">Cómo puedes utilizar nuestra plataforma educativa</p>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">2</div>
+                <h2>Descripción del Servicio</h2>
+            </div>
+            <p>SaberIX ofrece una plataforma de educación interactiva que incluye cursos en línea, recursos multimedia, evaluaciones adaptativas y herramientas de seguimiento del aprendizaje. Nos reservamos el derecho de modificar, ampliar o discontinuar cualquier característica de la plataforma en cualquier momento, notificando a los usuarios con antelación razonable cuando sea posible.</p>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">2.1</div>
+                <h2>Usos Permitidos</h2>
+            </div>
+            <p>Los usuarios podrán utilizar SaberIX para los siguientes fines:</p>
+            <ul>
+                <li>Acceder y completar cursos y programas educativos disponibles en la plataforma</li>
+                <li>Descargar materiales de estudio para uso personal y no comercial</li>
+                <li>Participar en foros, comunidades de aprendizaje y sesiones en vivo</li>
+                <li>Obtener certificaciones y diplomas reconocidos por la plataforma</li>
+                <li>Compartir contenido educativo producido personalmente dentro de la plataforma</li>
+            </ul>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">2.2</div>
+                <h2>Usos Prohibidos</h2>
+            </div>
+            <p>Queda expresamente prohibido utilizar SaberIX para:</p>
+            <ul>
+                <li>Reproducir, distribuir o comercializar contenidos sin autorización escrita de SaberIX</li>
+                <li>Intentar acceder sin autorización a sistemas, cuentas o datos de otros usuarios</li>
+                <li>Transmitir contenido ofensivo, difamatorio, obsceno o que viole derechos de terceros</li>
+                <li>Utilizar bots, scrapers u herramientas automatizadas para extraer datos de la plataforma</li>
+                <li>Suplantar la identidad de otros usuarios, instructores o representantes de SaberIX</li>
+                <li>Interferir con el funcionamiento normal de la plataforma o sus servidores</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- PROPIEDAD INTELECTUAL -->
+<section class="alt" id="propiedad">
+    <div class="container">
+        <h2 class="section-title">Propiedad Intelectual</h2>
+        <p class="section-subtitle">Protección de los contenidos y materiales educativos</p>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">3</div>
+                <h2>Derechos de Autor</h2>
+            </div>
+            <p>Todo el contenido disponible en SaberIX — incluyendo, sin limitación, textos, imágenes, videos, audios, gráficos, logotipos, código fuente y materiales didácticos — está protegido por las leyes de derechos de autor aplicables en la República Dominicana y los tratados internacionales vigentes. SaberIX o sus licenciantes son los titulares exclusivos de dichos derechos.</p>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">3.1</div>
+                <h2>Licencia de Uso</h2>
+            </div>
+            <p>SaberIX te otorga una licencia personal, no exclusiva, intransferible y revocable para acceder y utilizar los contenidos de la plataforma exclusivamente con fines educativos personales. Esta licencia no incluye el derecho de sublicenciar, vender, revender, reproducir masivamente ni crear obras derivadas basadas en nuestros materiales sin autorización expresa por escrito.</p>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">3.2</div>
+                <h2>Contenido Generado por Usuarios</h2>
+            </div>
+            <p>Al publicar o compartir contenido dentro de la plataforma, otorgas a SaberIX una licencia mundial, no exclusiva y libre de regalías para utilizar, reproducir, modificar y distribuir dicho contenido con el propósito de operar y mejorar nuestros servicios. Conservas la titularidad sobre tus creaciones originales, siendo el único responsable de que no infrinjan derechos de terceros.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PRIVACIDAD -->
+<section id="privacidad">
+    <div class="container">
+        <h2 class="section-title">Privacidad</h2>
+        <p class="section-subtitle">Cómo recopilamos, usamos y protegemos tu información</p>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">4</div>
+                <h2>Recopilación de Datos</h2>
+            </div>
+            <p>SaberIX recopila información personal necesaria para brindarte el servicio educativo, incluyendo nombre, dirección de correo electrónico, datos de facturación y métricas de progreso académico. Toda esta información es tratada conforme a nuestra Política de Privacidad, la cual forma parte integral de los presentes términos y que te recomendamos revisar en detalle.</p>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">4.1</div>
+                <h2>Uso de la Información</h2>
+            </div>
+            <p>La información recopilada se utiliza para los siguientes propósitos:</p>
+            <ul>
+                <li>Gestionar tu cuenta y personalizar tu experiencia de aprendizaje</li>
+                <li>Procesar pagos y emitir certificados de manera segura</li>
+                <li>Enviarte comunicaciones sobre cursos, actualizaciones y ofertas relevantes</li>
+                <li>Analizar el rendimiento de la plataforma y mejorar nuestros servicios</li>
+                <li>Cumplir con obligaciones legales y regulatorias aplicables</li>
+            </ul>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">4.2</div>
+                <h2>Cookies y Tecnologías de Seguimiento</h2>
+            </div>
+            <p>Utilizamos cookies propias y de terceros para mejorar la funcionalidad de la plataforma, recordar tus preferencias y analizar el tráfico. Puedes gestionar las preferencias de cookies desde la configuración de tu navegador; sin embargo, la desactivación de ciertas cookies puede limitar algunas funcionalidades de la plataforma.</p>
+        </div>
+    </div>
+</section>
+
+<!-- RESPONSABILIDAD -->
+<section class="alt" id="responsabilidad">
+    <div class="container">
+        <h2 class="section-title">Responsabilidad</h2>
+        <p class="section-subtitle">Alcances y límites de nuestra responsabilidad</p>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">5</div>
+                <h2>Limitación de Responsabilidad</h2>
+            </div>
+            <p>SaberIX no garantiza que la plataforma esté disponible de manera ininterrumpida, libre de errores o que los resultados obtenidos mediante su uso sean precisos o fiables. En la máxima medida permitida por la legislación aplicable, SaberIX no será responsable por daños indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso de nuestros servicios.</p>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">5.1</div>
+                <h2>Indemnización</h2>
+            </div>
+            <p>El usuario acepta defender, indemnizar y mantener indemne a SaberIX, sus directivos, empleados y socios ante cualquier reclamación, daño, pérdida o gasto —incluyendo honorarios legales razonables— que surja de: (a) el incumplimiento de estos Términos de Uso; (b) el uso indebido de la plataforma; o (c) la violación de derechos de terceros mediante el contenido publicado en la misma.</p>
+        </div>
+    </div>
+</section>
+
+<!-- MODIFICACIONES -->
+<section id="modificaciones">
+    <div class="container">
+        <h2 class="section-title">Modificaciones</h2>
+        <p class="section-subtitle">Cómo gestionamos los cambios en nuestros términos</p>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">6</div>
+                <h2>Cambios en los Términos</h2>
+            </div>
+            <p>SaberIX se reserva el derecho de modificar estos Términos de Uso en cualquier momento. Cuando realicemos cambios sustanciales, te notificaremos mediante un aviso prominente en la plataforma o por correo electrónico con al menos 15 días de anticipación. El uso continuado de nuestros servicios después de la entrada en vigor de los cambios constituye tu aceptación de los nuevos términos.</p>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">6.1</div>
+                <h2>Cambios en el Servicio</h2>
+            </div>
+            <p>Podemos actualizar, modificar o discontinuar funcionalidades de la plataforma según sea necesario para mejorar la experiencia educativa o por razones técnicas, legales o comerciales. Haremos los esfuerzos razonables para informarte con antelación sobre cambios significativos que puedan afectar tu experiencia de usuario.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CONDUCTA -->
+<section class="alt" id="conducta">
+    <div class="container">
+        <h2 class="section-title">Conducta del Usuario</h2>
+        <p class="section-subtitle">Estándares de comportamiento en nuestra comunidad educativa</p>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">7</div>
+                <h2>Código de Conducta</h2>
+            </div>
+            <p>SaberIX aspira a ser un espacio de aprendizaje seguro, inclusivo y respetuoso para todas las personas. Como parte de nuestra comunidad, te comprometemos a:</p>
+            <ul>
+                <li>Tratar a todos los usuarios, instructores y personal con respeto y dignidad</li>
+                <li>Abstenerte de publicar contenido discriminatorio por razón de origen, género, religión, orientación sexual o discapacidad</li>
+                <li>No acosar, intimidar ni amenazar a otros miembros de la comunidad</li>
+                <li>Mantener la confidencialidad de las cuentas y no compartir credenciales de acceso</li>
+                <li>Reportar comportamientos inapropiados al equipo de soporte de SaberIX</li>
+            </ul>
+        </div>
+
+        <div class="termino-card">
+            <div class="termino-card-header">
+                <div class="termino-num">7.1</div>
+                <h2>Consecuencias por Infracciones</h2>
+            </div>
+            <p>El incumplimiento del código de conducta o de cualquier disposición de estos Términos podrá resultar, a discreción de SaberIX, en: suspensión temporal o permanente de la cuenta, eliminación de contenido publicado, restricción de acceso a determinadas funcionalidades, y en casos graves, en acciones legales conforme a la legislación vigente en la República Dominicana.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA CONTACTO -->
+<section class="cta-section" id="contacto">
+    <div class="container">
+        <h2>¿Tienes Dudas?</h2>
+        <p>Nuestro equipo está disponible para aclarar cualquier inquietud sobre estos términos</p>
+        <a href="mailto:legal@saberix.com" class="btn-cta">Contáctanos</a>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 SaberIX — Educación Interactiva del Futuro</p>
+    <div class="divider"></div>
+    <p>Estos términos rigen el uso de la plataforma SaberIX en República Dominicana y Latinoamérica</p>
+</footer>
+
+<script>
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const navLinks = document.querySelectorAll('.nav-link');
+
+menuBtn.addEventListener('click', () => {
+    menuBtn.classList.toggle('active');
+    sidebar.classList.toggle('active');
+    sidebarOverlay.classList.toggle('active');
+});
+
+sidebarOverlay.addEventListener('click', () => {
+    menuBtn.classList.remove('active');
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+});
+
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        menuBtn.classList.remove('active');
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+    });
+});
+
+window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section, header');
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (window.scrollY >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+        }
+    });
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+        }
+    });
+});
+
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+}, observerOptions);
+document.querySelectorAll('section').forEach(section => observer.observe(section));
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
+</body>
+</html>

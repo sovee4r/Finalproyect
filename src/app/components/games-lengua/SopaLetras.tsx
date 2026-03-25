@@ -1,4 +1,4 @@
-// src/app/components/games-lengua/SopaLetras.tsx
+﻿// src/app/components/games-lengua/SopaLetras.tsx
 // Sopa de Letras — Lengua 4to-6to | patron identico a AhorcadoLengua
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -15,7 +15,7 @@ import { useMonedas } from "../../../hooks/useMonedas";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MiniJugadores } from "../MultiLobby";
 
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
 type Screen = "splash" | "config" | "juego" | "resultados";
 type Modo   = "solo" | "multi";
 const TAMAÑO = 12;
@@ -785,3 +785,5 @@ export function SopaLetras(){
     </motion.div>
   );
 }
+
+

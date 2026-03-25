@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sobre Nosotros | SaberIX</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        color: #e0e0e0;
+        line-height: 1.75;
+        background: #0f0f1e;
+        overflow-x: hidden;
+    }
+
+    /* BOTÓN MENÚ FLOTANTE */
+    .menu-btn {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #440dcf 100%);
+        border: none;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5);
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 1001;
+    }
+
+    .menu-btn:hover {
+        transform: scale(1.15) rotate(90deg);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.7);
+    }
+
+    .menu-btn.active {
+        transform: rotate(180deg);
+        background: linear-gradient(135deg, #0318fe 0%, #f5576c 100%);
+    }
+
+    .menu-btn svg {
+        width: 26px;
+        height: 26px;
+        stroke: white;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -380px;
+        width: 380px;
+        height: 100vh;
+        background: linear-gradient(180deg, rgba(15, 15, 30, 0.98) 0%, rgba(30, 30, 60, 0.98) 100%);
+        backdrop-filter: blur(30px);
+        box-shadow: 5px 0 40px rgba(0, 0, 0, 0.6);
+        transition: left 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 1000;
+        padding: 120px 45px 45px;
+        overflow-y: auto;
+        border-right: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+        z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .sidebar .logo {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        margin-bottom: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+    }
+
+    .nav-menu {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .nav-menu li {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    .sidebar.active .nav-menu li {
+        animation: slideInLeft 0.5s ease forwards;
+    }
+
+    .nav-menu li:nth-child(1) { animation-delay: 0.1s; }
+    .nav-menu li:nth-child(2) { animation-delay: 0.15s; }
+    .nav-menu li:nth-child(3) { animation-delay: 0.2s; }
+    .nav-menu li:nth-child(4) { animation-delay: 0.25s; }
+    .nav-menu li:nth-child(5) { animation-delay: 0.3s; }
+    .nav-menu li:nth-child(6) { animation-delay: 0.35s; }
+
+    @keyframes slideInLeft {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .nav-menu li a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 1.15rem;
+        letter-spacing: 1.5px;
+        transition: all 0.3s ease;
+        padding: 18px 25px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-menu li a::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        border-radius: 0 5px 5px 0;
+    }
+
+    .nav-menu li a:hover::before,
+    .nav-menu li a.active::before {
+        transform: scaleY(1);
+    }
+
+    .nav-menu li a::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 15px;
+    }
+
+    .nav-menu li a:hover::after,
+    .nav-menu li a.active::after {
+        opacity: 1;
+    }
+
+    .nav-menu li a:hover,
+    .nav-menu li a.active {
+        color: white;
+        transform: translateX(8px);
+    }
+
+    .nav-menu li a .icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-menu li a .icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+    }
+
+    /* HEADER HERO */
+    header.hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #ffffff;
+        padding: 180px 30px 120px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+    }
+
+    header.hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: moveBackground 20s linear infinite;
+    }
+
+    @keyframes moveBackground {
+        0% {
+            transform: translate(0, 0);
+        }
+        100% {
+            transform: translate(50px, 50px);
+        }
+    }
+
+    header.hero h1 {
+        font-size: 4.5rem;
+        font-weight: 400;
+        letter-spacing: 12px;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease;
+        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    header.hero p {
+        font-size: 1.5rem;
+        font-weight: 300;
+        letter-spacing: 4px;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease 0.3s backwards;
+    }
+
+    header.hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 180px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        z-index: 1;
+        animation: expandWidth 1s ease 0.6s backwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes expandWidth {
+        from {
+            width: 0;
+        }
+        to {
+            width: 180px;
+        }
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        animation: bounce 2s infinite;
+    }
+
+    .scroll-indicator svg {
+        width: 35px;
+        height: 35px;
+        stroke: white;
+        fill: none;
+        stroke-width: 2;
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateX(-50%) translateY(0);
+        }
+        50% {
+            transform: translateX(-50%) translateY(15px);
+        }
+    }
+
+    /* CONTAINER */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 30px;
+    }
+
+    /* SECCIONES */
+    section {
+        padding: 100px 0;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    section.visible {
+        animation: fadeInSection 0.8s ease forwards;
+    }
+
+    @keyframes fadeInSection {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    section.alt {
+        background: #1a1a2e;
+    }
+
+    /* BLOQUE CON ICONO */
+    .bloque {
+        display: flex;
+        align-items: center;
+        gap: 60px;
+        margin-bottom: 80px;
+        padding: 55px;
+        background: linear-gradient(135deg, rgba(30, 30, 60, 0.8) 0%, rgba(50, 50, 80, 0.6) 100%);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s ease;
+    }
+
+    .bloque::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .bloque:hover::before {
+        left: 100%;
+    }
+
+    .bloque:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 30px 80px rgba(102, 126, 234, 0.3);
+        border-color: rgba(102, 126, 234, 0.4);
+    }
+
+    .bloque.reverse {
+        flex-direction: row-reverse;
+    }
+
+    .bloque .texto h2 {
+        font-size: 2.3rem;
+        color: white;
+        margin-bottom: 25px;
+        letter-spacing: 2px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .bloque .texto h2::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 70px;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #6013ad 100%);
+        border-radius: 2px;
+    }
+
+    .bloque .texto p {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-align: justify;
+        line-height: 2;
+    }
+
+    .bloque .icono {
+        min-width: 200px;
+        width: 200px;
+        height: 200px;
+        fill: none;
+        stroke: #667eea;
+        stroke-width: 2;
+        opacity: 0.9;
+        transition: all 0.5s ease;
+        filter: drop-shadow(0 10px 30px rgba(102, 126, 234, 0.4));
+    }
+
+    .bloque:hover .icono {
+        transform: scale(1.15) rotate(10deg);
+        stroke: #f093fb;
+    }
+
+    /* VALORES */
+    .valores-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 130px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .valores-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    }
+
+    .valores-section .section-title {
+        color: white;
+        text-align: center;
+        font-size: 3rem;
+        margin-bottom: 25px;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        position: relative;
+        padding-bottom: 30px;
+        text-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .valores-section .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 3px;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 80px;
+        font-style: italic;
+        letter-spacing: 1.5px;
+    }
+
+    .valores-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 45px;
+        margin-top: 60px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .valor {
+        text-align: center;
+        padding: 55px 35px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+    }
+
+    .valor::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+        transition: transform 0.6s ease;
+        border-radius: 50%;
+    }
+
+    .valor:hover::before {
+        transform: translate(-50%, -50%) scale(2.5);
+    }
+
+    .valor:hover {
+        transform: translateY(-20px) scale(1.08);
+        background: rgba(255, 255, 255, 0.18);
+        border-color: white;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .valor svg {
+        width: 100px;
+        height: 100px;
+        fill: none;
+        stroke: white;
+        stroke-width: 2;
+        margin-bottom: 30px;
+        transition: all 0.6s ease;
+        filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
+    }
+
+    .valor:hover svg {
+        transform: rotateY(360deg) scale(1.25);
+    }
+
+    .valor p {
+        font-size: 1.5rem;
+        font-weight: 500;
+        letter-spacing: 1.5px;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* FORMULARIO DE CONTACTO */
+    .contacto-section {
+        background: #0f0f1e;
+        padding: 130px 0;
+        position: relative;
+    }
+
+    .section-title-dark {
+        text-align: center;
+        font-size: 3rem;
+        color: white;
+        margin-bottom: 25px;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        position: relative;
+        padding-bottom: 30px;
+    }
+
+    .section-title-dark::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 5px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 3px;
+    }
+
+    .contacto-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        margin-top: 80px;
+    }
+
+    .formulario-box {
+        background: linear-gradient(135deg, rgba(30, 30, 60, 0.8) 0%, rgba(50, 50, 80, 0.6) 100%);
+        padding: 65px;
+        border-radius: 20px;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        transition: all 0.5s ease;
+    }
+
+    .formulario-box:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 35px 90px rgba(102, 126, 234, 0.3);
+        border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .formulario-box h3 {
+        font-size: 2.1rem;
+        color: white;
+        margin-bottom: 40px;
+        letter-spacing: 2px;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 18px;
+        border: 2px solid rgba(102, 126, 234, 0.3);
+        border-radius: 12px;
+        font-size: 1rem;
+        font-family: 'Georgia', serif;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 140px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px 45px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.15rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        text-transform: uppercase;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transition: transform 0.5s ease;
+    }
+
+    .btn-submit:hover::before {
+        transform: translate(-50%, -50%) scale(3);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    /* UBICACIÓN */
+    .ubicacion-box {
+        background: linear-gradient(135deg, rgba(30, 30, 60, 0.8) 0%, rgba(50, 50, 80, 0.6) 100%);
+        padding: 65px;
+        border-radius: 20px;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        transition: all 0.5s ease;
+    }
+
+    .ubicacion-box:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 35px 90px rgba(102, 126, 234, 0.3);
+        border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .ubicacion-box h3 {
+        font-size: 2.1rem;
+        color: white;
+        margin-bottom: 40px;
+        letter-spacing: 2px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 30px;
+        padding: 22px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        transform: translateX(10px);
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+    }
+
+    .info-item svg {
+        width: 30px;
+        height: 30px;
+        fill: #667eea;
+        margin-right: 20px;
+        flex-shrink: 0;
+        margin-top: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover svg {
+        fill: #f093fb;
+        transform: scale(1.2);
+    }
+
+    .info-item .info-content {
+        flex: 1;
+    }
+
+    .info-item strong {
+        display: block;
+        color: white;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .info-item p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    .mapa {
+        width: 100%;
+        height: 350px;
+        border-radius: 15px;
+        margin-top: 40px;
+        border: 3px solid rgba(102, 126, 234, 0.3);
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .mapa:hover {
+        border-color: #667eea;
+        transform: scale(1.02);
+    }
+
+    .mapa iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* FOOTER */
+    footer {
+        background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+        color: white;
+        text-align: center;
+        padding: 60px 30px;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -50%;
+        width: 200%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+    }
+
+    footer .divider {
+        width: 120px;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        margin: 30px auto;
+        border-radius: 2px;
+    }
+
+    footer p {
+        margin: 12px 0;
+        opacity: 0.9;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 968px) {
+        .sidebar {
+            width: 320px;
+            left: -320px;
+        }
+
+        .bloque {
+            flex-direction: column;
+            text-align: center;
+            gap: 35px;
+        }
+
+        .bloque.reverse {
+            flex-direction: column;
+        }
+
+        .contacto-grid {
+            grid-template-columns: 1fr;
+            gap: 45px;
+        }
+
+        .valores-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        header.hero h1 {
+            font-size: 3rem;
+            letter-spacing: 6px;
+        }
+
+        header.hero {
+            padding: 150px 30px 90px;
+        }
+    }
+
+    @media (max-width: 568px) {
+        .menu-btn {
+            width: 55px;
+            height: 55px;
+            top: 20px;
+            left: 20px;
+        }
+
+        .sidebar {
+            width: 85vw;
+            left: -85vw;
+            padding: 100px 30px 30px;
+        }
+
+        header.hero {
+            padding: 130px 20px 70px;
+        }
+
+        header.hero h1 {
+            font-size: 2.3rem;
+            letter-spacing: 4px;
+        }
+
+        .bloque {
+            padding: 35px;
+        }
+
+        .formulario-box,
+        .ubicacion-box {
+            padding: 40px;
+        }
+
+        .valores-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- BOTÓN MENÚ -->
+<button class="menu-btn" id="menuBtn">
+    <svg viewBox="0 0 24 24">
+        <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+</button>
+
+<!-- OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="logo">SaberIX</div>
+    
+    <ul class="nav-menu">
+        <li>
+            <a href="#inicio" class="nav-link active">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    </svg>
+                </span>
+                <span>Inicio</span>
+            </a>
+        </li>
+        <li>
+            <a href="#quienes-somos" class="nav-link">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </span>
+                <span>Nosotros</span>
+            </a>
+        </li>
+        <li>
+            <a href="#mision" class="nav-link">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </span>
+                <span>Misión</span>
+            </a>
+        </li>
+        <li>
+            <a href="#vision" class="nav-link">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </span>
+                <span>Visión</span>
+            </a>
+        </li>
+        <li>
+            <a href="#valores" class="nav-link">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </span>
+                <span>Valores</span>
+            </a>
+        </li>
+        <li>
+            <a href="#contacto" class="nav-link">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </span>
+                <span>Contacto</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+
+<!-- HEADER HERO -->
+<header class="hero" id="inicio">
+    <h1>SOBRE NOSOTROS</h1>
+    <p>Conoce la esencia detrás de SaberIX</p>
+    <div class="scroll-indicator">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+</header>
+
+<!-- QUIENES SOMOS -->
+<section id="quienes-somos">
+    <div class="container">
+        <div class="bloque">
+            <div class="texto">
+                <h2>¿Quiénes somos?</h2>
+                <p>
+                    SaberIX es una plataforma educativa interactiva de vanguardia que transforma el aprendizaje
+                    en una experiencia emocionante y envolvente mediante juegos dinámicos, retos intelectuales 
+                    y preguntas tipo quiz cuidadosamente diseñadas. Nuestro propósito fundamental es motivar a 
+                    los estudiantes a aprender disfrutando cada desafío, combinando tecnología de última generación 
+                    con metodologías pedagógicas innovadoras y probadas para crear un ambiente de aprendizaje 
+                    verdaderamente dinámico, efectivo y memorable.
+                </p>
+            </div>
+
+            <svg viewBox="0 0 120 120" class="icono">
+                <circle cx="60" cy="35" r="15"/>
+                <rect x="40" y="55" width="40" height="40" rx="8"/>
+                <line x1="60" y1="50" x2="60" y2="55"/>
+                <circle cx="60" cy="75" r="3"/>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- MISION -->
+<section class="alt" id="mision">
+    <div class="container">
+        <div class="bloque reverse">
+            <svg viewBox="0 0 100 100" class="icono">
+                <polygon points="50,10 90,90 10,90"/>
+                <circle cx="50" cy="60" r="8"/>
+                <line x1="50" y1="20" x2="50" y2="52"/>
+            </svg>
+
+            <div class="texto">
+                <h2>Misión</h2>
+                <p>
+                    Ofrecer una herramienta educativa innovadora y accesible que combine tecnología de punta,
+                    gamificación inteligente y contenido académico de la más alta calidad para facilitar un 
+                    aprendizaje dinámico, accesible y profundamente motivador. Nos comprometemos firmemente a 
+                    transformar la experiencia educativa tradicional, haciendo que cada estudiante descubra el 
+                    verdadero placer de aprender mientras desarrolla habilidades esenciales para su futuro.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- VISION -->
+<section id="vision">
+    <div class="container">
+        <div class="bloque">
+            <div class="texto">
+                <h2>Visión</h2>
+                <p>
+                    Convertirnos en la plataforma líder indiscutible de aprendizaje gamificado en toda Latinoamérica,
+                    revolucionando la forma tradicional de enseñar a través de experiencias digitales
+                    verdaderamente inmersivas, interactivas y significativas. Aspiramos a ser reconocidos 
+                    internacionalmente como la solución educativa preferida por instituciones educativas,
+                    profesores innovadores y estudiantes comprometidos.
+                </p>
+            </div>
+
+            <svg viewBox="0 0 100 100" class="icono">
+                <circle cx="50" cy="50" r="35"/>
+                <circle cx="50" cy="50" r="25"/>
+                <circle cx="50" cy="50" r="15"/>
+                <circle cx="50" cy="50" r="5"/>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- VALORES -->
+<section class="valores-section" id="valores">
+    <div class="container">
+        <h2 class="section-title">Nuestros Valores</h2>
+        <p class="section-subtitle">Los pilares fundamentales que guían nuestro trabajo</p>
+
+        <div class="valores-grid">
+            <div class="valor">
+                <svg viewBox="0 0 100 100">
+                    <rect x="20" y="20" width="60" height="60" rx="5"/>
+                    <line x1="35" y1="50" x2="65" y2="50"/>
+                    <line x1="50" y1="35" x2="50" y2="65"/>
+                </svg>
+                <p>Innovación</p>
+            </div>
+
+            <div class="valor">
+                <svg viewBox="0 0 100 100">
+                    <path d="M20 70 L50 20 L80 70 Z"/>
+                    <circle cx="50" cy="40" r="5"/>
+                    <line x1="40" y1="60" x2="60" y2="60"/>
+                </svg>
+                <p>Creatividad</p>
+            </div>
+
+            <div class="valor">
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="30"/>
+                    <path d="M35 50 L45 60 L65 40" stroke-width="3"/>
+                </svg>
+                <p>Compromiso</p>
+            </div>
+
+            <div class="valor">
+                <svg viewBox="0 0 100 100">
+                    <polygon points="50,10 60,40 90,40 65,60 75,90 50,70 25,90 35,60 10,40 40,40"/>
+                </svg>
+                <p>Excelencia</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACTO Y UBICACIÓN -->
+<section class="contacto-section" id="contacto">
+    <div class="container">
+        <h2 class="section-title-dark">Contáctanos</h2>
+        <p class="section-subtitle" style="color: rgba(255, 255, 255, 0.7);">Estamos aquí para ayudarte</p>
+
+        <div class="contacto-grid">
+            <!-- FORMULARIO -->
+            <div class="formulario-box">
+                <h3>Envíanos un Mensaje</h3>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="nombre">Nombre Completo *</label>
+                        <input type="text" id="nombre" name="nombre" required placeholder="Juan Pérez">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico *</label>
+                        <input type="email" id="email" name="email" required placeholder="tu@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="+1 (809) 555-1234">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="asunto">Asunto *</label>
+                        <input type="text" id="asunto" name="asunto" required placeholder="¿En qué podemos ayudarte?">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje *</label>
+                        <textarea id="mensaje" name="mensaje" required placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                </form>
+            </div>
+
+            <!-- UBICACIÓN -->
+            <div class="ubicacion-box">
+                <h3>Dónde Encontrarnos</h3>
+
+                <div class="info-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    <div class="info-content">
+                        <strong>Dirección Física</strong>
+                        <p>Av. Abraham Lincoln #1025, Plaza Caribalico, Local 301<br>
+                        Piantini, Santo Domingo, República Dominicana</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                    <div class="info-content">
+                        <strong>Correos Electrónicos</strong>
+                        <p>info@saberix.com<br>soporte@saberix.com</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/>
+                    </svg>
+                    <div class="info-content">
+                        <strong>Teléfonos de Contacto</strong>
+                        <p>+1 (809) 555-7846<br>+1 (829) 555-9123</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                        <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                    <div class="info-content">
+                        <strong>Horario de Atención</strong>
+                        <p>Lunes a Viernes: 8:00 AM - 6:00 PM<br>
+                        Sábados: 9:00 AM - 1:00 PM<br>
+                        Domingos: Cerrado</p>
+                    </div>
+                </div>
+
+                <!-- MAPA -->
+                <div class="mapa">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.4155889739767!2d-69.94415892399975!3d18.46814497090534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8eaf89f9a2e1a58d%3A0x1a5f7f7c7f7f7f7f!2sAv.%20Abraham%20Lincoln%2C%20Santo%20Domingo!5e0!3m2!1ses!2sdo!4v1234567890123!5m2!1ses!2sdo"
+                        allowfullscreen="" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 SaberIX — Educación Interactiva del Futuro</p>
+    <div class="divider"></div>
+    <p>Transformando el aprendizaje en República Dominicana y Latinoamérica</p>
+</footer>
+
+<script>
+// Variables
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const navLinks = document.querySelectorAll('.nav-link');
+
+// Toggle sidebar
+menuBtn.addEventListener('click', () => {
+    menuBtn.classList.toggle('active');
+    sidebar.classList.toggle('active');
+    sidebarOverlay.classList.toggle('active');
+});
+
+// Cerrar sidebar al hacer click en overlay
+sidebarOverlay.addEventListener('click', () => {
+    menuBtn.classList.remove('active');
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+});
+
+// Cerrar sidebar al hacer click en un link
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        menuBtn.classList.remove('active');
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+    });
+});
+
+// Scroll spy - destacar sección activa
+window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section, header');
+    let current = '';
+
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (window.scrollY >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+        }
+    });
+});
+
+// Animación de entrada para secciones
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('section').forEach(section => {
+    observer.observe(section);
+});
+
+// Manejo del formulario
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const nombre = document.getElementById('nombre').value;
+    const email = document.getElementById('email').value;
+    const asunto = document.getElementById('asunto').value;
+    
+    const btn = document.querySelector('.btn-submit');
+    const originalText = btn.textContent;
+    btn.textContent = 'Enviando...';
+    btn.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+    
+    setTimeout(() => {
+        alert('¡Gracias por contactarnos, ' + nombre + '!\n\nHemos recibido tu mensaje:\n\nAsunto: ' + asunto + '\nCorreo: ' + email + '\n\nTe responderemos pronto.');
+        
+        btn.textContent = '✓ Mensaje Enviado';
+        
+        setTimeout(() => {
+            this.reset();
+            btn.textContent = originalText;
+            btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        }, 2000);
+    }, 1500);
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            window.scrollTo({
+                top: target.offsetTop,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+</script>
+
+</body>
+</html>

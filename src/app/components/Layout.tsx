@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -290,9 +290,9 @@ export function Layout() {
                 <p className="text-gray-500 text-[10px]">{t("derechos")}</p>
               </div>
               <div className="hidden md:flex gap-6 text-[10px] text-gray-500">
-                <a href="#" className="hover:text-[#00d9ff] transition-colors">{t("sobreNosotros")}</a>
-                <a href="#" className="hover:text-[#00d9ff] transition-colors">{t("terminosDeUso")}</a>
-                <a href="#" className="hover:text-[#00d9ff] transition-colors">{t("privacidad")}</a>
+                <a href="/nosotros.html" target="_blank" className="hover:text-[#00d9ff] transition-colors">{t("sobreNosotros")}</a>
+                <a href="/terminos.html" target="_blank" className="hover:text-[#00d9ff] transition-colors">{t("terminosDeUso")}</a>
+                <a href="/terminos.html#privacidad" target="_blank" className="hover:text-[#00d9ff] transition-colors">{t("privacidad")}</a>
               </div>
               <div className="flex gap-3">
                 <SocialBtn href="https://www.facebook.com/share/18Do35dCD3/" bg="#1877f2">
@@ -349,3 +349,7 @@ const SocialBtn = ({ href, bg, border, children }: { href: string; bg: string; b
     {children}
   </a>
 );
+
+
+
+

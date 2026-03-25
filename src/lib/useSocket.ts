@@ -1,4 +1,4 @@
-// src/lib/useSocket.ts
+﻿// src/lib/useSocket.ts
 import { useEffect, useRef, useCallback, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -62,7 +62,7 @@ export interface MultiState {
   tiempoAgotado: boolean;
 }
 
-const SERVIDOR = import.meta.env.VITE_SOCKET_URL ?? "http://localhost:3001";
+const SERVIDOR = import.meta.env.VITE_SOCKET_URL ?? "https://finalproyect-production-3837.up.railway.app";
 
 /* ── Socket GLOBAL — persiste fuera del ciclo de React ── */
 let globalSocket: Socket | null = null;
@@ -285,3 +285,5 @@ export function useSocket() {
     resetError,
   };
 }
+
+

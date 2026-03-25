@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Bell, Shield, LogOut, Monitor, Languages, Check, AlertTriangle } from "lucide-react";
 import { useAuth } from "../AuthContext";
@@ -436,3 +436,5 @@ const SettingsSection = ({ title, icon, children }: { title: string; icon: React
     <div className="p-6 space-y-2">{children}</div>
   </motion.div>
 );
+
+

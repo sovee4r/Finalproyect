@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Target, TrendingUp, Trophy, User, Star, Zap, MessageCircle, UserPlus, Check, Globe2 } from "lucide-react";
 import { useAuth } from "../AuthContext";
 import { useSearchParams, useNavigate, useLocation } from "react-router";
@@ -315,3 +315,5 @@ export function Profile() {
     </div>
   );
 }
+
+

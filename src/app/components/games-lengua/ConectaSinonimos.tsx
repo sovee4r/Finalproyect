@@ -1,4 +1,4 @@
-// src/app/components/games-lengua/ConectaSinonimos.tsx
+﻿// src/app/components/games-lengua/ConectaSinonimos.tsx
 // Conecta Sinónimos/Antónimos — Lengua Española 4to-6to grado
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -16,7 +16,7 @@ import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from
 import { MiniJugadores } from "../MultiLobby";
 import logoImg from "../../../assets/logo.png";
 
-const API   = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+const API   = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
 type Screen    = "splash" | "config" | "juego" | "resultados";
 type Modo      = "solo" | "multi";
 type TipoJuego = "sinonimos" | "antonimos";
@@ -759,3 +759,5 @@ export function ConectaSinonimos(){
     </div>
   );
 }
+
+

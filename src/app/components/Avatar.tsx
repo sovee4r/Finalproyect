@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { User, Camera, Save, X, Loader2, Upload, Link } from "lucide-react";
 import { useAuth } from "../AuthContext";
 
@@ -343,3 +343,5 @@ export function Avatar() {
     </div>
   );
 }
+
+

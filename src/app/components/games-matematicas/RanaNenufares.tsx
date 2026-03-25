@@ -1,4 +1,4 @@
-// RanaNenufares.tsx — Matemáticas 4to-6to
+﻿// RanaNenufares.tsx — Matemáticas 4to-6to
 // La rana salta de nenúfar en nenúfar. Cada nenúfar tiene un número.
 // Responde la pregunta y elige el nenúfar con la respuesta correcta para saltar.
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -756,3 +756,5 @@ export function RanaNenufares() {
     </div>
   );
 }
+
+

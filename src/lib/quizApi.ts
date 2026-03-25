@@ -1,4 +1,4 @@
-// ══════════════════════════════════════════════
+﻿// ══════════════════════════════════════════════
 //  quizApi.ts — Conexión al backend con Railway MySQL
 //  Host:     turntable.proxy.rlwy.net
 //  Port:     43192
@@ -18,7 +18,7 @@ export interface Pregunta {
 // URL base del backend Express
 // En desarrollo: http://localhost:3000
 // En producción: reemplaza con tu URL de Render/Railway
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+const API_BASE = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
 
 export const quizApi = {
   /**
@@ -40,3 +40,5 @@ export const quizApi = {
     return res.json();
   },
 };
+
+
