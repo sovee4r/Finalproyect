@@ -8,6 +8,8 @@ import {
   User, Users, AlertTriangle, Settings, Zap
 } from "lucide-react";
 import { Link } from "react-router";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { useSocket } from "../../../lib/useSocket";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MiniJugadores } from "../MultiLobby";
@@ -273,6 +275,7 @@ export function QuizCiencias() {
         music.playVictory(); setShowConfetti(true);
       } else { music.stop(); }
       guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo });
+      agregarMonedas(score);
       setScreen("resultados");
     } else {
       setIdx(i => i + 1);

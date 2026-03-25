@@ -3,9 +3,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, Play, X, Volume2, VolumeX, RotateCcw, Trophy, Star, CheckCircle2, XCircle, Settings, User, Users, LogOut, AlertTriangle } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate} from "react-router";
 import logoImg from "../../../assets/logo.png";
 import { useSocket } from "../../../lib/useSocket";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MiniJugadores } from "../MultiLobby";
 
@@ -120,11 +122,16 @@ function SplashScreen({splashPct,splashDone}:{splashPct:number;splashDone:boolea
 function Recompensas({puntos}:{puntos:number}){return(<motion.div initial={{opacity:0,scale:0.95}} animate={{opacity:1,scale:1}} transition={{delay:0.7}} className="rounded-2xl border-2 p-6 mb-6" style={{background:"linear-gradient(135deg,rgba(255,152,0,0.08),rgba(255,215,0,0.04))",borderColor:"rgba(255,152,0,0.3)"}}><div className="flex items-center justify-center gap-2 mb-5"><Trophy size={15} className="text-[#ffd700]"/><p className="text-sm font-extrabold text-[#ffd700] tracking-widest uppercase">Recompensas</p></div><div className="flex justify-center gap-10"><div className="text-center"><div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mx-auto mb-2" style={{background:"linear-gradient(135deg,#ffd700,#ff9800)",boxShadow:"0 0 16px rgba(255,215,0,0.5)"}}>🪙</div><div className="font-['Press_Start_2P'] text-2xl text-[#ff9800]">+{puntos}</div><div className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">Monedas</div></div><div className="text-center"><div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mx-auto mb-2" style={{background:"linear-gradient(135deg,#a78bfa,#7c3aed)",boxShadow:"0 0 16px rgba(167,139,250,0.5)"}}>⚡</div><div className="font-['Press_Start_2P'] text-2xl text-[#a78bfa]">+{Math.round(puntos*1.5)}</div><div className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">Experiencia</div></div></div></motion.div>);}
 
 export function ClasificaAnimales(){
+  const { user } = useAuth();
+  const { agregarMonedas } = useMonedas();
+  const navigate = useNavigate();
   const music=useMusic(); const socket=useSocket();
   const [screen,setScreen]=useState<Screen>("splash");
   const [splashPct,setSplashPct]=useState(0); const [splashDone,setSplashDone]=useState(false);
   const [grado,setGrado]=useState(4); const [modo,setModo]=useState<Modo>("solo");
   const [playerName,setPlayerName]=useState("");
+  // Prellenar nombre con el de la cuenta
+  useEffect(() => { if (user?.nombre) setPlayerName(user.nombre); }, [user]);
   const [settOpen,setSettOpen]=useState(false); const [showRanking,setShowRanking]=useState(false);
   const [pendientes,setPendientes]=useState<Animal[]>([]);
   const [clasificados,setClasificados]=useState<Record<string,Animal[]>>({});
@@ -135,6 +142,8 @@ export function ClasificaAnimales(){
   const [feedback,setFeedback]=useState<{msg:string;ok:boolean}|null>(null);
 
   const multiState=socket.state;
+  if (!user) { navigate("/login"); return null; }
+
   const estaEnLobby=modo==="multi"&&multiState.estado==="lobby";
   const hayError=modo==="multi"&&multiState.estado==="error";
   const modoRef=useRef(modo); const gradoRef=useRef(grado); const nameRef=useRef(playerName);
@@ -152,7 +161,7 @@ export function ClasificaAnimales(){
   useEffect(()=>{if(modoRef.current==="multi"&&multiState.estado==="jugando"&&screen!=="juego"&&nameRef.current.trim())iniciarJuego(gradoRef.current);},[multiState.estado]); // eslint-disable-line
   useEffect(()=>{
     if(screen==="juego"&&pendientes.length===0&&totalClasificados===totalAnimales&&totalAnimales>0)
-      setTimeout(()=>{music.stop();setScreen("resultados");},800);
+      setTimeout(()=>{music.stop();agregarMonedas(puntos);setScreen("resultados");},800);
   },[pendientes.length,screen]); // eslint-disable-line
 
   function iniciarJuego(g:number){
@@ -226,7 +235,7 @@ export function ClasificaAnimales(){
         </div>
       </div>
       <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4"><p className="text-xs font-extrabold text-[#ff9800] tracking-widest uppercase mb-3">Grado</p><div className="grid grid-cols-3 gap-2">{[4,5,6].map(g=>(<button key={g} onClick={()=>setGrado(g)} className="py-3 rounded-xl border-2 font-bold text-sm transition-all" style={{borderColor:grado===g?"#ff9800":"rgba(255,255,255,0.1)",background:grado===g?"rgba(255,152,0,0.1)":"rgba(255,255,255,0.03)",color:grado===g?"#ff9800":"#6b7280"}}>{g}to Grado</button>))}</div></div>
-      <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4"><p className="text-xs font-extrabold text-[#ff9800] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13}/> Tu nombre</p><input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold outline-none focus:border-[#ff9800]/60 transition-all placeholder:text-gray-600" placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/></div>
+      <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4"><p className="text-xs font-extrabold text-[#ff9800] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13}/> Tu nombre</p><input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold outline-none focus:border-[#ff9800]/60 transition-all placeholder:text-gray-600" disabled={!!user} placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/></div>
       <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-6">
         <p className="text-xs font-extrabold text-[#00ff88] tracking-widest uppercase mb-3 flex items-center gap-2"><Play size={13}/> Modo de juego</p>
         <div className="grid grid-cols-2 gap-2 mb-4"><button onClick={()=>setModo("solo")} className={`py-3 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition-all ${modo==="solo"?"border-[#00ff88] bg-[#00ff88]/10 text-[#00ff88]":"border-white/10 bg-white/3 text-gray-400 hover:border-white/25"}`}><User size={15}/> Solitario</button><button onClick={()=>setModo("multi")} className={`py-3 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition-all ${modo==="multi"?"border-[#a78bfa] bg-[#a78bfa]/10 text-[#a78bfa]":"border-white/10 bg-white/3 text-gray-400 hover:border-white/25"}`}><Users size={15}/> Multijugador</button></div>

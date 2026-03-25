@@ -7,9 +7,11 @@ import {
   Trophy, Star, CheckCircle2, XCircle, Settings,
   User, Users, LogOut, Clock
 } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate} from "react-router";
 import logoImg from "../../../assets/logo.png";
 import { useSocket } from "../../../lib/useSocket";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MiniJugadores } from "../MultiLobby";
 
@@ -162,11 +164,16 @@ function Recompensas({puntos}:{puntos:number}){
 }
 
 export function Periodista(){
+  const { user } = useAuth();
+  const { agregarMonedas } = useMonedas();
+  const navigate = useNavigate();
   const music=useMusic(); const socket=useSocket();
   const [screen,setScreen]=useState<Screen>("splash");
   const [splashPct,setSplashPct]=useState(0); const [splashDone,setSplashDone]=useState(false);
   const [grado,setGrado]=useState(4); const [modo,setModo]=useState<Modo>("solo");
   const [playerName,setPlayerName]=useState("");
+  // Prellenar nombre con el de la cuenta
+  useEffect(() => { if (user?.nombre) setPlayerName(user.nombre); }, [user]);
   const [settOpen,setSettOpen]=useState(false); const [showRanking,setShowRanking]=useState(false);
 
   const [noticiaIdx,setNoticiaIdx]=useState(0);
@@ -180,6 +187,8 @@ export function Periodista(){
   const timerRef=useRef<ReturnType<typeof setInterval>|null>(null);
 
   const multiState=socket.state;
+  if (!user) { navigate("/login"); return null; }
+
   const estaEnLobby=modo==="multi"&&multiState.estado==="lobby";
   const hayError=modo==="multi"&&multiState.estado==="error";
   const modoRef=useRef(modo); const gradoRef=useRef(grado); const nameRef=useRef(playerName);
@@ -224,7 +233,7 @@ export function Periodista(){
         const nextNoticia=noticiaIdx+1;
         if(nextNoticia>=noticias.length){
           if(timerRef.current)clearInterval(timerRef.current);
-          music.stop(); setScreen("resultados");
+          music.stop(); agregarMonedas(puntos); setScreen("resultados");
         }else{
           const n=noticias[nextNoticia]; setNoticia(n); setNoticiaIdx(nextNoticia);
           setPregIdx(0); setSeleccionada(null); setMostrarFeedback(false);
@@ -333,7 +342,7 @@ export function Periodista(){
       <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
         <p className="text-xs font-extrabold text-[#DAA520] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13}/> Tu nombre</p>
         <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold outline-none focus:border-[#DAA520]/60 transition-all placeholder:text-gray-600"
-          placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
+          disabled={!!user} placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
       </div>
       <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-6">
         <p className="text-xs font-extrabold text-[#00ff88] tracking-widest uppercase mb-3 flex items-center gap-2"><Play size={13}/> Modo de juego</p>

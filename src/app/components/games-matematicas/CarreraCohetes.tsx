@@ -10,6 +10,8 @@ import {
   User, Users, AlertTriangle, Settings, Zap
 } from "lucide-react";
 import { Link } from "react-router";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { useSocket } from "../../../lib/useSocket";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import logoImg from "../../../assets/logo.png";
@@ -278,6 +280,7 @@ export function CarreraCohetes() {
       if (totalCorrectas >= Math.ceil(TOTAL_PREGUNTAS * 0.7)) { music.playVictory(); setShowConfetti(true); }
       else { music.stop(); }
       guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo });
+      agregarMonedas(score);
       setScreen("resultados");
     } else {
       setIdx(i => i + 1); setSeleccionada(null); setConfirmada(false);

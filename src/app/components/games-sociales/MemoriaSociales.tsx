@@ -6,8 +6,10 @@ import {
   CheckCircle2, Clock, LogOut, HelpCircle,
   User, Users, AlertTriangle, Settings
 } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate} from "react-router";
 import { useSocket } from "../../../lib/useSocket";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MiniJugadores } from "../MultiLobby";
 // Ruta corregida — src/assets/logo.png desde src/app/components/games-sociales/
@@ -161,6 +163,9 @@ function Confetti() {
 export function MemoriaSociales() {
   const music  = useMusic();
   const socket = useSocket();
+  const { user } = useAuth();
+  const { agregarMonedas } = useMonedas();
+  const navigate = useNavigate();
 
   const [screen,      setScreen]      = useState<Screen>("splash");
   const [splashPct,   setSplashPct]   = useState(0);
@@ -169,6 +174,8 @@ export function MemoriaSociales() {
   const [modo,        setModo]        = useState<Modo>("solo");
   const [grado,       setGrado]       = useState(4);
   const [playerName,  setPlayerName]  = useState("");
+  // Prellenar nombre con el de la cuenta
+  useEffect(() => { if (user?.nombre) setPlayerName(user.nombre); }, [user]);
   const [cards,       setCards]       = useState<Card[]>([]);
   const [selected,    setSelected]    = useState<number[]>([]);
   const [matches,     setMatches]     = useState(0);
@@ -206,6 +213,8 @@ export function MemoriaSociales() {
   }, [timerOn]);
 
   const multiState    = socket.state;
+  if (!user) { navigate("/login"); return null; }
+
   const estaEnLobby   = modo === "multi" && multiState.estado === "lobby";
   // Minijuegos manejan su propia pantalla de resultados - ignorar juego_terminado del backend
   const estaEnRanking = false;
@@ -273,6 +282,7 @@ export function MemoriaSociales() {
             setShowConfetti(true);
             const pts = Math.max(100, 1000 - moves*10 - tiempo);
             guardarResultado({ jugador: playerName||"Anónimo", grado, puntos: pts, correctas: nm, incorrectas: moves-nm, tiempo_seg: tiempo, modo });
+      agregarMonedas(pts);
           }
         }, 500);
       } else {
@@ -466,7 +476,7 @@ export function MemoriaSociales() {
           <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
             <p className="text-xs font-extrabold text-[#00e5ff] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13}/> Tu nombre</p>
             <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold text-base outline-none focus:border-[#00e5ff]/60 transition-all placeholder:text-gray-600"
-              placeholder="Escribe tu nombre..." value={playerName} onChange={e => setPlayerName(e.target.value)} maxLength={20}/>
+              disabled={!!user} placeholder="Escribe tu nombre..." value={playerName} onChange={e => setPlayerName(e.target.value)} maxLength={20}/>
           </div>
 
           {/* Grado */}

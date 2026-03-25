@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Send, User, Loader2 } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowLeft, Send, User, Loader2, Pencil, Trash2, Check, CheckCheck } from "lucide-react";
 import { useAuth } from "../AuthContext";
 import { useSearchParams, useNavigate } from "react-router";
 
@@ -19,11 +19,13 @@ export function Chat() {
   const amigoId     = Number(searchParams.get("userId"));
   const amigoNombre = decodeURIComponent(searchParams.get("nombre") ?? "");
 
-  const [mensajes,  setMensajes]  = useState<Mensaje[]>([]);
-  const [texto,     setTexto]     = useState("");
-  const [loading,   setLoading]   = useState(true);
-  const [enviando,  setEnviando]  = useState(false);
-  const [amigoFoto, setAmigoFoto] = useState<string | null>(null);
+  const [mensajes,   setMensajes]   = useState<Mensaje[]>([]);
+  const [texto,      setTexto]      = useState("");
+  const [loading,    setLoading]    = useState(true);
+  const [enviando,   setEnviando]   = useState(false);
+  const [amigoFoto,  setAmigoFoto]  = useState<string | null>(null);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [editTexto,  setEditTexto]  = useState("");
   const bottomRef   = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<any>(null);
 
@@ -32,7 +34,6 @@ export function Chat() {
     fetch(`${API}/api/perfil/${amigoId}`)
       .then(r => r.json())
       .then(d => { if (d.ok) setAmigoFoto(d.user.foto); });
-
     cargarMensajes();
     intervalRef.current = setInterval(cargarMensajes, 3000);
     return () => clearInterval(intervalRef.current);
@@ -71,6 +72,37 @@ export function Chat() {
     }
   }
 
+  async function editarMensaje(id: number) {
+    if (!editTexto.trim() || !user) return;
+    try {
+      await fetch(`${API}/api/mensajes/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contenido: editTexto.trim(), userId: user.id }),
+      });
+      setMensajes(prev => prev.map(m => m.id === id ? { ...m, contenido: editTexto.trim() } : m));
+    } catch (err) {
+      console.error("Error editando mensaje:", err);
+    } finally {
+      setEditandoId(null);
+      setEditTexto("");
+    }
+  }
+
+  async function borrarMensaje(id: number) {
+    if (!user) return;
+    try {
+      await fetch(`${API}/api/mensajes/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      setMensajes(prev => prev.filter(m => m.id !== id));
+    } catch (err) {
+      console.error("Error borrando mensaje:", err);
+    }
+  }
+
   function formatHora(dateStr: string) {
     return new Date(dateStr).toLocaleTimeString("es-DO", { hour: "2-digit", minute: "2-digit" });
   }
@@ -91,18 +123,22 @@ export function Chat() {
           className="p-2 hover:bg-white/10 rounded-xl transition-colors text-gray-400 hover:text-white">
           <ArrowLeft size={20} />
         </button>
-        <div className="w-10 h-10 rounded-full border-2 border-[#00d9ff] overflow-hidden flex items-center justify-center bg-[#1a1f35] flex-shrink-0">
-          {amigoFoto
-            ? <img src={amigoFoto} alt={amigoNombre} className="w-full h-full object-cover" />
-            : <User size={18} className="text-[#00d9ff]" />}
-        </div>
-        <div>
-          <p className="font-['Press_Start_2P'] text-xs text-white">{amigoNombre}</p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88]" />
-            <span className="text-[10px] text-[#00ff88]">En linea</span>
+        {/* Click en foto/nombre va al perfil */}
+        <button onClick={() => navigate(`/profile?userId=${amigoId}`)}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <div className="w-10 h-10 rounded-full border-2 border-[#00d9ff] overflow-hidden flex items-center justify-center bg-[#1a1f35] flex-shrink-0">
+            {amigoFoto
+              ? <img src={amigoFoto} alt={amigoNombre} className="w-full h-full object-cover" />
+              : <User size={18} className="text-[#00d9ff]" />}
           </div>
-        </div>
+          <div className="text-left">
+            <p className="font-['Press_Start_2P'] text-xs text-white">{amigoNombre}</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88]" />
+              <span className="text-[10px] text-[#00ff88]">En linea</span>
+            </div>
+          </div>
+        </button>
       </div>
 
       {/* Mensajes */}
@@ -124,6 +160,7 @@ export function Chat() {
             {mensajes.map((m, i) => {
               const esMio = m.de_id === user.id;
               const showFecha = i === 0 || formatFecha(mensajes[i - 1].created_at) !== formatFecha(m.created_at);
+              const esUltimo = i === mensajes.length - 1;
               return (
                 <React.Fragment key={m.id}>
                   {showFecha && (
@@ -145,18 +182,61 @@ export function Chat() {
                       </div>
                     )}
                     <div className={`max-w-[70%] flex flex-col gap-1 ${esMio ? "items-end" : "items-start"}`}>
-                      <div
-                        className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed text-white ${esMio ? "rounded-br-md" : "rounded-bl-md"}`}
-                        style={{
-                          background: esMio
-                            ? "linear-gradient(135deg,#00d9ff,#0096ff)"
-                            : "rgba(26,31,53,0.9)",
-                          border: esMio ? "none" : "1px solid rgba(255,255,255,0.08)",
-                          boxShadow: esMio ? "0 4px 16px rgba(0,217,255,0.2)" : "none",
-                        }}>
-                        {m.contenido}
+
+                      {editandoId === m.id ? (
+                        <div className="flex gap-2 items-center">
+                          <input
+                            value={editTexto}
+                            onChange={e => setEditTexto(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter") editarMensaje(m.id); if (e.key === "Escape") { setEditandoId(null); setEditTexto(""); } }}
+                            className="bg-[#1a1f35] border border-[#00d9ff]/50 rounded-xl px-3 py-2 text-white text-sm outline-none min-w-[150px]"
+                            autoFocus
+                          />
+                          <button onClick={() => editarMensaje(m.id)} className="text-[#00ff88] hover:opacity-80">
+                            <Check size={16} />
+                          </button>
+                          <button onClick={() => { setEditandoId(null); setEditTexto(""); }} className="text-gray-500 hover:opacity-80 text-xs">✕</button>
+                        </div>
+                      ) : (
+                        <div className="relative group">
+                          <div
+                            className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed text-white ${esMio ? "rounded-br-md" : "rounded-bl-md"}`}
+                            style={{
+                              background: esMio
+                                ? "linear-gradient(135deg,#00d9ff,#0096ff)"
+                                : "rgba(26,31,53,0.9)",
+                              border: esMio ? "none" : "1px solid rgba(255,255,255,0.08)",
+                              boxShadow: esMio ? "0 4px 16px rgba(0,217,255,0.2)" : "none",
+                            }}>
+                            {m.contenido}
+                          </div>
+                          {/* Botones editar/borrar — solo mis mensajes */}
+                          {esMio && (
+                            <div className="absolute top-0 right-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              <button
+                                onClick={() => { setEditandoId(m.id); setEditTexto(m.contenido); }}
+                                className="w-7 h-7 rounded-lg bg-[#1a1f35] border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#00d9ff] transition-colors">
+                                <Pencil size={12} />
+                              </button>
+                              <button
+                                onClick={() => borrarMensaje(m.id)}
+                                className="w-7 h-7 rounded-lg bg-[#1a1f35] border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#ff4757] transition-colors">
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Hora + visto */}
+                      <div className="flex items-center gap-1 px-1">
+                        <span className="text-[10px] text-gray-600">{formatHora(m.created_at)}</span>
+                        {esMio && esUltimo && (
+                          m.leido === 1
+                            ? <CheckCheck size={12} className="text-[#00d9ff]" />
+                            : <Check size={12} className="text-gray-600" />
+                        )}
                       </div>
-                      <span className="text-[10px] text-gray-600 px-1">{formatHora(m.created_at)}</span>
                     </div>
                   </motion.div>
                 </React.Fragment>

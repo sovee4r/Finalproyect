@@ -2,7 +2,10 @@
 // Lobby y componentes compartidos para minijuegos
 // Diseño idéntico al MultiLobby del quiz (imágenes de referencia)
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+import { useAuth } from "../AuthContext";
+
 import { motion, AnimatePresence } from "motion/react";
 import {
   Crown, Copy, Check, Play, LogOut,

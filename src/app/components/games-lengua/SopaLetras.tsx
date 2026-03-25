@@ -7,9 +7,11 @@ import {
   RotateCcw, Trophy, Star, CheckCircle2,
   Settings, User, Users, LogOut, Search, Clock, AlertTriangle
 } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate} from "react-router";
 import logoImg from "../../../assets/logo.png";
 import { useSocket } from "../../../lib/useSocket";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MiniJugadores } from "../MultiLobby";
 
@@ -149,6 +151,9 @@ function generarGrilla(palabras:Palabra[]):{grilla:string[][];posiciones:Map<str
    COMPONENTE PRINCIPAL
 ═══════════════════════════════════════════════════ */
 export function SopaLetras(){
+  const { user } = useAuth();
+  const { agregarMonedas } = useMonedas();
+  const navigate = useNavigate();
   const music=useMusic();
   const socket=useSocket();
 
@@ -158,6 +163,8 @@ export function SopaLetras(){
   const [grado,       setGrado]       = useState(4);
   const [modo,        setModo]        = useState<Modo>("solo");
   const [playerName,  setPlayerName]  = useState("");
+  // Prellenar nombre con el de la cuenta
+  useEffect(() => { if (user?.nombre) setPlayerName(user.nombre); }, [user]);
   const [paused,      setPaused]      = useState(false);
   const [settOpen,    setSettOpen]    = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
@@ -180,6 +187,8 @@ export function SopaLetras(){
 
   /* Multi */
   const multiState    = socket.state;
+  if (!user) { navigate("/login"); return null; }
+
   const estaEnLobby   = modo==="multi" && multiState.estado==="lobby";
   const estaEnRanking = false; // minijuego maneja sus propios resultados
   const hayError      = modo==="multi" && multiState.estado==="error";
@@ -260,7 +269,7 @@ export function SopaLetras(){
           // Actualizar ranking local multi
           if(modo==="multi") setPuntosMulti(pm=>({...pm,[playerName]:(pm[playerName]??0)+pts}));
           if(nuevas.length===palabrasJuego.length){
-            stopTimer();music.stop();
+            stopTimer();music.stop();agregarMonedas(puntos);
             setTimeout(()=>setScreen("resultados"),700);
           }
           setSeleccion([]);return;
@@ -494,7 +503,7 @@ export function SopaLetras(){
       <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
         <p className="text-xs font-extrabold text-[#00e5ff] tracking-widest uppercase mb-3 flex items-center gap-2"><User size={13}/> Tu nombre</p>
         <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold outline-none focus:border-[#00e5ff]/60 transition-all placeholder:text-gray-600"
-          placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
+          disabled={!!user} placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
       </div>
 
       {/* Modo — IDÉNTICO a Ahorcado */}

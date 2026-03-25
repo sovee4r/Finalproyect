@@ -58,7 +58,7 @@ export function Layout() {
           setNivel(d.nivel);
           setXpActual(d.xp_actual);
           setXpSiguiente(d.xp_siguiente);
-          setMonedas(d.total_correctas * 10);
+          setMonedas(d.monedas ?? d.total_correctas * 10 ?? 0);
         }
       })
       .catch(() => {});
@@ -70,34 +70,12 @@ export function Layout() {
     navigate("/login");
   };
 
-  // ─── Ocultar TODA la UI cuando estamos en cualquier juego ───
-  // Rutas de juegos existentes (lengua, ciencias, sociales)
-  // + rutas de juegos nuevos (quiz, cohetes, rana, tetris, lineatiempo)
   const RUTAS_JUEGO = [
-    // Lengua
-    "/quiz/",
-    "/ahorcado",
-    "/completa",
-    "/sopa",
-    "/conecta",
-    "/periodista",
-    // Ciencias
-    "/cadena",
-    "/animales",
-    "/celula",
-    "/laberinto",
-    // Sociales
-    "/memoria",
-    "/linea",
-    // Nuevos juegos — Matemáticas
-    "/math/quiz",
-    "/math/cohetes",
-    "/math/rana",
-    "/math/tetris",
-    // Nuevos juegos — Ciencias y Sociales
-    "/science/quiz",
-    "/social/quiz",
-    // Chat
+    "/quiz/", "/ahorcado", "/completa", "/sopa", "/conecta", "/periodista",
+    "/cadena", "/animales", "/celula", "/laberinto",
+    "/memoria", "/linea",
+    "/math/quiz", "/math/cohetes", "/math/rana", "/math/tetris",
+    "/science/quiz", "/social/quiz",
     "/chat",
   ];
   const isGameActive = RUTAS_JUEGO.some(r => location.pathname.includes(r));
@@ -124,8 +102,9 @@ export function Layout() {
             className="p-2 hover:bg-white/10 rounded-lg transition-colors text-[#00d9ff]">
             <Menu size={24} />
           </button>
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 md:w-10 md:h-10 relative">
+        <Link to="/" className="flex items-center M
+        -1 group">
+    <div className="w-24 h-16 md:w-28 md:h-20 relative mt-3">
               <img src={logoImg} alt="Saberix Logo"
                 className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,255,136,0.6)] group-hover:scale-110 transition-transform duration-300" />
             </div>
@@ -138,10 +117,13 @@ export function Layout() {
         <div className="flex items-center gap-3 md:gap-5">
           {user && (
             <div className="hidden sm:flex items-center gap-3">
-              <div className="flex items-center bg-[#1a1f35] border border-[#ffd700] rounded-md px-3 py-1.5 shadow-[0_0_8px_rgba(255,215,0,0.2)]">
-                <Coins size={14} className="text-[#ffd700] mr-2" />
-                <span className="font-['Press_Start_2P'] text-[10px] text-white">{monedas.toLocaleString()}</span>
-              </div>
+              {/* MONEDAS — clickeable */}
+              <Link to="/monedas">
+                <div className="flex items-center bg-[#1a1f35] border border-[#ffd700] rounded-md px-3 py-1.5 shadow-[0_0_8px_rgba(255,215,0,0.2)] hover:bg-[#ffd700]/10 hover:border-[#ffd700] transition-all cursor-pointer">
+                  <Coins size={14} className="text-[#ffd700] mr-2" />
+                  <span className="font-['Press_Start_2P'] text-[10px] text-white">{monedas.toLocaleString()}</span>
+                </div>
+              </Link>
               <div className="flex items-center bg-[#1a1f35] border border-[#ff1b8d] rounded-md px-3 py-1.5 shadow-[0_0_8px_rgba(255,27,141,0.2)]">
                 <Star size={14} className="text-[#ff1b8d] mr-2" />
                 <span className="font-['Press_Start_2P'] text-[10px] text-white">LVL {nivel ?? "..."}</span>
@@ -206,6 +188,7 @@ export function Layout() {
                     <div className="p-2">
                       <MenuDropdownItem icon={<UserCircle size={15} />} label={t("perfil")}        to="/profile"  onClick={() => setIsUserMenuOpen(false)} color="#00d9ff" />
                       <MenuDropdownItem icon={<Palette size={15} />}    label={t("avatar")}        to="/avatar"   onClick={() => setIsUserMenuOpen(false)} color="#00ff88" />
+                      <MenuDropdownItem icon={<Coins size={15} />}      label="Monedas"            to="/monedas"  onClick={() => setIsUserMenuOpen(false)} color="#ffd700" />
                       <MenuDropdownItem icon={<Settings size={15} />}   label={t("configuracion")} to="/settings" onClick={() => setIsUserMenuOpen(false)} color="#a78bfa" />
                       <div className="h-px bg-white/10 my-1.5" />
                       <button onClick={handleLogout}
@@ -269,7 +252,8 @@ export function Layout() {
               </div>
 
               <div className="h-px bg-white/10 my-2 mx-2" />
-              <NavItem to="/avatar"   icon={<Palette size={20} />}   label={t("avatar")}        active={location.pathname === "/avatar"} />
+              <NavItem to="/monedas"  icon={<Coins size={20} />}      label="Monedas"            active={location.pathname === "/monedas"} />
+              <NavItem to="/avatar"   icon={<Palette size={20} />}    label={t("avatar")}        active={location.pathname === "/avatar"} />
               <NavItem to="/friends"  icon={<Users size={20} />}      label={t("amigos")}        active={location.pathname === "/friends"} />
               <NavItem to="/profile"  icon={<Target size={20} />}     label={t("perfil")}        active={location.pathname === "/profile"} />
               <div className="h-px bg-white/10 my-2 mx-2" />

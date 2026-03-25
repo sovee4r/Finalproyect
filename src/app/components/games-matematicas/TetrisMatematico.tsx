@@ -12,6 +12,8 @@ import {
   User, Users, AlertTriangle, Settings, Zap
 } from "lucide-react";
 import { Link } from "react-router";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { useSocket } from "../../../lib/useSocket";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import logoImg from "../../../assets/logo.png";
@@ -303,6 +305,7 @@ export function TetrisMatematico() {
     if (correctasRef.current >= Math.ceil(TOTAL_BLOQUES * 0.7)) { music.playVictory(); setShowConfetti(true); }
     else { music.stop(); }
     guardarResultado({ jugador: playerNameRef.current || "Anónimo", grado, puntos: scoreRef.current, correctas: correctasRef.current, incorrectas: incorrectasRef.current, tiempo_seg: tiempoRef.current, modo });
+    agregarMonedas(scoreRef.current);
     setScreen("resultados");
   };
 

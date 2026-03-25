@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../AuthContext";
 
 const API = "https://finalproyect-production-3837.up.railway.app";
 
@@ -34,10 +35,10 @@ const diffColor: Record<string, string> = {
 type IconComp = React.ComponentType<{ size?: number; className?: string }>;
 
 const subjectCfg: Record<string, { color: string; Icon: IconComp; label: string; labelEn: string; coins: number; time: string }> = {
-  math:     { color: "#4169E1", Icon: Calculator,  label: "MATEMATICAS", labelEn: "MATH",           coins: 250, time: "15m" },
-  science:  { color: "#228B22", Icon: FlaskConical, label: "CIENCIAS",   labelEn: "SCIENCE",        coins: 200, time: "12m" },
-  language: { color: "#DAA520", Icon: BookOpen,     label: "LENGUA",     labelEn: "LANGUAGE",       coins: 180, time: "10m" },
-  social:   { color: "#DC143C", Icon: Globe2,       label: "SOCIALES",   labelEn: "SOCIAL STUDIES", coins: 220, time: "13m" },
+  math:     { color: "#4169E1", Icon: Calculator,   label: "MATEMATICAS", labelEn: "MATH",           coins: 250, time: "15m" },
+  science:  { color: "#228B22", Icon: FlaskConical,  label: "CIENCIAS",   labelEn: "SCIENCE",        coins: 200, time: "12m" },
+  language: { color: "#DAA520", Icon: BookOpen,      label: "LENGUA",     labelEn: "LANGUAGE",       coins: 180, time: "10m" },
+  social:   { color: "#DC143C", Icon: Globe2,        label: "SOCIALES",   labelEn: "SOCIAL STUDIES", coins: 220, time: "13m" },
 };
 
 const ALL_GAMES: GameEntry[] = [
@@ -95,6 +96,7 @@ export function Games() {
   const navigate    = useNavigate();
   const { t, i18n } = useTranslation();
   const isEn = i18n.language === "en";
+  const { user } = useAuth();
 
   const [expanded,    setExpanded]    = useState<Record<number, boolean>>({ 4: true, 5: true, 6: true });
   const [leaderboard, setLeaderboard] = useState<JugadorReal[]>([]);
@@ -112,6 +114,11 @@ export function Games() {
   const pageTitle     = subject
     ? (isEn ? subjectCfg[subject]?.labelEn : subjectCfg[subject]?.label) ?? t("juegosDisponibles")
     : t("todosLosJuegos");
+
+  function handlePlay(game: GameEntry) {
+    if (!user) { navigate("/login"); return; }
+    if (game.available && game.route) navigate(game.route);
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 pb-20">
@@ -198,7 +205,7 @@ export function Games() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-2">
                           {gradeGames.map(game => (
                             <SmallGameCard key={game.id} game={game} color={cfg.color} Icon={cfg.Icon} isEn={isEn}
-                              onPlay={() => game.available && game.route && navigate(game.route)} />
+                              onPlay={() => handlePlay(game)} />
                           ))}
                         </div>
                       )}

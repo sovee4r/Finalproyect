@@ -13,6 +13,10 @@ import { Register }           from "./components/Register";
 import { GoogleCallback }     from "./components/GoogleCallback";
 import { Chat }               from "./components/Chat";
 
+// ✅ IMPORT CORRECTO
+import CoinsPage from "./components/coins";
+
+
 // ── Lengua ──
 import { AhorcadoLengua }     from "./components/games-lengua/AhorcadoLengua";
 import { CompletaOracion }    from "./components/games-lengua/CompletaOracion";
@@ -42,7 +46,9 @@ function NotFound() {
   return (
     <div className="min-h-[50vh] flex flex-col items-center justify-center p-4">
       <div className="font-['Press_Start_2P'] text-4xl text-[#ff1b8d] mb-4">404</div>
-      <div className="font-['Press_Start_2P'] text-sm text-white">Página no encontrada</div>
+      <div className="font-['Press_Start_2P'] text-sm text-white">
+        Página no encontrada
+      </div>
     </div>
   );
 }
@@ -60,6 +66,9 @@ export const router = createBrowserRouter([
       { path: "profile",                          Component: Profile           },
       { path: "settings",                         Component: Settings          },
       { path: "help",                             Component: Help              },
+
+      // ✅ AQUÍ ESTÁ COINS CORRECTO
+      { path: "monedas",                          Component: CoinsPage         },
 
       // ── Lengua ──
       { path: "games/language/quiz/4",            Component: QuizLengua4       },
@@ -81,7 +90,7 @@ export const router = createBrowserRouter([
       { path: "games/social/memoria",             Component: MemoriaSociales   },
       { path: "games/social/linea",               Component: LineaTiempo       },
 
-      // ── Matematicas ──
+      // ── Matemáticas ──
       { path: "games/math/quiz",                  Component: QuizMatematicas   },
       { path: "games/math/cohetes",               Component: CarreraCohetes    },
       { path: "games/math/rana",                  Component: RanaNenufares     },
@@ -90,8 +99,9 @@ export const router = createBrowserRouter([
       { path: "*",                                Component: NotFound          },
     ],
   },
-  { path: "/login",                   Component: Login          },
-  { path: "/register",                Component: Register       },
-  { path: "/auth/google/callback",    Component: GoogleCallback },
-  { path: "/chat",                    Component: Chat           },
+
+  { path: "/login",                Component: Login          },
+  { path: "/register",             Component: Register       },
+  { path: "/auth/google/callback", Component: GoogleCallback },
+  { path: "/chat",                 Component: Chat           },
 ]);

@@ -8,8 +8,10 @@ import {
   RotateCcw, Trophy, Star, CheckCircle2, XCircle,
   Settings, User, Users, LogOut, Link2, Clock, AlertTriangle
 } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate} from "react-router";
 import { useSocket } from "../../../lib/useSocket";
+import { useAuth } from "../../AuthContext";
+import { useMonedas } from "../../../hooks/useMonedas";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MiniJugadores } from "../MultiLobby";
 import logoImg from "../../../assets/logo.png";
@@ -125,6 +127,9 @@ function shuffle<T>(arr:T[]):T[]{const a=[...arr];for(let i=a.length-1;i>0;i--){
 
 /* ─── COMPONENTE PRINCIPAL ─── */
 export function ConectaSinonimos(){
+  const { user } = useAuth();
+  const { agregarMonedas } = useMonedas();
+  const navigate = useNavigate();
   const music=useMusic();
   const socket=useSocket();
 
@@ -135,6 +140,8 @@ export function ConectaSinonimos(){
   const [tipoJuego,   setTipoJuego]   = useState<TipoJuego>("sinonimos");
   const [modo,        setModo]        = useState<Modo>("solo");
   const [playerName,  setPlayerName]  = useState("");
+  // Prellenar nombre con el de la cuenta
+  useEffect(() => { if (user?.nombre) setPlayerName(user.nombre); }, [user]);
   const [paused,      setPaused]      = useState(false);
   const [settOpen,    setSettOpen]    = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
@@ -155,6 +162,8 @@ export function ConectaSinonimos(){
   const pauseRef=useRef(false);
 
   const multiState  =socket.state;
+  if (!user) { navigate("/login"); return null; }
+
   const estaEnLobby =modo==="multi"&&multiState.estado==="lobby";
   const estaEnRanking=false;
   const hayError    =modo==="multi"&&multiState.estado==="error";
@@ -214,7 +223,7 @@ export function ConectaSinonimos(){
       setPuntos(p=>p+pts);setCorrectas(c=>c+1);
       setFeedback({msg:`¡Correcto! +${pts} pts`,ok:true});
       const totalCorrectas=nuevas.filter(c=>c.correcto).length;
-      if(totalCorrectas===pares.length){stopTimer();music.stop();setTimeout(()=>setScreen("resultados"),800);}
+      if(totalCorrectas===pares.length){stopTimer();music.stop();agregarMonedas(puntos);setTimeout(()=>setScreen("resultados"),800);}
     }else{
       setIncorrectas(i=>i+1);
       setFeedback({msg:"Incorrecto, intenta de nuevo",ok:false});
@@ -449,7 +458,7 @@ export function ConectaSinonimos(){
           <div className="rounded-2xl border-2 border-white/8 bg-[#0f1425] p-5 mb-4">
             <p className="text-xs font-extrabold tracking-widest uppercase mb-3 flex items-center gap-2" style={{color:CA}}><User size={13}/> Tu nombre</p>
             <input className="w-full bg-white/4 border-2 border-white/10 rounded-xl px-4 py-3 text-white font-semibold outline-none transition-all placeholder:text-gray-600"
-              placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
+              disabled={!!user} placeholder="Escribe tu nombre..." value={playerName} onChange={e=>setPlayerName(e.target.value)} maxLength={20}/>
           </div>
 
           {/* Modo */}

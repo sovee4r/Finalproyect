@@ -39,12 +39,12 @@ apiRouter.get("/leaderboard-global", async (req: Request, res: Response) => {
   try {
     const [rows]: any = await pool.execute(
       `SELECT u.nombre, u.foto,
-       COALESCE(SUM(r.correctas), 0) * 10 as score,
-        COUNT(r.id) as partidas,
-        COALESCE(SUM(r.correctas), 0) as correctas
+       u.monedas as score,
+       COUNT(r.id) as partidas,
+       COALESCE(SUM(r.correctas), 0) as correctas
        FROM usuarios u
        LEFT JOIN resultados_juegos r ON r.user_id = u.id
-       GROUP BY u.id, u.nombre, u.foto
+       GROUP BY u.id, u.nombre, u.foto, u.monedas
        ORDER BY score DESC
        LIMIT 10`
     );
@@ -97,6 +97,16 @@ apiRouter.post("/resultados_juegos", async (req: Request, res: Response) => {
       `INSERT INTO resultados_juegos (jugador, juego, materia, grado, puntos, correctas, incorrectas, tiempo_seg, modo, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [jugador || "Anonimo", juego || "desconocido", materia || "general", grado || 4, puntos || 0, correctas || 0, incorrectas || 0, tiempo_seg || 0, modo || "solo", user_id || null]
     );
+    if (user_id) {
+      const total = (correctas || 0) + (incorrectas || 0);
+      const monedasGanadas = total > 0
+        ? Math.max(50, Math.round((correctas / total) * 250))
+        : 50;
+      await pool.execute(
+        "UPDATE usuarios SET monedas = monedas + ? WHERE id = ?",
+        [monedasGanadas, user_id]
+      );
+    }
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -143,10 +153,87 @@ apiRouter.post("/auth/login", async (req: Request, res: Response) => {
     );
     if ((rows as any[]).length === 0)
       return res.status(401).json({ error: "Credenciales incorrectas" });
-    return res.json({ ok: true, user: (rows as any[])[0] });
+    const user = (rows as any[])[0];
+    // Marcar como online al hacer login
+    await pool.execute(
+      "UPDATE usuarios SET online = 1, last_seen = NOW() WHERE id = ?",
+      [user.id]
+    );
+    return res.json({ ok: true, user });
   } catch (err) {
     console.error("Error login:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+apiRouter.post("/auth/logout", async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ ok: false });
+    await pool.execute(
+      "UPDATE usuarios SET online = 0, last_seen = NOW() WHERE id = ?",
+      [userId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* Heartbeat — el frontend llama esto cada 30s para mantenerse online */
+apiRouter.post("/auth/heartbeat", async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ ok: false });
+    await pool.execute(
+      "UPDATE usuarios SET online = 1, last_seen = NOW() WHERE id = ?",
+      [userId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* GET /api/online/:userId — consultar si un usuario está online */
+apiRouter.get("/online/:userId", async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const [rows]: any = await pool.execute(
+      "SELECT online, last_seen FROM usuarios WHERE id = ?",
+      [userId]
+    );
+    if ((rows as any[]).length === 0) return res.json({ ok: false });
+    const u = (rows as any[])[0];
+    // Si last_seen fue hace más de 2 minutos, considerarlo offline aunque diga online
+    const lastSeen  = u.last_seen ? new Date(u.last_seen).getTime() : 0;
+    const diffMin   = (Date.now() - lastSeen) / 1000 / 60;
+    const isOnline  = u.online === 1 && diffMin < 2;
+    res.json({ ok: true, online: isOnline, last_seen: u.last_seen });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* GET /api/online-bulk — consultar varios usuarios a la vez */
+apiRouter.post("/online-bulk", async (req: Request, res: Response) => {
+  try {
+    const { userIds } = req.body as { userIds: number[] };
+    if (!userIds?.length) return res.json({ ok: true, estados: {} });
+    const placeholders = userIds.map(() => "?").join(",");
+    const [rows]: any = await pool.execute(
+      `SELECT id, online, last_seen FROM usuarios WHERE id IN (${placeholders})`,
+      userIds
+    );
+    const estados: Record<number, boolean> = {};
+    for (const u of rows as any[]) {
+      const lastSeen = u.last_seen ? new Date(u.last_seen).getTime() : 0;
+      const diffMin  = (Date.now() - lastSeen) / 1000 / 60;
+      estados[u.id]  = u.online === 1 && diffMin < 2;
+    }
+    res.json({ ok: true, estados });
+  } catch (err) {
+    res.status(500).json({ ok: false });
   }
 });
 
@@ -196,11 +283,14 @@ apiRouter.get("/auth/google/callback", async (req: Request, res: Response) => {
     let user: any;
     if ((existing as any[]).length > 0) {
       user = (existing as any[])[0];
-      await pool.execute("UPDATE usuarios SET foto = ? WHERE id = ?", [googleUser.picture ?? null, user.id]);
+      await pool.execute(
+        "UPDATE usuarios SET foto = ?, online = 1, last_seen = NOW() WHERE id = ?",
+        [googleUser.picture ?? null, user.id]
+      );
       user.foto = googleUser.picture ?? null;
     } else {
       const [result]: any = await pool.execute(
-        "INSERT INTO usuarios (nombre, email, foto, password_hash, created_at) VALUES (?, ?, ?, ?, NOW())",
+        "INSERT INTO usuarios (nombre, email, foto, password_hash, online, last_seen, created_at) VALUES (?, ?, ?, ?, 1, NOW(), NOW())",
         [googleUser.name, googleUser.email, googleUser.picture ?? null, "google_oauth"]
       );
       user = { id: (result as any).insertId, nombre: googleUser.name, email: googleUser.email, foto: googleUser.picture ?? null, bio: null, pais: null };
@@ -302,13 +392,17 @@ apiRouter.get("/experiencia/:userId", async (req: Request, res: Response) => {
        FROM resultados_juegos WHERE user_id = ?`,
       [userId]
     );
+    const [mRows]: any = await pool.execute(
+      "SELECT monedas FROM usuarios WHERE id = ?", [userId]
+    );
     const s            = (rows as any[])[0];
     const xp           = Number(s.xp_total ?? 0);
     const nivel        = Math.floor(xp / 500) + 1;
     const xp_actual    = xp % 500;
     const xp_siguiente = 500;
+    const monedas      = Number((mRows as any[])[0]?.monedas ?? 0);
     res.json({
-      ok: true, xp, nivel, xp_actual, xp_siguiente,
+      ok: true, xp, nivel, xp_actual, xp_siguiente, monedas,
       partidas:         Number(s.partidas         ?? 0),
       mejor_puntuacion: Number(s.mejor_puntuacion ?? 0),
       total_correctas:  Number(s.total_correctas  ?? 0),
@@ -475,6 +569,51 @@ apiRouter.post("/mensajes", async (req: Request, res: Response) => {
       [(result as any).insertId]
     );
     res.json({ ok: true, mensaje: (rows as any[])[0] });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* Editar mensaje */
+apiRouter.put("/mensajes/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { contenido, userId } = req.body;
+    if (!contenido?.trim()) return res.status(400).json({ ok: false });
+    await pool.execute(
+      "UPDATE mensajes SET contenido = ? WHERE id = ? AND de_id = ?",
+      [contenido.trim(), id, userId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* Borrar mensaje */
+apiRouter.delete("/mensajes/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+    await pool.execute(
+      "DELETE FROM mensajes WHERE id = ? AND de_id = ?",
+      [id, userId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* Marcar como leido */
+apiRouter.put("/mensajes/leer/:deId/:paraId", async (req: Request, res: Response) => {
+  try {
+    const { deId, paraId } = req.params;
+    await pool.execute(
+      "UPDATE mensajes SET leido = 1 WHERE de_id = ? AND para_id = ?",
+      [deId, paraId]
+    );
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ ok: false });
   }
