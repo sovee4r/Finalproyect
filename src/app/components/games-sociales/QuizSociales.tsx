@@ -13,7 +13,6 @@ import { useMonedas } from "../../../hooks/useMonedas";
 import { useSocket } from "../../../lib/useSocket";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
 import { MultiRanking, MiniJugadores } from "../MultiLobby";
-import { MiniJugadores } from "../MultiLobby";
 import logoImg from "../../../assets/logo.png";
 
 const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
