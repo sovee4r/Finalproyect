@@ -1,3 +1,5 @@
+﻿const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
+
 // Periodista.tsx — Lengua 4to-6to
 // Lee una noticia y responde preguntas de comprensión lectora
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -163,6 +165,10 @@ function Recompensas({puntos}:{puntos:number}){
   );
 }
 
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; }) {
+  try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "periodista", materia: "lengua" }) }); } catch (_) {}
+}
+
 export function Periodista(){
   const { user } = useAuth();
   const { agregarMonedas } = useMonedas();
@@ -233,7 +239,7 @@ export function Periodista(){
         const nextNoticia=noticiaIdx+1;
         if(nextNoticia>=noticias.length){
           if(timerRef.current)clearInterval(timerRef.current);
-          music.stop(); agregarMonedas(puntos); setScreen("resultados");
+          music.stop(); agregarMonedas(puntos); guardarResultado({jugador:playerName||"Anónimo",grado,puntos,correctas,incorrectas,tiempo_seg:tiempoSeg,modo}); setScreen("resultados");
         }else{
           const n=noticias[nextNoticia]; setNoticia(n); setNoticiaIdx(nextNoticia);
           setPregIdx(0); setSeleccionada(null); setMostrarFeedback(false);
@@ -509,3 +515,4 @@ export function Periodista(){
     </motion.div>
   );
 }
+

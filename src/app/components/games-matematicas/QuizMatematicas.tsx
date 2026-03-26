@@ -12,6 +12,7 @@ import { useAuth } from "../../AuthContext";
 import { useMonedas } from "../../../hooks/useMonedas";
 import { useSocket } from "../../../lib/useSocket";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
+import { MultiRanking } from "../MultiLobby";
 import { MiniJugadores } from "../MultiLobby";
 import logoImg from "../../../assets/logo.png";
 
@@ -177,6 +178,8 @@ function Confetti() {
 }
 
 export function QuizMatematicas() {
+  const { user } = useAuth();
+  const { agregarMonedas, gastarMonedas } = useMonedas();
   const music = useMusic();
   const socket = useSocket();
 
@@ -204,6 +207,7 @@ export function QuizMatematicas() {
   const [mostrarExplicacion, setMostrarExplicacion] = useState(false);
 
   const pauseRef = useRef(false);
+  useEffect(() => { if (user?.nombre) setPlayerName(user.nombre); }, [user]);
   const playerNameRef = useRef(playerName);
   playerNameRef.current = playerName;
 
@@ -226,7 +230,7 @@ export function QuizMatematicas() {
 
   const multiState = socket.state;
   const estaEnLobby = modo === "multi" && multiState.estado === "lobby";
-  const estaEnRanking = false;
+  const estaEnResultadosMulti = modo === "multi" && multiState.estado === "resultados";
   const hayError = modo === "multi" && multiState.estado === "error";
   const modoRef = useRef(modo); modoRef.current = modo;
   const gradoRef = useRef(grado); gradoRef.current = grado;
@@ -252,6 +256,11 @@ export function QuizMatematicas() {
   const confirmarRespuesta = () => {
     if (seleccionada === null || confirmada) return;
     setConfirmada(true); setMostrarExplicacion(true);
+    const opciones: ("A"|"B"|"C"|"D")[] = ["A","B","C","D"];
+    if (modo === "multi" && multiState.sala) {
+      const esCorrecta = seleccionada === preguntas[idx].correcta;
+    socket.responder(multiState.sala.codigo, esCorrecta ? pregActual.respuesta_correcta ?? opciones[seleccionada] : "X", esCorrecta ? 99 : 0);
+    }
     if (seleccionada === preguntas[idx].correcta) {
       const pts = Math.max(50, 150 - Math.floor(tiempo / preguntas.length) * 5);
       setScore(s => s + pts); setCorrectas(c => c + 1);
@@ -265,8 +274,13 @@ export function QuizMatematicas() {
       if (correctas + (seleccionada === preguntas[idx].correcta ? 1 : 0) >= Math.ceil(preguntas.length * 0.7)) {
         music.playVictory(); setShowConfetti(true);
       } else { music.stop(); }
-      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo });
-      agregarMonedas(score);
+      const _esCorr = seleccionada === preguntas[idx].correcta;
+      const _totalCorr = correctas + (_esCorr ? 1 : 0);
+      const _totalInc = incorrectas + (_esCorr ? 0 : 1);
+      const _ptsExtra = _esCorr ? Math.max(50, 120 - tiempo * 2) : 0;
+      const _totalPts = score + _ptsExtra;
+      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: _totalPts, correctas: _totalCorr, incorrectas: _totalInc, tiempo_seg: tiempo, modo, user_id: user?.id });
+      agregarMonedas(_totalPts);
       setScreen("resultados");
     } else {
       setIdx(i => i + 1); setSeleccionada(null); setConfirmada(false);
@@ -280,7 +294,6 @@ export function QuizMatematicas() {
   function cancelExit() { setExitConfirm(false); }
 
   if (estaEnLobby && multiState.sala) return <GameLobby state={multiState} nombrePropio={playerName} onIniciar={() => { socket.iniciarJuego(multiState.sala!.codigo); iniciarJuego(grado); }} onSalir={() => { socket.salirSala(); setModo("solo"); }} colorAccent={COLOR} />;
-  if (estaEnRanking) return <GameRankingFinal ranking={multiState.rankingFinal} nombrePropio={playerName} onJugarDeNuevo={() => { socket.salirSala(); setScreen("config"); }} onSalir={() => { socket.salirSala(); setScreen("config"); }} colorAccent={COLOR} />;
   if (hayError) return <GameError mensaje={multiState.errorMsg} onReset={socket.resetError} colorAccent={COLOR} />;
 
   const preguntaActual = preguntas[idx];
@@ -420,8 +433,18 @@ export function QuizMatematicas() {
         )}
       </AnimatePresence>
 
-      {/* ─── CONFIG ─── */}
-      {screen === "config" && !estaEnLobby && !estaEnRanking && !hayError && (
+
+      {/* ─── RANKING FINAL MULTI ─── */}
+      {estaEnResultadosMulti && (
+        <MultiRanking
+          ranking={multiState.rankingFinal} nombrePropio={playerName}
+          onJugarDeNuevo={() => { socket.salirSala(); setModo("solo"); setScreen("config"); }}
+          onSalir={() => { socket.salirSala(); setModo("solo"); setScreen("config"); }}
+        />
+      )}
+
+            {/* ─── CONFIG ─── */}
+      {screen === "config" && !estaEnLobby && !estaEnResultadosMulti && !hayError && (
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-xl px-4 py-8">
           <div className="flex items-center gap-4 mb-8">
             <Link to="/games/math" className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"><ArrowLeft size={22} /></Link>
@@ -675,5 +698,7 @@ export function QuizMatematicas() {
     </div>
   );
 }
+
+
 
 

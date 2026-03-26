@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../app/AuthContext";
 
 const API = "https://finalproyect-production-3837.up.railway.app";
@@ -61,3 +61,4 @@ export function useMonedas() {
 
   return { monedas, agregarMonedas, gastarMonedas };
 }
+

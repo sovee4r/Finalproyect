@@ -1,3 +1,5 @@
+﻿const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
+
 // ClasificaAnimales.tsx — Ciencias 4to-6to
 // Arrastra animales a su categoría correcta (mamífero, ave, reptil, etc.)
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -238,6 +240,10 @@ function Recompensas({ puntos }: { puntos: number }) {
   );
 }
 
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; }) {
+  try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "clasifica_animales", materia: "ciencias" }) }); } catch (_) {}
+}
+
 export function ClasificaAnimales() {
   const { user } = useAuth();
   const { agregarMonedas } = useMonedas();
@@ -297,7 +303,7 @@ export function ClasificaAnimales() {
 
   useEffect(() => {
     if (screen === "juego" && pendientes.length === 0 && totalClasificados === totalAnimales && totalAnimales > 0)
-      setTimeout(() => { music.stop(); agregarMonedas(puntos); setScreen("resultados"); }, 800);
+      guardarResultado({jugador:playerName||"Anónimo",grado,puntos,correctas:totalClasificados,incorrectas:errores,tiempo_seg:0,modo});setTimeout(() => { music.stop(); agregarMonedas(puntos); setScreen("resultados"); }, 800);
   }, [pendientes.length, screen]); // eslint-disable-line
 
   function iniciarJuego(g: number) {
@@ -621,3 +627,4 @@ export function ClasificaAnimales() {
     </motion.div>
   );
 }
+

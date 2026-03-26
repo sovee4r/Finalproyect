@@ -150,6 +150,10 @@ function generarGrilla(palabras:Palabra[]):{grilla:string[][];posiciones:Map<str
 /* ═══════════════════════════════════════════════════
    COMPONENTE PRINCIPAL
 ═══════════════════════════════════════════════════ */
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; }) {
+  try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "sopa_letras", materia: "lengua" }) }); } catch (_) {}
+}
+
 export function SopaLetras(){
   const { user } = useAuth();
   const { agregarMonedas } = useMonedas();
@@ -270,7 +274,7 @@ export function SopaLetras(){
           if(modo==="multi") setPuntosMulti(pm=>({...pm,[playerName]:(pm[playerName]??0)+pts}));
           if(nuevas.length===palabrasJuego.length){
             stopTimer();music.stop();agregarMonedas(puntos);
-            setTimeout(()=>setScreen("resultados"),700);
+            guardarResultado({jugador:playerName||"Anónimo",grado,puntos,correctas:0,incorrectas:0,tiempo_seg:tiempoSeg,modo});setTimeout(()=>setScreen("resultados"),700);
           }
           setSeleccion([]);return;
         }

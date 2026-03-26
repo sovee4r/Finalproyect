@@ -14,6 +14,7 @@ import { useAuth } from "../../AuthContext";
 import { useMonedas } from "../../../hooks/useMonedas";
 import { useSocket } from "../../../lib/useSocket";
 import { GameLobby, GameError, GameRankingFinal, MultiPanel, RankingPanel } from "../GameShared";
+import { MultiRanking } from "../MultiLobby";
 import logoImg from "../../../assets/logo.png";
 
 const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
@@ -148,7 +149,7 @@ function useMusic() {
   return { start, stop, toggleMute, setVolume, playVictory, muted, vol };
 }
 
-async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string }) {
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; user_id?: number }) {
   try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "carrera_cohetes", materia: "matematicas" }) }); } catch (_) {}
 }
 
@@ -180,6 +181,8 @@ const TOTAL_PREGUNTAS = 10;
 const META = 100; // % de progreso necesario para ganar
 
 export function CarreraCohetes() {
+  const { user } = useAuth();
+  const { agregarMonedas, gastarMonedas } = useMonedas();
   const music = useMusic();
   const socket = useSocket();
 
@@ -211,6 +214,7 @@ export function CarreraCohetes() {
   const [cohetePulse, setCohetePulse] = useState(false);
 
   const pauseRef = useRef(false);
+  useEffect(() => { if (user?.nombre) setPlayerName(user.nombre); }, [user]);
   const playerNameRef = useRef(playerName);
   playerNameRef.current = playerName;
 
@@ -233,6 +237,7 @@ export function CarreraCohetes() {
 
   const multiState = socket.state;
   const estaEnLobby = modo === "multi" && multiState.estado === "lobby";
+  const estaEnResultadosMulti = modo === "multi" && multiState.estado === "resultados";
   const hayError = modo === "multi" && multiState.estado === "error";
   const modoRef = useRef(modo); modoRef.current = modo;
   const gradoRef = useRef(grado); gradoRef.current = grado;
@@ -258,6 +263,11 @@ export function CarreraCohetes() {
   const confirmarRespuesta = () => {
     if (seleccionada === null || confirmada) return;
     setConfirmada(true); setMostrarExplicacion(true);
+    const opciones: ("A"|"B"|"C"|"D")[] = ["A","B","C","D"];
+    if (modo === "multi" && multiState.sala) {
+      const esCorrecta = seleccionada === preguntas[idx].correcta;
+    socket.responder(multiState.sala.codigo, esCorrecta ? pregActual.respuesta_correcta ?? opciones[seleccionada] : "X", esCorrecta ? 99 : 0);
+    }
     const esCorrecto = seleccionada === preguntas[idx].correcta;
     if (esCorrecto) {
       const avance = META / TOTAL_PREGUNTAS;
@@ -280,7 +290,7 @@ export function CarreraCohetes() {
       const totalCorrectas = correctas + (seleccionada === preguntas[idx].correcta ? 1 : 0);
       if (totalCorrectas >= Math.ceil(TOTAL_PREGUNTAS * 0.7)) { music.playVictory(); setShowConfetti(true); }
       else { music.stop(); }
-      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo });
+      guardarResultado({ jugador: playerName || "Anónimo", grado, puntos: score, correctas, incorrectas, tiempo_seg: tiempo, modo, user_id: user?.id });
       agregarMonedas(score);
       setScreen("resultados");
     } else {
@@ -427,7 +437,17 @@ export function CarreraCohetes() {
         )}
       </AnimatePresence>
 
-      {/* ─── CONFIG ─── */}
+
+      {/* ─── RANKING FINAL MULTI ─── */}
+      {estaEnResultadosMulti && (
+        <MultiRanking
+          ranking={multiState.rankingFinal} nombrePropio={playerName}
+          onJugarDeNuevo={() => { socket.salirSala(); setModo("solo"); setScreen("config"); }}
+          onSalir={() => { socket.salirSala(); setModo("solo"); setScreen("config"); }}
+        />
+      )}
+
+            {/* ─── CONFIG ─── */}
       {screen === "config" && !estaEnLobby && !hayError && (
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-xl px-4 py-8">
           <div className="flex items-center gap-4 mb-8">
@@ -531,12 +551,28 @@ export function CarreraCohetes() {
               </div>
             </div>
             <div className="flex gap-1.5 flex-shrink-0 ml-2">
-              <button onClick={togglePause} className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ background: "rgba(255,215,0,0.08)", borderColor: "rgba(255,215,0,0.22)", color: "#ffd700" }}>
-                {paused ? <Play size={14} /> : <Pause size={14} />}
-              </button>
-              <button onClick={openSettings} className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ background: "rgba(0,229,255,0.08)", borderColor: "rgba(0,229,255,0.22)", color: "#00e5ff" }}>
-                <Settings size={14} />
-              </button>
+              {modo === "multi" ? (
+                <>
+                  <button onClick={music.toggleMute} className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ background: "rgba(0,229,255,0.08)", borderColor: "rgba(0,229,255,0.22)", color: "#00e5ff" }}>
+                    {music.muted ? <Volume2 size={14} /> : <VolumeX size={14} />}
+                  </button>
+                  <button onClick={() => setShowRanking(r => !r)} className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ background: showRanking ? "rgba(255,215,0,0.2)" : "rgba(255,215,0,0.08)", borderColor: "rgba(255,215,0,0.4)", color: "#ffd700" }}>
+                    <Trophy size={14} />
+                  </button>
+                  <button onClick={() => { socket.salirSala(); music.stop(); setModo("solo"); setScreen("config"); }} className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ background: "rgba(255,71,87,0.08)", borderColor: "rgba(255,71,87,0.3)", color: "#ff4757" }}>
+                    <LogOut size={14} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={togglePause} className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ background: "rgba(255,215,0,0.08)", borderColor: "rgba(255,215,0,0.22)", color: "#ffd700" }}>
+                    {paused ? <Play size={14} /> : <Pause size={14} />}
+                  </button>
+                  <button onClick={openSettings} className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ background: "rgba(0,229,255,0.08)", borderColor: "rgba(0,229,255,0.22)", color: "#00e5ff" }}>
+                    <Settings size={14} />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -755,5 +791,7 @@ export function CarreraCohetes() {
     </div>
   );
 }
+
+
 
 

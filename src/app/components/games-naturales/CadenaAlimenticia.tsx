@@ -1,3 +1,5 @@
+﻿const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
+
 // CadenaAlimenticia.tsx — Ciencias 4to-6to
 // Arrastra los organismos para ordenar la cadena alimenticia correctamente
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -190,6 +192,10 @@ function Recompensas({puntos}:{puntos:number}){
   );
 }
 
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; }) {
+  try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "cadena_alimenticia", materia: "ciencias" }) }); } catch (_) {}
+}
+
 export function CadenaAlimenticia(){
   const { user } = useAuth();
   const { agregarMonedas } = useMonedas();
@@ -242,7 +248,7 @@ export function CadenaAlimenticia(){
   }
   function cargarSiguiente(g:number,idx:number){
     const list=CADENAS[g]??CADENAS[4];
-    if(idx>=list.length){music.stop();agregarMonedas(puntos);setScreen("resultados");return;}
+    if(idx>=list.length){music.stop();agregarMonedas(puntos);guardarResultado({jugador:playerName||"Anónimo",grado,puntos,correctas:completadas,incorrectas:0,tiempo_seg:0,modo});setScreen("resultados");return;}
     const c=list[idx]; setCadenaActual(c); setCadenaIdx(idx);
     setOrdenUsuario(shuffle([...c.cadena]));
     setIntentos(0); setFeedback(null); setMostrarSol(false);
@@ -611,3 +617,5 @@ export function CadenaAlimenticia(){
     </motion.div>
   );
 }
+
+

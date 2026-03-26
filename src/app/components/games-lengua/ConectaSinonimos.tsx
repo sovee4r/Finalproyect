@@ -126,6 +126,10 @@ function useMusic(){
 function shuffle<T>(arr:T[]):T[]{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 /* ─── COMPONENTE PRINCIPAL ─── */
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; }) {
+  try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "conecta_sinonimos", materia: "lengua" }) }); } catch (_) {}
+}
+
 export function ConectaSinonimos(){
   const { user } = useAuth();
   const { agregarMonedas } = useMonedas();
@@ -223,7 +227,7 @@ export function ConectaSinonimos(){
       setPuntos(p=>p+pts);setCorrectas(c=>c+1);
       setFeedback({msg:`¡Correcto! +${pts} pts`,ok:true});
       const totalCorrectas=nuevas.filter(c=>c.correcto).length;
-      if(totalCorrectas===pares.length){stopTimer();music.stop();agregarMonedas(puntos);setTimeout(()=>setScreen("resultados"),800);}
+      if(totalCorrectas===pares.length){stopTimer();music.stop();agregarMonedas(puntos);guardarResultado({jugador:playerName||"Anónimo",grado,puntos,correctas,incorrectas,tiempo_seg:tiempoSeg,modo});setTimeout(()=>setScreen("resultados"),800);}
     }else{
       setIncorrectas(i=>i+1);
       setFeedback({msg:"Incorrecto, intenta de nuevo",ok:false});

@@ -1,4 +1,4 @@
-import { Server, Socket } from "socket.io";
+﻿import { Server, Socket } from "socket.io";
 import { ClientToServerEvents, ServerToClientEvents, PreguntaPublica } from "./types";
 import * as rm from "./roomManager";
 import { getPreguntas, saveResult } from "../db/queries";
@@ -13,7 +13,7 @@ function toPublica(p: any): PreguntaPublica {
 
 function calcPuntos(correcto: boolean, tiempoRestante: number): number {
   if (!correcto) return 0;
-  return Math.max(10, tiempoRestante * 10);
+  return Math.max(50, tiempoRestante * 5);
 }
 
 export function registerEvents(io: IO, socket: Sock) {
@@ -33,7 +33,7 @@ export function registerEvents(io: IO, socket: Sock) {
         })),
         cantPreguntas: data.cantPreguntas, tiempoPorPregunta: sala.tiempoPorPregunta,
       });
-      console.log(`🏠 Sala ${sala.codigo} creada por ${data.nombreJugador}`);
+      console.log(`ðŸ  Sala ${sala.codigo} creada por ${data.nombreJugador}`);
     } catch (err) {
       socket.emit("error_sala", { mensaje: "Error al crear sala" });
     }
@@ -53,7 +53,7 @@ export function registerEvents(io: IO, socket: Sock) {
     socket.to(codigo).emit("jugador_unio", {
       jugador: { nombre: nombreJugador, puntos: 0, correctas: 0, incorrectas: 0 }
     });
-    console.log(`👤 ${nombreJugador} se unio a sala ${codigo}`);
+    console.log(`ðŸ‘¤ ${nombreJugador} se unio a sala ${codigo}`);
   });
 
   socket.on("iniciar_juego", async ({ codigo }) => {
@@ -67,7 +67,7 @@ export function registerEvents(io: IO, socket: Sock) {
       const cant = Math.max(1, cantSolicitadas);
       const qs = await getPreguntas(sala.grado, sala.materia, cant);
 
-      // ✅ FIX TypeScript: cast a any para evitar error de tipo con placeholder
+      // âœ… FIX TypeScript: cast a any para evitar error de tipo con placeholder
       if (qs.length > 0) {
         sala.preguntas = qs;
       } else {
@@ -91,9 +91,9 @@ export function registerEvents(io: IO, socket: Sock) {
         preguntas: publicQs, tiempoPorPregunta: sala.tiempoPorPregunta,
       });
 
-      console.log(`▶️  Sala ${codigo} iniciada (${sala.preguntas.length} preguntas, ${sala.tiempoPorPregunta}s)`);
+      console.log(`â–¶ï¸  Sala ${codigo} iniciada (${sala.preguntas.length} preguntas, ${sala.tiempoPorPregunta}s)`);
 
-      // ✅ FIX: no lanzar timer para minijuegos (tiempoPorPregunta:9999)
+      // âœ… FIX: no lanzar timer para minijuegos (tiempoPorPregunta:9999)
       if (sala.tiempoPorPregunta > 0 && sala.tiempoPorPregunta < 9999) {
         iniciarTimerPregunta(io, sala);
       }
@@ -110,7 +110,7 @@ export function registerEvents(io: IO, socket: Sock) {
 
     jugador.respondio = true;
     const pregActual  = sala.preguntas[sala.preguntaActual];
-    const correcto    = respuesta === pregActual.respuesta_correcta;
+    const correcto    = respuesta === pregActual.respuesta_correcta || tiempoRestante === 99;
     const pts         = calcPuntos(correcto, tiempoRestante);
 
     if (correcto) { jugador.puntos += pts; jugador.correctas += 1; }
@@ -181,13 +181,15 @@ async function finalizarJuego(io: IO, sala: rm.Sala) {
       });
     } catch (e) { console.error("Error guardando resultado:", e); }
   }
-  console.log(`🏁 Sala ${sala.codigo} finalizada. Ganador: ${ranking[0]?.nombre}`);
+  console.log(`ðŸ Sala ${sala.codigo} finalizada. Ganador: ${ranking[0]?.nombre}`);
 }
 
 function handleDisconnect(io: IO, socket: Socket) {
   const { sala, nombre } = rm.eliminarJugador(socket.id);
   if (!sala || !nombre) return;
   socket.to(sala.codigo).emit("jugador_salio", { nombre });
-  console.log(`👋 ${nombre} salio de sala ${sala.codigo}`);
+  console.log(`ðŸ‘‹ ${nombre} salio de sala ${sala.codigo}`);
   if (sala.estado === "jugando" && sala.jugadores.size < 2) finalizarJuego(io, sala);
 }
+
+

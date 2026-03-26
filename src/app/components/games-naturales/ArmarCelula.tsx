@@ -1,3 +1,5 @@
+﻿const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
+
 // ArmarCelula.tsx — Ciencias 4to-6to
 // Identifica si cada organelo pertenece a la célula animal, vegetal o ambas
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -104,6 +106,10 @@ function Recompensas({puntos,color="#228B22"}:{puntos:number;color?:string}){
   );
 }
 
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; }) {
+  try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "armar_celula", materia: "ciencias" }) }); } catch (_) {}
+}
+
 export function ArmarCelula(){
   const { user } = useAuth();
   const { agregarMonedas } = useMonedas();
@@ -159,7 +165,7 @@ export function ArmarCelula(){
     }else{setIncorrectas(i=>i+1);}
     setTimeout(()=>{
       const next=actualIdx+1;
-      if(next>=organelos.length){music.stop();agregarMonedas(puntos);setScreen("resultados");}
+      if(next>=organelos.length){music.stop();agregarMonedas(puntos);guardarResultado({jugador:playerName||"Anónimo",grado,puntos,correctas,incorrectas,tiempo_seg:0,modo});setScreen("resultados");}
       else{setActualIdx(next);setSeleccionada(null);setMostrarFeedback(false);}
     },1800);
   }
@@ -302,3 +308,4 @@ export function ArmarCelula(){
     </motion.div>
   );
 }
+

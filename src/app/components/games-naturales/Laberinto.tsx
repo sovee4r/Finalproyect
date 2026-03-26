@@ -71,6 +71,8 @@ const PREGUNTAS_BANCO: Record<number,Pregunta[]> = {
 
 // ── LABERINTO GENERACIÓN ──
 const COLS=9, ROWS=9;
+
+const API = import.meta.env.VITE_API_URL ?? "https://finalproyect-production-3837.up.railway.app";
 type Walls = {N:boolean;S:boolean;E:boolean;W:boolean};
 type Maze  = Walls[][];
 
@@ -136,6 +138,10 @@ function SplashScreen({pct,done}:{pct:number;done:boolean}){
   );
 }
 
+async function guardarResultado(data: { jugador: string; grado: number; puntos: number; correctas: number; incorrectas: number; tiempo_seg: number; modo: string; }) {
+  try { await fetch(`${API}/api/resultados_juegos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, juego: "laberinto", materia: "ciencias" }) }); } catch (_) {}
+}
+
 export function Laberinto(){
   const { user } = useAuth();
   const { agregarMonedas } = useMonedas();
@@ -183,7 +189,7 @@ export function Laberinto(){
   },[screen]);
   useEffect(()=>{if(modoRef.current==="multi"&&multiState.estado==="jugando"&&screen!=="juego"&&nameRef.current.trim())iniciarJuego(gradoRef.current);},[multiState.estado]); // eslint-disable-line
   useEffect(()=>{if(screen==="juego"){timerRef.current=setInterval(()=>setTiempoSeg(t=>t+1),1000);}return()=>{if(timerRef.current)clearInterval(timerRef.current);};},[screen]);
-  useEffect(()=>{if(llegó&&screen==="juego"){if(timerRef.current)clearInterval(timerRef.current);setTimeout(()=>{music.stop();agregarMonedas(puntos);setScreen("resultados");},600);};},[llegó]); // eslint-disable-line
+  useEffect(()=>{if(llegó&&screen==="juego"){if(timerRef.current)clearInterval(timerRef.current);guardarResultado({jugador:playerName||"Anónimo",grado,puntos,correctas,incorrectas,tiempo_seg:tiempoSeg,modo});setTimeout(()=>{music.stop();agregarMonedas(puntos);setScreen("resultados");},600);};},[llegó]); // eslint-disable-line
 
   // Teclado
   useEffect(()=>{
